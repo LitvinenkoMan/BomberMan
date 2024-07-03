@@ -1,14 +1,16 @@
 using System;
+using ScriptableObjects;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 namespace MonoBehaviours
 {
     [RequireComponent(typeof(CharacterController))]
     public class PlayerMovement : MonoBehaviour
     {
-        [SerializeField]
-        private float PlayerMovementMultiplier = 1;
+        [SerializeField, Tooltip("Used to take main player values (speed, amount of bombs, health and ex.)")]
+        private BasePlayerParameters PlayerParameters;
 
         private CharacterController _controller;
         
@@ -36,7 +38,8 @@ namespace MonoBehaviours
             }
             
             _controls.PlayerMainActionMaps.Enable();
-
+            PlayerParameters.ResetValues();
+            
             MoveAction = _controls.PlayerMainActionMaps.Move;
             PlaceBombAction = _controls.PlayerMainActionMaps.PlaceBomb;
         }
@@ -57,7 +60,7 @@ namespace MonoBehaviours
 
         public void OnMove(Vector2 inputValue)
         {
-            _controller.Move(new Vector3(inputValue.x, 0, inputValue.y) * (PlayerMovementMultiplier * Time.deltaTime));
+            _controller.Move(new Vector3(inputValue.x, 0, inputValue.y) * (PlayerParameters.SpeedMultiplier * Time.deltaTime));
         }
 
         public void OnPlaceBomb(int inputValue)
