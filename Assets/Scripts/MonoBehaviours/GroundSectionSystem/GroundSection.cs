@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel;
 using MonoBehaviours.GroundSectionSystem;
 using UnityEngine;
 
@@ -7,7 +6,6 @@ namespace MonoBehaviours.GroundSectionSystem
 {
     public class GroundSection : MonoBehaviour
     {
-        
         public Vector3 ObstaclePlacementPosition { get; private set; }
         public Obstacle PlacedObstacle { get; private set; }
         public SectionPathways ConnectedSections;
@@ -24,7 +22,8 @@ namespace MonoBehaviours.GroundSectionSystem
         /// <returns></returns>
         public bool AddObstacle(Obstacle newObstacle)
         {
-            if (PlacedObstacle) return false;
+            if (PlacedObstacle) return false;  // Decided to do this way, because I want to prevent adding a new Obstacle to section with already existing one
+            if (!newObstacle) return false;
             PlacedObstacle = newObstacle;
             PlacedObstacle.transform.position = ObstaclePlacementPosition;
             return true;
@@ -34,7 +33,19 @@ namespace MonoBehaviours.GroundSectionSystem
         {
             transform.position = position;
             ObstaclePlacementPosition = transform.position + new Vector3(0, 0.5f, 0);
-            PlacedObstacle.SetNewPosition(ObstaclePlacementPosition);
+            
+            if (PlacedObstacle) PlacedObstacle.SetNewPosition(ObstaclePlacementPosition);
+        }
+
+        /// <summary>
+        /// Removes obstacle if there was one.
+        /// </summary>
+        /// <returns>Last placed obstacle</returns>
+        public Obstacle RemoveObstacle()
+        {
+            var lastObstacle = PlacedObstacle;
+            PlacedObstacle = null;
+            return lastObstacle;
         }
     }
 }

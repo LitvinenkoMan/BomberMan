@@ -55,13 +55,13 @@ namespace Editor
             GUILayout.Label("\nObstacle settings", EditorStyles.boldLabel);
             
             ObstaclePrefab =
-                EditorGUILayout.ObjectField("Obstacle to add", SectionPrefab, typeof(GameObject), false) as
+                EditorGUILayout.ObjectField("Obstacle to add", ObstaclePrefab, typeof(GameObject), false) as
                     GameObject;
             
             
             if (GUILayout.Button("Add obstacles to Selected sections"))
             {
-                // Add obstacles
+                AddObstacle();
             }
         }
 
@@ -77,10 +77,14 @@ namespace Editor
             {
                 for (int j = 0; j < LevelHeight; j++)
                 {
-                    GameObject newSection = Instantiate(SectionPrefab, new Vector3(i, 0, j),
+                    GameObject newSection = Instantiate(SectionPrefab, Vector3.zero, 
                         SectionPrefab.transform.rotation, LevelDataHolder.transform);
+                    newSection.name += "_" + SectionID; 
+                    GroundSection instancedSection = newSection.GetComponent<GroundSection>();
+                    instancedSection.SetNewSectionPosition(new Vector3(i, 0, j));
 
-                    groundSections[i][j] = newSection.GetComponent<GroundSection>();
+                    groundSections[i][j] = instancedSection;
+                    SectionID++;
                 }
             }
             
@@ -92,6 +96,26 @@ namespace Editor
                     if (j - 1 >= 0) groundSections[i][j].ConnectedSections.lowerSection = groundSections[i][j - 1];
                     if (i + 1 < LevelWidth)groundSections[i][j].ConnectedSections.rightSection = groundSections[i + 1][j];
                     if (i - 1 >= 0)groundSections[i][j].ConnectedSections.leftSection = groundSections[i - 1][j];
+                }
+            }
+        }
+
+        private void AddObstacle()
+        {
+            if (!ObstaclePrefab)
+            {
+                Debug.LogError("Could not add obstacle to Section, because Obstacle prefab is not set");
+            }
+            foreach (var gameObject in Selection.gameObjects)
+            {
+                GroundSection section;
+                gameObject.TryGetComponent(out section);
+                if (section && !section.PlacedObstacle)
+                {
+                    Obstacle obstacle = Instantiate(ObstaclePrefab).GetComponent<Obstacle>();
+                    obstacle.transform.SetParent(section.transform);
+                    section.SetNewSectionPosition(section.transform.position);
+                    section.AddObstacle(obstacle);
                 }
             }
         }
