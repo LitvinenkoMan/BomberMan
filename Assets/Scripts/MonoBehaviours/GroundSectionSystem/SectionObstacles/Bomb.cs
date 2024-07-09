@@ -1,9 +1,7 @@
 using System;
 using System.Collections;
-using System.Net;
 using Interfaces;
 using ScriptableObjects;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
@@ -11,11 +9,12 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
     public class Bomb : Obstacle, IBomb
     {
         public bool IgniteOnStart;
+        public Action<Bomb> onExplode;
         
         [SerializeField]
         private BasePlayerParameters PlayerParams;
         [SerializeField]
-        private GameObject BombVisuals; 
+        private GameObject BombVisuals;
 
         //private float _explosionSpeed = 1;
         private float _timer;
@@ -49,7 +48,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         public void PlaceBomb(Vector3 newPos)
         {
-            
+            transform.position = newPos;
         }
 
         public void Ignite()
@@ -68,47 +67,33 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             ExplodeToDown(startSection, PlayerParams.BombsSpreading);
             ExplodeToRight(startSection, PlayerParams.BombsSpreading);
             ExplodeToLeft(startSection, PlayerParams.BombsSpreading);
-            //
-            // for (int i = 1; i <= PlayerParams.BombsSpreading; i++)
-            // {
-            //     var adjustedPosition = new Vector3(0, 0, i);
-            //     adjustedPosition += transform.position;
-            //
-            //     GroundSection nearSection = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(adjustedPosition);
-            //     if (nearSection.PlacedObstacle) break;
-            //     
-            //     GameObject expl = GroundSectionsUtils.Instance.ExplosionsPool.GetFromPool(true);
-            //     expl.transform.position = nearSection.ObstaclePlacementPosition;
-            //     
-            //     StartCoroutine(ReturnExplosionToPool(expl));
-            // }
-
-            _isTimerOn = false;      
+            
+            _isTimerOn = false;
+            onExplode.Invoke(this);
         }
 
         public void Reset()
         {
             _timer = PlayerParams.BombsCountdown;
+            _isTimerOn = false;
             BombVisuals.SetActive(true);
-        }
-
-        private IEnumerator ReturnExplosionToPool(GameObject expl)
-        {
-            yield return new WaitForSeconds(2);
-            GroundSectionsUtils.Instance.ExplosionsPool.AddToPool(expl);
         }
 
         private void ExplodeToUp(GroundSection currentSection, int depth)
         {
-            if (depth <= 0 || currentSection.PlacedObstacle)
+            if (depth <= 0 )
             {
                 return;
             }
+
             depth -= 1;
             
             PlaceExplosionEffect(currentSection);
             
-            ExplodeToUp(currentSection.ConnectedSections.upperSection, depth);
+            if (currentSection.ConnectedSections.upperSection != null && currentSection.ConnectedSections.upperSection.PlacedObstacle == null)
+            {
+                ExplodeToUp(currentSection.ConnectedSections.upperSection, depth);
+            }
         }
 
         private void ExplodeToDown(GroundSection currentSection, int depth)
@@ -120,8 +105,11 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             depth -= 1;
             
             PlaceExplosionEffect(currentSection);
-            
-            ExplodeToDown(currentSection.ConnectedSections.lowerSection, depth);
+
+            if (currentSection.ConnectedSections.lowerSection)
+            {
+                ExplodeToDown(currentSection.ConnectedSections.lowerSection, depth);
+            }
         }
 
         private void ExplodeToRight(GroundSection currentSection, int depth)
@@ -133,8 +121,12 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             depth -= 1;
             
             PlaceExplosionEffect(currentSection);
-            
-            ExplodeToRight(currentSection.ConnectedSections.rightSection, depth);
+
+
+            if (currentSection.ConnectedSections.rightSection.PlacedObstacle == null)
+            {
+                ExplodeToRight(currentSection.ConnectedSections.rightSection, depth);
+            }
         }
 
         private void ExplodeToLeft(GroundSection currentSection, int depth)
@@ -146,8 +138,10 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             depth -= 1;
             
             PlaceExplosionEffect(currentSection);
-            
-            ExplodeToLeft(currentSection.ConnectedSections.leftSection, depth);
+            if (currentSection.ConnectedSections.leftSection.PlacedObstacle == null)
+            {
+                ExplodeToLeft(currentSection.ConnectedSections.leftSection, depth);
+            }
         }
 
         private void PlaceExplosionEffect(GroundSection currentSection)
@@ -157,25 +151,10 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             StartCoroutine(ReturnExplosionToPool(expl));
         }
 
-
-        // Explosion Mechanic
-        // private IEnumerator ExplodeToUpDirectionWithDepth(GroundSection startSection, byte Depth)
-        // {
-        //     var explodeToUpDirectionWithDepth = ExplodeToUpDirectionWithDepth(startSection.ConnectedSections.upperSection, Depth);
-        //     
-        //     if (Depth <= 0) yield break;
-        //     
-        //     GameObject ExplosionVFX = GroundSectionsUtils.Instance.ExplosionsPool.GetFromPool();
-        //     ExplosionVFX.transform.position = startSection.ObstaclePlacementPosition;
-        //     yield return new WaitForSeconds((PlayerParams.BombsSpreading - Depth) / _explosionSpeed);
-        //     
-        //     Depth--;
-        //     StartCoroutine(explodeToUpDirectionWithDepth);
-        //
-        //     yield return new WaitForSeconds(2);
-        //     GroundSectionsUtils.Instance.ExplosionsPool.AddToPool(ExplosionVFX);
-        //     StopCoroutine(explodeToUpDirectionWithDepth);
-        //     yield break;
-        // }
+        private IEnumerator ReturnExplosionToPool(GameObject expl)
+        {
+            yield return new WaitForSeconds(2);
+            GroundSectionsUtils.Instance.ExplosionsPool.AddToPool(expl);
+        }
     }
 }

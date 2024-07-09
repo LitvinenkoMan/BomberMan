@@ -19,7 +19,6 @@ namespace MonoBehaviours
         
         // InputActions 
         private InputAction MoveAction;
-        private InputAction PlaceBombAction;
         
         
         
@@ -41,7 +40,6 @@ namespace MonoBehaviours
             PlayerParameters.ResetValues();
             
             MoveAction = _controls.PlayerMainActionMaps.Move;
-            PlaceBombAction = _controls.PlayerMainActionMaps.PlaceBomb;
         }
         
         void Update()
@@ -50,11 +48,6 @@ namespace MonoBehaviours
             if (MoveAction.IsInProgress())
             {
                 OnMove(MoveAction.ReadValue<Vector2>());
-            }
-
-            if (PlaceBombAction.WasCompletedThisFrame())
-            {
-                OnPlaceBomb(PlaceBombAction.ReadValue<int>());
             }
         }
 

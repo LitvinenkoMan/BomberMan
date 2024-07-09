@@ -41,8 +41,9 @@ namespace MonoBehaviours
 
         public void AddToPool(GameObject newMember)
         {
-            newMember.SetActive(false);
             _pool.Enqueue(newMember);
+            newMember.transform.SetParent(transform);
+            newMember.SetActive(false);
         }
         
         private GameObject InstantiateNewMember(bool activeFromStart)

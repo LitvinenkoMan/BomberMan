@@ -11,7 +11,6 @@ namespace Editor
         
         // Sections
         public GameObject LevelDataHolder;
-        public GroundSection CurrentSelectedSection;
         public GameObject SectionPrefab;
         private int SectionID = 0;
         public byte LevelWidth = 16;
@@ -35,10 +34,6 @@ namespace Editor
                 EditorGUILayout.ObjectField("Map Holder", LevelDataHolder, typeof(GameObject),
                         true)
                     as GameObject;
-            CurrentSelectedSection =
-                EditorGUILayout.ObjectField("Current selected Section", CurrentSelectedSection, typeof(GroundSection),
-                        true)
-                    as GroundSection;
             SectionPrefab =
                 EditorGUILayout.ObjectField("Prefab to clone", SectionPrefab, typeof(GameObject), false) as
                     GameObject;
@@ -63,6 +58,35 @@ namespace Editor
             {
                 AddObstacle();
             }
+            if (GUILayout.Button("Fix Obstacle"))
+            {
+                SetLostObstacleToNearestSection();
+            }
+        }
+
+        private void SetLostObstacleToNearestSection()
+        {
+            var mapData = LevelDataHolder.GetComponent<LevelSectionsDataHolder>();
+            foreach (var gameObject in Selection.gameObjects)
+            {
+                Obstacle obstacle;
+                gameObject.TryGetComponent(out obstacle);
+                if (obstacle)
+                {
+                    var obstaclePos = obstacle.transform.position;
+                    GroundSection nearestSection = null;
+                    float distance = 99999999;
+                    foreach (var section in mapData.sections)
+                    {
+                        if (Vector3.Distance(obstaclePos, section.transform.position) < distance)
+                        {
+                            distance = Vector3.Distance(obstaclePos, section.transform.position);
+                            nearestSection = section;
+                        }
+                    }
+                    nearestSection.AddObstacle(obstacle);
+                }
+            }
         }
 
         private void CreateMap()
@@ -85,7 +109,7 @@ namespace Editor
 
                     groundSections[i][j] = instancedSection;
                     SectionID++;
-                }
+                }   
             }
             
             for (int i = 0; i < LevelWidth; i++)
@@ -105,7 +129,9 @@ namespace Editor
             if (!ObstaclePrefab)
             {
                 Debug.LogError("Could not add obstacle to Section, because Obstacle prefab is not set");
+                return;
             }
+            
             foreach (var gameObject in Selection.gameObjects)
             {
                 GroundSection section;

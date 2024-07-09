@@ -1,5 +1,6 @@
 using System;
 using MonoBehaviours.GroundSectionSystem;
+using Unity.Collections;
 using UnityEngine;
 
 namespace MonoBehaviours.GroundSectionSystem
@@ -7,7 +8,8 @@ namespace MonoBehaviours.GroundSectionSystem
     public class GroundSection : MonoBehaviour
     {
         public Vector3 ObstaclePlacementPosition { get; private set; }
-        public Obstacle PlacedObstacle { get; private set; }
+        [ReadOnly]
+        public Obstacle PlacedObstacle;
         public SectionPathways ConnectedSections;
 
         private void Start()
@@ -20,13 +22,10 @@ namespace MonoBehaviours.GroundSectionSystem
         /// </summary>
         /// <param name="newObstacle">Any object inherited from obstacle</param>
         /// <returns></returns>
-        public bool AddObstacle(Obstacle newObstacle)
+        public void AddObstacle(Obstacle newObstacle)
         {
-            if (PlacedObstacle) return false;  // Decided to do this way, because I want to prevent adding a new Obstacle to section with already existing one
-            if (!newObstacle) return false;
             PlacedObstacle = newObstacle;
             PlacedObstacle.transform.position = ObstaclePlacementPosition;
-            return true;
         }
 
         public void SetNewSectionPosition(Vector3 position)
