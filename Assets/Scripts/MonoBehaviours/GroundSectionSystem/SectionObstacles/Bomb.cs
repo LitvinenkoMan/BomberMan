@@ -22,16 +22,22 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         
         private void OnEnable()
         {
+            HealthPoints = 1;
+            CanPlayerStepOnIt = false;
+            CanReceiveDamage = true;
+            
             _timer = PlayerParams.BombsCountdown;
             if (IgniteOnStart)
             {
                 Ignite();
             }
+
+            OnHealthChanged += OnHealthRunOutExplode;
         }
 
         private void OnDisable()
         {
-            
+            OnHealthChanged -=OnHealthRunOutExplode;
         }
 
         private void Update()
@@ -89,10 +95,16 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             depth -= 1;
             
             PlaceExplosionEffect(currentSection);
-            
-            if (currentSection.ConnectedSections.upperSection != null && currentSection.ConnectedSections.upperSection.PlacedObstacle == null)
+            if (currentSection.ConnectedSections.upperSection != null)
             {
-                ExplodeToUp(currentSection.ConnectedSections.upperSection, depth);
+                if (currentSection.ConnectedSections.upperSection.PlacedObstacle == null)
+                {
+                    ExplodeToUp(currentSection.ConnectedSections.upperSection, depth);
+                }
+                else
+                {
+                    DamageObstacle(currentSection.ConnectedSections.upperSection.PlacedObstacle);
+                }
             }
         }
 
@@ -106,9 +118,16 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             
             PlaceExplosionEffect(currentSection);
 
-            if (currentSection.ConnectedSections.lowerSection)
+            if (currentSection.ConnectedSections.lowerSection != null)
             {
-                ExplodeToDown(currentSection.ConnectedSections.lowerSection, depth);
+                if (currentSection.ConnectedSections.lowerSection.PlacedObstacle == null)
+                {
+                    ExplodeToDown(currentSection.ConnectedSections.lowerSection, depth);
+                }
+                else
+                {
+                    DamageObstacle(currentSection.ConnectedSections.lowerSection.PlacedObstacle);
+                }
             }
         }
 
@@ -122,10 +141,16 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             
             PlaceExplosionEffect(currentSection);
 
-
-            if (currentSection.ConnectedSections.rightSection.PlacedObstacle == null)
+            if (currentSection.ConnectedSections.rightSection != null)
             {
-                ExplodeToRight(currentSection.ConnectedSections.rightSection, depth);
+                if (currentSection.ConnectedSections.rightSection.PlacedObstacle == null)
+                {
+                    ExplodeToRight(currentSection.ConnectedSections.rightSection, depth);
+                }
+                else
+                {
+                    DamageObstacle(currentSection.ConnectedSections.rightSection.PlacedObstacle);
+                }
             }
         }
 
@@ -138,9 +163,17 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             depth -= 1;
             
             PlaceExplosionEffect(currentSection);
-            if (currentSection.ConnectedSections.leftSection.PlacedObstacle == null)
+            
+            if (currentSection.ConnectedSections.leftSection != null)
             {
-                ExplodeToLeft(currentSection.ConnectedSections.leftSection, depth);
+                if (currentSection.ConnectedSections.leftSection.PlacedObstacle == null)
+                {
+                    ExplodeToLeft(currentSection.ConnectedSections.leftSection, depth);
+                }
+                else
+                {
+                    DamageObstacle(currentSection.ConnectedSections.leftSection.PlacedObstacle);
+                }
             }
         }
 
@@ -149,6 +182,22 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             GameObject expl = GroundSectionsUtils.Instance.ExplosionsPool.GetFromPool(true);
             expl.transform.position = currentSection.ObstaclePlacementPosition;
             StartCoroutine(ReturnExplosionToPool(expl));
+        }
+
+        private void DamageObstacle(Obstacle obstacle)
+        {
+            if (obstacle.CanReceiveDamage)
+            {
+                obstacle.SetHealthPoints((byte)(obstacle.HealthPoints - 1));
+            }
+        }
+
+        private void OnHealthRunOutExplode(byte healthLeft)
+        {
+            if (healthLeft <= 0)
+            {
+                Explode();
+            }
         }
 
         private IEnumerator ReturnExplosionToPool(GameObject expl)

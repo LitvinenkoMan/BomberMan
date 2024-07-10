@@ -22,7 +22,7 @@ namespace MonoBehaviours
             {
                 for (int i = 0; i < StartingCount; i++)
                 {
-                    InstantiateNewMember(false);
+                    AddToPool(InstantiateNewMember(false));
                 }
             }
         }

@@ -24,10 +24,6 @@ namespace MonoBehaviours.GroundSectionSystem
             } 
         }
 
-        void Start()
-        {
-        }
-
         public GroundSection GetNearestSectionFromPosition(Vector3 searchPosition)
         {
             GroundSection nearestSection = null;

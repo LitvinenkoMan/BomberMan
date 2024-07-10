@@ -61,6 +61,7 @@ namespace MonoBehaviours
                 bomb.PlaceBomb(section.ObstaclePlacementPosition);
                 bomb.transform.SetParent(null);
                 bomb.onExplode += SubtractAmountOfCurrentBombs;
+                section.AddObstacle(bomb);
                 currentPlacedBombs++;
             }
         }
@@ -70,14 +71,13 @@ namespace MonoBehaviours
             currentPlacedBombs--;
             explodedBomb.onExplode -= SubtractAmountOfCurrentBombs;
             StartCoroutine(ReturnBombBackToPool(explodedBomb));
-
         }
 
         private IEnumerator ReturnBombBackToPool(Bomb bomb)
         {
-            yield return new WaitForSeconds(2.1f);
-            BombsPool.AddToPool(bomb.gameObject);
-            bomb.Reset();
+            yield return new WaitForSeconds(2.1f);  // I pushing bombs to return explosion effects back to ObjectPool, since I do that,
+            BombsPool.AddToPool(bomb.gameObject);   // I need to wait until coroutine will return them back, and after that I will return bomb,
+            bomb.Reset();                           // because coroutines won't work if Object is Disabled
         }
     }
 }
