@@ -25,7 +25,6 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         private void Awake()
         {
-
             BombCollider = GetComponent<SphereCollider>();
         }
 
@@ -103,7 +102,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             _isTimerOn = false;
             _isExploded = true;
             BombCollider.isTrigger = true;
-            onExplode.Invoke(this);
+            onExplode?.Invoke(this);
         }
 
         private void ExplodeToDirection(GroundSection currentSection, int depth, SpreadDirections direction)

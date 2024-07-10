@@ -16,19 +16,19 @@ namespace MonoBehaviours.GroundSectionSystem
         public void SetHealthPoints(byte newHealth)
         {
             HealthPoints = newHealth;
-            OnHealthChanged.Invoke(HealthPoints);
+            OnHealthChanged?.Invoke(HealthPoints);
         }
 
         public void SetAbilityToStepOnIt(bool state)
         {
             CanPlayerStepOnIt = state;
-            OnAbilityToStepOnObstacleChanged.Invoke(CanPlayerStepOnIt);
+            OnAbilityToStepOnObstacleChanged?.Invoke(CanPlayerStepOnIt);
         }
 
         public void SetAbilityToReceiveDamage(bool state)
         {
             CanReceiveDamage = state;
-            OnAbilityToReciveDamageChanged.Invoke(CanReceiveDamage);
+            OnAbilityToReciveDamageChanged?.Invoke(CanReceiveDamage);
         }
 
         public virtual void SetNewPosition(Vector3 position)
