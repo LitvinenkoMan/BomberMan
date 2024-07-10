@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 {
+    [RequireComponent(typeof(SphereCollider))]
     public class Bomb : Obstacle, IBomb
     {
         public bool IgniteOnStart;
@@ -15,17 +16,24 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         private BasePlayerParameters PlayerParams;
         [SerializeField]
         private GameObject BombVisuals;
-
+        
+        private Collider BombCollider;
         //private float _explosionSpeed = 1;
         private float _timer;
         private bool _isTimerOn;
-        
-        private void OnEnable()
+        private bool _isExploded;
+
+        private void Awake()
         {
             HealthPoints = 1;
             CanPlayerStepOnIt = false;
             CanReceiveDamage = true;
-            
+
+            BombCollider = GetComponent<SphereCollider>();
+        }
+
+        private void OnEnable()
+        {
             _timer = PlayerParams.BombsCountdown;
             if (IgniteOnStart)
             {
@@ -37,7 +45,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         private void OnDisable()
         {
-            OnHealthChanged -=OnHealthRunOutExplode;
+            OnHealthChanged -= OnHealthRunOutExplode;
         }
 
         private void Update()
@@ -50,6 +58,23 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
                     Explode();
                 }
             }
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            if (!_isExploded)
+            {
+                BombCollider.isTrigger = false;
+            }
+        }
+
+        public void Reset()
+        {
+            _timer = PlayerParams.BombsCountdown;
+            _isTimerOn = false;
+            _isExploded = false;
+            BombCollider.isTrigger = true;
+            BombVisuals.SetActive(true);
         }
 
         public void PlaceBomb(Vector3 newPos)
@@ -75,14 +100,9 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             ExplodeToLeft(startSection, PlayerParams.BombsSpreading);
             
             _isTimerOn = false;
+            _isExploded = true;
+            BombCollider.isTrigger = true;
             onExplode.Invoke(this);
-        }
-
-        public void Reset()
-        {
-            _timer = PlayerParams.BombsCountdown;
-            _isTimerOn = false;
-            BombVisuals.SetActive(true);
         }
 
         private void ExplodeToUp(GroundSection currentSection, int depth)
