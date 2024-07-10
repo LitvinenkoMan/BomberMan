@@ -94,10 +94,10 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             GroundSection startSection = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
             startSection.RemoveObstacle();
             
-            ExplodeToUp(startSection, PlayerParams.BombsSpreading);
-            ExplodeToDown(startSection, PlayerParams.BombsSpreading);
-            ExplodeToRight(startSection, PlayerParams.BombsSpreading);
-            ExplodeToLeft(startSection, PlayerParams.BombsSpreading);
+            ExplodeToDirection(startSection, PlayerParams.BombsSpreading, SpreadDirections.Up);
+            ExplodeToDirection(startSection, PlayerParams.BombsSpreading, SpreadDirections.Down);
+            ExplodeToDirection(startSection, PlayerParams.BombsSpreading, SpreadDirections.Right);
+            ExplodeToDirection(startSection, PlayerParams.BombsSpreading, SpreadDirections.Left);
             
             _isTimerOn = false;
             _isExploded = true;
@@ -105,95 +105,49 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             onExplode.Invoke(this);
         }
 
-        private void ExplodeToUp(GroundSection currentSection, int depth)
+        private void ExplodeToDirection(GroundSection currentSection, int depth, SpreadDirections direction)
         {
+            if (currentSection.PlacedObstacle)
+            {
+                DamageObstacle(currentSection.PlacedObstacle);
+                return;
+            }
+
+            PlaceExplosionEffect(currentSection);
+            
+            // if (Player)
+            // {
+            //     -HealthPoints;
+            // }
+            
+            
             if (depth <= 0 )
             {
                 return;
             }
-
             depth -= 1;
             
-            PlaceExplosionEffect(currentSection);
-            if (currentSection.ConnectedSections.upperSection != null)
+            switch (direction)
             {
-                if (currentSection.ConnectedSections.upperSection.PlacedObstacle == null)
-                {
-                    ExplodeToUp(currentSection.ConnectedSections.upperSection, depth);
-                }
-                else
-                {
-                    DamageObstacle(currentSection.ConnectedSections.upperSection.PlacedObstacle);
-                }
-            }
-        }
-
-        private void ExplodeToDown(GroundSection currentSection, int depth)
-        {
-            if (depth <= 0 || currentSection.PlacedObstacle)
-            {
-                return;
-            }
-            depth -= 1;
-            
-            PlaceExplosionEffect(currentSection);
-
-            if (currentSection.ConnectedSections.lowerSection != null)
-            {
-                if (currentSection.ConnectedSections.lowerSection.PlacedObstacle == null)
-                {
-                    ExplodeToDown(currentSection.ConnectedSections.lowerSection, depth);
-                }
-                else
-                {
-                    DamageObstacle(currentSection.ConnectedSections.lowerSection.PlacedObstacle);
-                }
-            }
-        }
-
-        private void ExplodeToRight(GroundSection currentSection, int depth)
-        {
-            if (depth <= 0 || currentSection.PlacedObstacle)
-            {
-                return;
-            }
-            depth -= 1;
-            
-            PlaceExplosionEffect(currentSection);
-
-            if (currentSection.ConnectedSections.rightSection != null)
-            {
-                if (currentSection.ConnectedSections.rightSection.PlacedObstacle == null)
-                {
-                    ExplodeToRight(currentSection.ConnectedSections.rightSection, depth);
-                }
-                else
-                {
-                    DamageObstacle(currentSection.ConnectedSections.rightSection.PlacedObstacle);
-                }
-            }
-        }
-
-        private void ExplodeToLeft(GroundSection currentSection, int depth)
-        {
-            if (depth <= 0 || currentSection.PlacedObstacle)
-            {
-                return;
-            }
-            depth -= 1;
-            
-            PlaceExplosionEffect(currentSection);
-            
-            if (currentSection.ConnectedSections.leftSection != null)
-            {
-                if (currentSection.ConnectedSections.leftSection.PlacedObstacle == null)
-                {
-                    ExplodeToLeft(currentSection.ConnectedSections.leftSection, depth);
-                }
-                else
-                {
-                    DamageObstacle(currentSection.ConnectedSections.leftSection.PlacedObstacle);
-                }
+                case SpreadDirections.Up:
+                    if (currentSection.ConnectedSections.upperSection)
+                        ExplodeToDirection(currentSection.ConnectedSections.upperSection, depth, SpreadDirections.Up);
+                    break;
+                case SpreadDirections.Down:
+                    if (currentSection.ConnectedSections.lowerSection)
+                        ExplodeToDirection(currentSection.ConnectedSections.lowerSection, depth, SpreadDirections.Down);
+                    break;
+                case SpreadDirections.Right:
+                    if (currentSection.ConnectedSections.rightSection)
+                        ExplodeToDirection(currentSection.ConnectedSections.rightSection, depth,
+                            SpreadDirections.Right);
+                    break;
+                case SpreadDirections.Left:
+                    if (currentSection.ConnectedSections.leftSection)
+                        ExplodeToDirection(currentSection.ConnectedSections.leftSection, depth, SpreadDirections.Left);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
             }
         }
 
@@ -227,3 +181,11 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         }
     }
 }
+
+enum SpreadDirections
+{
+    Up,
+    Down,
+    Right,
+    Left
+} 
