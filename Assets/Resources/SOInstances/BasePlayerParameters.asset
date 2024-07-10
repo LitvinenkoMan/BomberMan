@@ -15,5 +15,5 @@ MonoBehaviour:
   _startPlayerHealth: 3
   _startSpeedMultiplier: 5
   _startBombsAtTime: 1
-  _startBombsSpreading: 5
+  _startBombsSpreading: 1
   _startBombsCountdown: 3

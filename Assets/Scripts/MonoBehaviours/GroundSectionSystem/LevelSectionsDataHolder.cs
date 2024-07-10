@@ -5,6 +5,7 @@ namespace MonoBehaviours.GroundSectionSystem
 {
     public class LevelSectionsDataHolder : MonoBehaviour
     {
+        
         public List<GroundSection> sections;
 
         private void OnEnable()

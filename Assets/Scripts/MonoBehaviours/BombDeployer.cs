@@ -55,7 +55,7 @@ namespace MonoBehaviours
         private void DeployBomb(InputAction.CallbackContext context)
         {
             var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
-            if (section && !section.PlacedObstacle && currentPlacedBombs <= PlayerParams.BombsAtTime)
+            if (section && !section.PlacedObstacle && currentPlacedBombs < PlayerParams.BombsAtTime)
             {
                 var bomb = BombsPool.GetFromPool(true).GetComponent<Bomb>();
                 bomb.PlaceBomb(section.ObstaclePlacementPosition);

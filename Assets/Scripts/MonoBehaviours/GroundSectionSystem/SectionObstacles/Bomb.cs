@@ -25,15 +25,16 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         private void Awake()
         {
-            HealthPoints = 1;
-            CanPlayerStepOnIt = false;
-            CanReceiveDamage = true;
 
             BombCollider = GetComponent<SphereCollider>();
         }
 
         private void OnEnable()
         {
+            HealthPoints = 1;
+            CanPlayerStepOnIt = false;
+            CanReceiveDamage = true;
+            
             _timer = PlayerParams.BombsCountdown;
             if (IgniteOnStart)
             {
