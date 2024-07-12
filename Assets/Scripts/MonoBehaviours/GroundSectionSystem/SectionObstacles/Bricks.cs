@@ -3,26 +3,25 @@ using UnityEngine;
 
 namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 {
+    [RequireComponent(typeof(Collider))]
     public class Bricks : Obstacle
     {
         [SerializeField] private GameObject Visuals;
 
-        private Collider collider;
+        private Collider _collider;
         
         private void OnEnable()
         {
-            HealthPoints = 1;
-            CanPlayerStepOnIt = false;
             CanReceiveDamage = true;
 
-            collider = GetComponent<Collider>();
+            _collider = GetComponent<Collider>();
 
-            OnHealthChanged += BreakBricks;
+            ObstacleHealthComponent.OnHealthChanged += BreakBricks;
         }
 
         private void OnDisable()
         {
-            OnHealthChanged -= BreakBricks;
+            ObstacleHealthComponent.OnHealthChanged -= BreakBricks;
         }
 
         void Start()
@@ -38,8 +37,8 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         private void Reset()
         {
             Visuals.SetActive(true);
-            collider.isTrigger = false;
-            HealthPoints = 1;
+            _collider.isTrigger = false;
+            ObstacleHealthComponent.SetHealth(1);
         }
 
         private void BreakBricks(byte health)
@@ -48,7 +47,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             {
                 GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position).RemoveObstacle();
                 Visuals.SetActive(false);
-                collider.isTrigger = true;
+                _collider.isTrigger = true;
             }
         }
     }

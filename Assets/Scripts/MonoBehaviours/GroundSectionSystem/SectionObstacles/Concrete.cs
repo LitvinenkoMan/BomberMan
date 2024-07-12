@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace MonoBehaviours.GroundSectionSystem
 {
@@ -6,9 +7,8 @@ namespace MonoBehaviours.GroundSectionSystem
     {
         private void Start()
         {
-            HealthPoints = 255;
+            ObstacleHealthComponent.SetHealth(255);
             CanReceiveDamage = false;
-            CanPlayerStepOnIt = false;
         }
     }
 }

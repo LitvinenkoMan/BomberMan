@@ -3,7 +3,7 @@ using UnityEngine;
 namespace ScriptableObjects
 {
     [CreateAssetMenu]
-    public class BasePlayerParameters : ScriptableObject
+    public class BasePlayerParameters : ActorBaseParams
     {
         [SerializeField]
         public byte _startPlayerHealth = 3;
@@ -16,7 +16,6 @@ namespace ScriptableObjects
         [SerializeField]
         public byte _startBombsCountdown = 3;
         
-        public byte PlayerHealth { get; private set; }
         public byte SpeedMultiplier { get; private set; }
         public byte BombsAtTime { get; private set; }
         public byte BombsSpreading { get; private set; }
@@ -24,14 +23,14 @@ namespace ScriptableObjects
         
         public void ResetValues()
         {
-            PlayerHealth = _startPlayerHealth;
+            ActorHealth = _startPlayerHealth;
             SpeedMultiplier = _startSpeedMultiplier;
             BombsAtTime = _startBombsAtTime;
             BombsSpreading = _startBombsSpreading;
             BombsCountdown = _startBombsCountdown;
         }
 
-        public void SetPlayerHealth(byte newValue) => PlayerHealth = newValue;
+        public void SetPlayerHealth(byte newValue) => ActorHealth = newValue;
         public void SetSpeedMultiplier(byte newValue) => SpeedMultiplier = newValue;
         public void SetBombsAtTime(byte newValue) => BombsAtTime = newValue;
         public void SetBombsSpreading(byte newValue) => BombsSpreading = newValue;

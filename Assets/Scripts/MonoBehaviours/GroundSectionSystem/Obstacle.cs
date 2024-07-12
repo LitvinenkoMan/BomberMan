@@ -3,26 +3,17 @@ using UnityEngine;
 
 namespace MonoBehaviours.GroundSectionSystem
 {
+    [RequireComponent(typeof(HealthComponent))]
     public class Obstacle : MonoBehaviour
     {
-        public byte HealthPoints { get; protected set; }
-        public bool CanPlayerStepOnIt { get; protected set; }
+        public HealthComponent ObstacleHealthComponent;
         public bool CanReceiveDamage { get; protected set; }
 
-        protected Action<byte> OnHealthChanged; 
-        protected Action<bool> OnAbilityToStepOnObstacleChanged; 
-        protected Action<bool> OnAbilityToReciveDamageChanged; 
+        protected Action<bool> OnAbilityToReciveDamageChanged;
 
-        public void SetHealthPoints(byte newHealth)
+        private void Awake()
         {
-            HealthPoints = newHealth;
-            OnHealthChanged?.Invoke(HealthPoints);
-        }
-
-        public void SetAbilityToStepOnIt(bool state)
-        {
-            CanPlayerStepOnIt = state;
-            OnAbilityToStepOnObstacleChanged?.Invoke(CanPlayerStepOnIt);
+            ObstacleHealthComponent = GetComponent<HealthComponent>();
         }
 
         public void SetAbilityToReceiveDamage(bool state)

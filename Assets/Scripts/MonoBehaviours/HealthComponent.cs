@@ -1,0 +1,77 @@
+using System;
+using System.Collections;
+using UnityEngine;
+
+namespace MonoBehaviours
+{
+    public class HealthComponent : MonoBehaviour
+    {
+        [SerializeField, Tooltip("If not set Component will use Starting Health instead, this field not necessary")]
+        private ActorBaseParams baseParams;
+        [SerializeField, Tooltip("If this GameObject should be Immune after being damaged, set this to true")]
+        private bool ImmuneAfterGettingDamaged;
+        [SerializeField]
+        private float ImmunityTime;
+        [SerializeField]
+        private byte StartingHealth;
+        public byte HealthPoints { get; private set; }
+
+        private bool _isImmune;
+        
+        // Events
+        public Action<byte> OnHealthChanged;
+
+        private void Start()
+        {
+            if (baseParams)
+            {
+                HealthPoints = baseParams.ActorHealth;
+            }
+            else
+            {
+                HealthPoints = StartingHealth;
+            }
+        }
+
+        private void OnEnable()
+        {
+            _isImmune = false;
+        }
+
+        private void OnDisable()
+        {
+            
+        }
+
+        /// <summary>
+        /// Will try to set new HP to GameObject, if newHealth will be less then previous one, will give immune
+        /// </summary>
+        /// <param name="newHealth"></param>
+        public void SetHealth(byte newHealth)
+        {
+            int deltaHealth = HealthPoints - newHealth;
+            if (deltaHealth < 0)
+            {
+                if (_isImmune)
+                {
+                    return;
+                }
+                
+                if (ImmuneAfterGettingDamaged)
+                {
+                    StartCoroutine(Immunity());
+                }
+            }
+            HealthPoints = newHealth;
+            OnHealthChanged?.Invoke(HealthPoints);
+        }
+
+        private IEnumerator Immunity()
+        {
+            _isImmune = true;
+            // TODO: Add some kind of animation
+            yield return new WaitForSeconds(ImmunityTime);
+            _isImmune = false;
+        }
+    }
+}

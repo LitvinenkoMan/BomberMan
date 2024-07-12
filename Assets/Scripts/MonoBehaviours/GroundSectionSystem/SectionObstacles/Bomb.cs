@@ -17,7 +17,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         [SerializeField]
         private GameObject BombVisuals;
         
-        private Collider BombCollider;
+        private Collider _bombCollider;
         //private float _explosionSpeed = 1;
         private float _timer;
         private bool _isTimerOn;
@@ -25,13 +25,11 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         private void Awake()
         {
-            BombCollider = GetComponent<SphereCollider>();
+            _bombCollider = GetComponent<SphereCollider>();
         }
 
         private void OnEnable()
         {
-            HealthPoints = 1;
-            CanPlayerStepOnIt = false;
             CanReceiveDamage = true;
             
             _timer = PlayerParams.BombsCountdown;
@@ -40,12 +38,12 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
                 Ignite();
             }
 
-            OnHealthChanged += OnHealthRunOutExplode;
+            ObstacleHealthComponent.OnHealthChanged += OnHealthRunOutExplode;
         }
 
         private void OnDisable()
         {
-            OnHealthChanged -= OnHealthRunOutExplode;
+            ObstacleHealthComponent.OnHealthChanged -= OnHealthRunOutExplode;
         }
 
         private void Update()
@@ -64,7 +62,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         {
             if (!_isExploded)
             {
-                BombCollider.isTrigger = false;
+                _bombCollider.isTrigger = false;
             }
         }
 
@@ -73,7 +71,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             _timer = PlayerParams.BombsCountdown;
             _isTimerOn = false;
             _isExploded = false;
-            BombCollider.isTrigger = true;
+            _bombCollider.isTrigger = true;
             BombVisuals.SetActive(true);
         }
 
@@ -101,7 +99,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             
             _isTimerOn = false;
             _isExploded = true;
-            BombCollider.isTrigger = true;
+            _bombCollider.isTrigger = true;
             onExplode?.Invoke(this);
         }
 
@@ -162,7 +160,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         {
             if (obstacle.CanReceiveDamage)
             {
-                obstacle.SetHealthPoints((byte)(obstacle.HealthPoints - 1));
+                obstacle.ObstacleHealthComponent.SetHealth((byte)(obstacle.ObstacleHealthComponent.HealthPoints - 1));
             }
         }
 

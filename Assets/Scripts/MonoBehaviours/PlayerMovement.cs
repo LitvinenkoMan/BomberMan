@@ -32,8 +32,6 @@ namespace MonoBehaviours
             if (_controls == null)
             {
                 _controls = new PlayerMainControls();
-                // Tell the "gameplay" action map that we want to get told about
-                // when actions get triggered.
             }
             
             _controls.PlayerMainActionMaps.Enable();

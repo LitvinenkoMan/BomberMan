@@ -8,6 +8,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/InEditorOnly/OutdoorsScene.unity
     guid: 8124e5870f4fd4c779e7a5f994e84ad1
+  - enabled: 1
+    path: Assets/Scenes/SingletonsAndUtils.unity
+    guid: f86ad0d4a39fa90418923369859964a0
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: f0facabcd77f1364f933fd5563e8cffd,
       type: 2}
