@@ -11,7 +11,7 @@ namespace MonoBehaviours.GroundSectionSystem
 
         protected Action<bool> OnAbilityToReciveDamageChanged;
 
-        private void Awake()
+        private void Start()
         {
             ObstacleHealthComponent = GetComponent<HealthComponent>();
         }

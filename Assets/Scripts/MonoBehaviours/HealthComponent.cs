@@ -12,6 +12,7 @@ namespace MonoBehaviours
         private bool ImmuneAfterGettingDamaged;
         [SerializeField]
         private float ImmunityTime;
+//#if baseParams       
         [SerializeField]
         private byte StartingHealth;
         public byte HealthPoints { get; private set; }

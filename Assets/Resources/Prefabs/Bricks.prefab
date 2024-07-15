@@ -132,7 +132,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86cea5dad8d57714db2186daa58aa44a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObstacleHealthComponent: {fileID: 0}
+  ObstacleHealthComponent: {fileID: 7824594161072046893}
   Visuals: {fileID: 4100097575563663966}
 --- !u!65 &426458469771513397
 BoxCollider:

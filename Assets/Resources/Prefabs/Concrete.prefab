@@ -121,7 +121,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8206f6d4f4f2170468b440c0e34a809c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObstacleHealthComponent: {fileID: 0}
+  ObstacleHealthComponent: {fileID: 6393183761067734736}
 --- !u!114 &6393183761067734736
 MonoBehaviour:
   m_ObjectHideFlags: 0

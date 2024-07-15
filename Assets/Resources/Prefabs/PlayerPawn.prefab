@@ -55,10 +55,11 @@ GameObject:
   - component: {fileID: 2021193808197260962}
   - component: {fileID: 6568705062240621401}
   - component: {fileID: 7211535355868605204}
-  - component: {fileID: 4454664985879038347}
   - component: {fileID: 3192485037731634668}
+  - component: {fileID: 4454664985879038347}
   - component: {fileID: 1320740036372020134}
   - component: {fileID: 6133191061836779383}
+  - component: {fileID: 7137738926094273680}
   m_Layer: 0
   m_Name: PlayerPawn
   m_TagString: Untagged
@@ -134,19 +135,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &4454664985879038347
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4821896025292580154}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b7459a0392b9f44c9d26ed4bd09e633, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PlayerParameters: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
 --- !u!143 &3192485037731634668
 CharacterController:
   m_ObjectHideFlags: 0
@@ -173,6 +161,19 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4454664985879038347
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4821896025292580154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b7459a0392b9f44c9d26ed4bd09e633, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PlayerParameters: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
 --- !u!114 &1320740036372020134
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -202,3 +203,19 @@ MonoBehaviour:
   ObjectExample: {fileID: 6260933269128134215, guid: a19dc95892433e948a0a89d9befe479e,
     type: 3}
   StartingCount: 10
+--- !u!114 &7137738926094273680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4821896025292580154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a2e4521c0d71624381b03f9d69c0b80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
+  ImmuneAfterGettingDamaged: 1
+  ImmunityTime: 3
+  StartingHealth: 0

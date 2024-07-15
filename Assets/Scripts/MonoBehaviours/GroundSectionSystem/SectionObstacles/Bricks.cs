@@ -13,9 +13,6 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         private void OnEnable()
         {
             CanReceiveDamage = true;
-
-            _collider = GetComponent<Collider>();
-
             ObstacleHealthComponent.OnHealthChanged += BreakBricks;
         }
 
@@ -26,7 +23,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         void Start()
         {
-        
+            _collider = GetComponent<Collider>();
         }
 
         void Update()

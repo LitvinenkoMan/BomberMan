@@ -3,6 +3,7 @@ using System.Collections;
 using MonoBehaviours.GroundSectionSystem;
 using MonoBehaviours.GroundSectionSystem.SectionObstacles;
 using ScriptableObjects;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -22,13 +23,9 @@ namespace MonoBehaviours
         private PlayerMainControls _controls;
         private InputAction PlaceBombAction;
 
-        private void Awake()
-        {
-            Initialize();
-        }
-
         private void OnEnable()
         {
+            Initialize();
             PlaceBombAction.performed += DeployBomb;
         }
 
@@ -54,9 +51,11 @@ namespace MonoBehaviours
 
         private void DeployBomb(InputAction.CallbackContext context)
         {
+            Debug.Log("trying Deploy bomb");
             var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
             if (section && !section.PlacedObstacle && currentPlacedBombs < PlayerParams.BombsAtTime)
             {
+                Debug.Log("Deploying bomb");
                 var bomb = BombsPool.GetFromPool(true).GetComponent<Bomb>();
                 bomb.PlaceBomb(section.ObstaclePlacementPosition);
                 bomb.transform.SetParent(null);
