@@ -19,7 +19,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         
         private Collider _bombCollider;
         //private float _explosionSpeed = 1;
-        private float _timer;
+        private float _timer; 
         private bool _isTimerOn;
         private bool _isExploded;
 
@@ -169,14 +169,13 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         private void TryDamageHealthComponent(Vector3 position)
         {
-            Collider[] colliders = Array.Empty<Collider>();
-            Physics.OverlapBoxNonAlloc(position, Vector3.one, colliders);
+            Collider[] colliders = Physics.OverlapBox(position, new Vector3(1,1,1));
 
             for (int i = 0; i < colliders.Length; i++)
             {
                 HealthComponent health;
-                colliders[i].TryGetComponent(out health);
-                if (health)
+                colliders[i].gameObject.TryGetComponent(out health);
+                if (health && !colliders[i].gameObject.GetComponent<Obstacle>())    //TODO: recode this check, looks bad
                 {
                     health.SetHealth((byte)(health.HealthPoints-PlayerParams.BombsDamage));
                 }

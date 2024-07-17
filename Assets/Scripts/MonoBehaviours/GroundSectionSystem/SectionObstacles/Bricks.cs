@@ -26,11 +26,6 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             _collider = GetComponent<Collider>();
         }
 
-        void Update()
-        {
-        
-        }
-
         private void Reset()
         {
             Visuals.SetActive(true);

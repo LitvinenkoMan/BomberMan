@@ -8,8 +8,10 @@ namespace MonoBehaviours.GroundSectionSystem
     {
         public HealthComponent ObstacleHealthComponent;
         public bool CanReceiveDamage { get; protected set; }
+        public bool CanPlayerStepOnIt { get; protected set; }
 
         protected Action<bool> OnAbilityToReciveDamageChanged;
+        protected Action<bool> OnAbilityToPlayerCanStepOnIt;
 
         private void Start()
         {
@@ -20,6 +22,12 @@ namespace MonoBehaviours.GroundSectionSystem
         {
             CanReceiveDamage = state;
             OnAbilityToReciveDamageChanged?.Invoke(CanReceiveDamage);
+        }
+
+        public void SetAbilityToPlayerCanStepOnIt(bool state)
+        {
+            CanPlayerStepOnIt = state;
+            OnAbilityToPlayerCanStepOnIt?.Invoke(CanReceiveDamage);
         }
 
         public virtual void SetNewPosition(Vector3 position)

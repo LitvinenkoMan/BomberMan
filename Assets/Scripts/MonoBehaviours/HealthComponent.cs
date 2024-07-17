@@ -12,8 +12,7 @@ namespace MonoBehaviours
         private bool ImmuneAfterGettingDamaged;
         [SerializeField]
         private float ImmunityTime;
-//#if baseParams       
-        [SerializeField]
+        [SerializeField, Tooltip("Will be used if Base Params is not set")]
         private byte StartingHealth;
         public byte HealthPoints { get; private set; }
 
@@ -45,13 +44,13 @@ namespace MonoBehaviours
         }
 
         /// <summary>
-        /// Will try to set new HP to GameObject, if newHealth will be less then previous one, will give immune
+        /// Will try to set new HP to GameObject, if newHealth will be less then previous one will give immune, if ImmuneAfterGettingDamaged is set to true.
         /// </summary>
-        /// <param name="newHealth"></param>
+        /// <param name="newHealth">New amount of health</param>
         public void SetHealth(byte newHealth)
         {
-            int deltaHealth = HealthPoints - newHealth;
-            if (deltaHealth < 0)
+            int deltaHealth = newHealth - HealthPoints;
+            if (deltaHealth < 0)        // that means if new health is 2, and previous was 3, then 2-3=-1 - means owner was Damaged 
             {
                 if (_isImmune)
                 {

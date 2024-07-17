@@ -56,33 +56,23 @@ namespace Editor
             {
                 AddObstacle();
             }
-            if (GUILayout.Button("Fix Obstacle"))
+            if (GUILayout.Button("Remove Obstacle"))
             {
-                SetLostObstacleToNearestSection();
+                RemoveObstacleFromSection();
             }
         }
 
-        private void SetLostObstacleToNearestSection()
+        private void RemoveObstacleFromSection()
         {
-            var mapData = LevelDataHolder.GetComponent<LevelSectionsDataHolder>();
             foreach (var gameObject in Selection.gameObjects)
             {
-                Obstacle obstacle;
-                gameObject.TryGetComponent(out obstacle);
-                if (obstacle)
+                gameObject.TryGetComponent(out GroundSection nearestSection);
+                if (nearestSection)
                 {
-                    var obstaclePos = obstacle.transform.position;
-                    GroundSection nearestSection = null;
-                    float distance = 99999999;
-                    foreach (var section in mapData.sections)
+                    if (nearestSection.PlacedObstacle)
                     {
-                        if (Vector3.Distance(obstaclePos, section.transform.position) < distance)
-                        {
-                            distance = Vector3.Distance(obstaclePos, section.transform.position);
-                            nearestSection = section;
-                        }
+                        DestroyImmediate(nearestSection.RemoveObstacle().gameObject);
                     }
-                    nearestSection.AddObstacle(obstacle);
                 }
             }
         }
@@ -132,8 +122,7 @@ namespace Editor
             
             foreach (var gameObject in Selection.gameObjects)
             {
-                GroundSection section;
-                gameObject.TryGetComponent(out section);
+                gameObject.TryGetComponent(out GroundSection section);
                 if (section && !section.PlacedObstacle)
                 {
                     Obstacle obstacle = Instantiate(ObstaclePrefab).GetComponent<Obstacle>();
