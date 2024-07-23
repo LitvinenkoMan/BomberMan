@@ -6,14 +6,15 @@ using ScriptableObjects;
 using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 namespace MonoBehaviours
 {
     [RequireComponent(typeof(ObjectPoolQueue))]
     public class BombDeployer : MonoBehaviour
     {
-        [SerializeField]
-        private BasePlayerParameters PlayerParams;
+        [FormerlySerializedAs("PlayerParams")] [SerializeField]
+        private BaseBomberParameters bomberParams;
         [SerializeField]
         private ObjectPoolQueue BombsPool;
 
@@ -53,7 +54,7 @@ namespace MonoBehaviours
         {
             Debug.Log("trying Deploy bomb");
             var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
-            if (section && !section.PlacedObstacle && currentPlacedBombs < PlayerParams.BombsAtTime)
+            if (section && !section.PlacedObstacle && currentPlacedBombs < bomberParams.BombsAtTime)
             {
                 Debug.Log("Deploying bomb");
                 var bomb = BombsPool.GetFromPool(true).GetComponent<Bomb>();

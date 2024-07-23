@@ -221,7 +221,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ObstacleHealthComponent: {fileID: 654695661294613331}
   IgniteOnStart: 1
-  PlayerParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
+  bomberParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
   BombVisuals: {fileID: 609344817609076943}
 --- !u!114 &654695661294613331
 MonoBehaviour:

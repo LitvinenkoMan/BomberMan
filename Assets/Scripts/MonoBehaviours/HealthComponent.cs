@@ -20,6 +20,7 @@ namespace MonoBehaviours
         
         // Events
         public Action<byte> OnHealthChanged;
+        public Action OnHealthRunOut;
 
         private void Start()
         {
@@ -50,7 +51,7 @@ namespace MonoBehaviours
         public void SetHealth(byte newHealth)
         {
             int deltaHealth = newHealth - HealthPoints;
-            if (deltaHealth < 0)        // that means if new health is 2, and previous was 3, then 2-3=-1 - means owner was Damaged 
+            if (deltaHealth < 0)        // if new health is 2, and previous was 3, then 2-3=-1 - means owner was Damaged 
             {
                 if (_isImmune)
                 {
@@ -64,6 +65,10 @@ namespace MonoBehaviours
             }
             HealthPoints = newHealth;
             OnHealthChanged?.Invoke(HealthPoints);
+            if (HealthPoints <= 0)
+            {
+                OnHealthRunOut?.Invoke();
+            }
         }
 
         private IEnumerator Immunity()

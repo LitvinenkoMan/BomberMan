@@ -9,8 +9,8 @@ namespace MonoBehaviours
     [RequireComponent(typeof(CharacterController))]
     public class PlayerMovement : MonoBehaviour
     {
-        [SerializeField, Tooltip("Used to take main player values (speed, amount of bombs, health and ex.)")]
-        private BasePlayerParameters PlayerParameters;
+        [FormerlySerializedAs("PlayerParameters")] [SerializeField, Tooltip("Used to take main player values (speed, amount of bombs, health and ex.)")]
+        private BaseBomberParameters bomberParameters;
 
         private CharacterController _controller;
         
@@ -35,7 +35,7 @@ namespace MonoBehaviours
             }
             
             _controls.PlayerMainActionMaps.Enable();
-            PlayerParameters.ResetValues();
+            bomberParameters.ResetValues();
             
             MoveAction = _controls.PlayerMainActionMaps.Move;
         }
@@ -51,7 +51,7 @@ namespace MonoBehaviours
 
         public void OnMove(Vector2 inputValue)
         {
-            _controller.Move(new Vector3(inputValue.x, 0, inputValue.y) * (PlayerParameters.SpeedMultiplier * Time.deltaTime));
+            _controller.Move(new Vector3(inputValue.x, 0, inputValue.y) * (bomberParameters.SpeedMultiplier * Time.deltaTime));
         }
 
         public void OnPlaceBomb(int inputValue)

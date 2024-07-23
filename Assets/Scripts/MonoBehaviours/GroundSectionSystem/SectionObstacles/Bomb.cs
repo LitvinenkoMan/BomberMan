@@ -3,6 +3,7 @@ using System.Collections;
 using Interfaces;
 using ScriptableObjects;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 {
@@ -13,7 +14,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         public Action<Bomb> onExplode;
         
         [SerializeField]
-        private BasePlayerParameters PlayerParams;
+        private BaseBomberParameters bomberParams;
         [SerializeField]
         private GameObject BombVisuals;
         
@@ -26,12 +27,13 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         private void Start()
         {
             CanReceiveDamage = true;
+            CanPlayerStepOnIt = false;
             _bombCollider = GetComponent<SphereCollider>();
         }
 
         private void OnEnable()
         {
-            _timer = PlayerParams.BombsCountdown;
+            _timer = bomberParams.BombsCountdown;
             if (IgniteOnStart)
             {
                 Ignite();
@@ -67,7 +69,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         public void Reset()
         {
-            _timer = PlayerParams.BombsCountdown;
+            _timer = bomberParams.BombsCountdown;
             _isTimerOn = false;
             _isExploded = false;
             _bombCollider.isTrigger = true;
@@ -94,13 +96,13 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
             PlaceExplosionEffect(startSection);
 
-            ExplodeToDirection(startSection.ConnectedSections.upperSection, PlayerParams.BombsSpreading - 1,
+            ExplodeToDirection(startSection.ConnectedSections.upperSection, bomberParams.BombsSpreading - 1,
                 SpreadDirections.Up);
-            ExplodeToDirection(startSection.ConnectedSections.lowerSection, PlayerParams.BombsSpreading - 1,
+            ExplodeToDirection(startSection.ConnectedSections.lowerSection, bomberParams.BombsSpreading - 1,
                 SpreadDirections.Down);
-            ExplodeToDirection(startSection.ConnectedSections.rightSection, PlayerParams.BombsSpreading - 1,
+            ExplodeToDirection(startSection.ConnectedSections.rightSection, bomberParams.BombsSpreading - 1,
                 SpreadDirections.Right);
-            ExplodeToDirection(startSection.ConnectedSections.leftSection, PlayerParams.BombsSpreading - 1,
+            ExplodeToDirection(startSection.ConnectedSections.leftSection, bomberParams.BombsSpreading - 1,
                 SpreadDirections.Left);
 
             _isTimerOn = false;
@@ -113,8 +115,12 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         {
             if (currentSection.PlacedObstacle)
             {
+                if (!currentSection.PlacedObstacle.CanPlayerStepOnIt)
+                {
+                    DamageObstacle(currentSection.PlacedObstacle);
+                    return;
+                }
                 DamageObstacle(currentSection.PlacedObstacle);
-                return;
             }
 
             PlaceExplosionEffect(currentSection);
@@ -177,7 +183,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
                 colliders[i].gameObject.TryGetComponent(out health);
                 if (health && !colliders[i].gameObject.GetComponent<Obstacle>())    //TODO: recode this check, looks bad
                 {
-                    health.SetHealth((byte)(health.HealthPoints-PlayerParams.BombsDamage));
+                    health.SetHealth((byte)(health.HealthPoints-bomberParams.BombsDamage));
                 }
             }
         }

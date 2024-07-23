@@ -13,6 +13,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         private void OnEnable()
         {
             CanReceiveDamage = true;
+            CanPlayerStepOnIt = false;
             ObstacleHealthComponent.OnHealthChanged += BreakBricks;
         }
 

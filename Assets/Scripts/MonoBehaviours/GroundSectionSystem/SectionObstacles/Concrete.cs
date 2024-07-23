@@ -9,6 +9,7 @@ namespace MonoBehaviours.GroundSectionSystem
         {
             ObstacleHealthComponent.SetHealth(255);
             CanReceiveDamage = false;
+            CanPlayerStepOnIt = false;
         }
     }
 }

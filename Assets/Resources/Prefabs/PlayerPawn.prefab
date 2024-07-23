@@ -60,6 +60,7 @@ GameObject:
   - component: {fileID: 1320740036372020134}
   - component: {fileID: 6133191061836779383}
   - component: {fileID: 7137738926094273680}
+  - component: {fileID: 7731251428465038235}
   m_Layer: 0
   m_Name: PlayerPawn
   m_TagString: Untagged
@@ -173,7 +174,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b7459a0392b9f44c9d26ed4bd09e633, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerParameters: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
+  bomberParameters: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
 --- !u!114 &1320740036372020134
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -186,7 +187,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 747db11059caa1b46ae18c92f93e5c04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
+  bomberParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
   BombsPool: {fileID: 6133191061836779383}
 --- !u!114 &6133191061836779383
 MonoBehaviour:
@@ -219,3 +220,16 @@ MonoBehaviour:
   ImmuneAfterGettingDamaged: 1
   ImmunityTime: 3
   StartingHealth: 0
+--- !u!114 &7731251428465038235
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4821896025292580154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae1a3a6223f599b43b0e7a2ec20d2da5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BomberParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
