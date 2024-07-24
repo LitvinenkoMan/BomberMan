@@ -25,6 +25,7 @@ namespace MonoBehaviours
         void Start()
         {
             _controller = GetComponent<CharacterController>();
+            bomberParameters.ResetValues();
         }
 
         private void OnEnable()
@@ -35,7 +36,6 @@ namespace MonoBehaviours
             }
             
             _controls.PlayerMainActionMaps.Enable();
-            bomberParameters.ResetValues();
             
             MoveAction = _controls.PlayerMainActionMaps.Move;
         }

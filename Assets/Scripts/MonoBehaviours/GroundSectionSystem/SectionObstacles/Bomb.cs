@@ -39,12 +39,12 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
                 Ignite();
             }
 
-            ObstacleHealthComponent.OnHealthChanged += OnHealthRunOutExplode;
+            ObstacleHealthComponent.OnHealthRunOut += OnHealthRunOutExplode;
         }
 
         private void OnDisable()
         {
-            ObstacleHealthComponent.OnHealthChanged -= OnHealthRunOutExplode;
+            ObstacleHealthComponent.OnHealthRunOut -= OnHealthRunOutExplode;
         }
 
         private void Update()
@@ -169,7 +169,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         {
             if (obstacle.CanReceiveDamage)
             {
-                obstacle.ObstacleHealthComponent.SetHealth((byte)(obstacle.ObstacleHealthComponent.HealthPoints - 1));
+                obstacle.ObstacleHealthComponent.SetHealth(obstacle.ObstacleHealthComponent.HealthPoints - bomberParams.BombsDamage);
             }
         }
 
@@ -183,17 +183,14 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
                 colliders[i].gameObject.TryGetComponent(out health);
                 if (health && !colliders[i].gameObject.GetComponent<Obstacle>())    //TODO: recode this check, looks bad
                 {
-                    health.SetHealth((byte)(health.HealthPoints-bomberParams.BombsDamage));
+                    health.SetHealth((byte)(health.HealthPoints - bomberParams.BombsDamage));
                 }
             }
         }
 
-        private void OnHealthRunOutExplode(byte healthLeft)
+        private void OnHealthRunOutExplode()
         {
-            if (healthLeft <= 0)
-            {
-                Explode();
-            }
+            Explode();
         }
 
         private IEnumerator ReturnExplosionToPool(GameObject expl)

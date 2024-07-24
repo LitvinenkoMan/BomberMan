@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using ScriptableObjects;
 using UnityEngine;
@@ -25,16 +26,6 @@ namespace MonoBehaviours.GroundSectionSystem
         
         
         protected bool _isTaken; 
-        
-
-        private void OnEnable()
-        {
-            Initialize();
-            if (TimedPowerUp)
-            {
-                StartCoroutine(CountLifeTime());
-            }
-        }
 
         protected virtual void Initialize()
         {
@@ -44,10 +35,30 @@ namespace MonoBehaviours.GroundSectionSystem
             _isTaken = false;
         }
 
-        protected virtual void ApplyPowerUp(BaseBomberParameters Params)
+        private void OnEnable()
         {
-            
+            Initialize();
+            if (TimedPowerUp)
+            {
+                StartCoroutine(CountLifeTime());
+            }
+            ObstacleHealthComponent.OnHealthRunOut += RemovePowerUpFromGroundSection;
         }
+
+        private void OnDisable()
+        {
+            ObstacleHealthComponent.OnHealthRunOut -= RemovePowerUpFromGroundSection;
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.gameObject.TryGetComponent(out BomberParamsProvider provider) && !_isTaken)
+            {
+                ApplyPowerUp(provider.GetBomberParams());
+            }
+        }
+
+        protected virtual void ApplyPowerUp(BaseBomberParameters Params) { }
 
         protected virtual void RemovePowerUpFromGroundSection()
         {

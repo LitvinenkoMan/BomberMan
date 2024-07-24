@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class ActorBaseParams : ScriptableObject
 {
-    public byte ActorHealth { get; protected set; }
+    public int ActorHealth { get; protected set; }
 }

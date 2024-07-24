@@ -14,12 +14,12 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         {
             CanReceiveDamage = true;
             CanPlayerStepOnIt = false;
-            ObstacleHealthComponent.OnHealthChanged += BreakBricks;
+            ObstacleHealthComponent.OnHealthRunOut += BreakBricks;
         }
 
         private void OnDisable()
         {
-            ObstacleHealthComponent.OnHealthChanged -= BreakBricks;
+            ObstacleHealthComponent.OnHealthRunOut -= BreakBricks;
         }
 
         void Start()
@@ -34,14 +34,11 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             ObstacleHealthComponent.SetHealth(1);
         }
 
-        private void BreakBricks(byte health)
+        private void BreakBricks()
         {
-            if (health <= 0)
-            {
-                GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position).RemoveObstacle();
-                Visuals.SetActive(false);
-                _collider.isTrigger = true;
-            }
+            GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position).RemoveObstacle();
+            Visuals.SetActive(false);
+            _collider.isTrigger = true;
         }
     }
 }

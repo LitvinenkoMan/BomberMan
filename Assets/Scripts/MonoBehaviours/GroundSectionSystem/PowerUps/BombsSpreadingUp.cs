@@ -7,25 +7,14 @@ namespace MonoBehaviours.GroundSectionSystem.PowerUps
     public class BombsSpreadingUp : PowerUp
     {
         [Header("Power up settings")]
-        [SerializeField] private byte SpreadingIncreaseValue; 
-        void Start()
-        {
-            ObstacleHealthComponent.OnHealthRunOut += RemovePowerUpFromGroundSection;
-        }
-
-        private void OnTriggerEnter(Collider other)
-        {
-            if (other.gameObject.TryGetComponent(out BomberParamsProvider provider) && !_isTaken)
-            {
-                ApplyPowerUp(provider.GetBomberParams());
-            }
-        }
+        [SerializeField] private byte SpreadingIncreaseValue = 1;
 
         protected override void ApplyPowerUp(BaseBomberParameters Params)
         {
             Visuals.SetActive(false);
             _isTaken = true;
             Params.SetBombsSpreading((byte)(Params.BombsSpreading + SpreadingIncreaseValue));
+            Debug.Log($"Current BombsSpreading now: {Params.BombsSpreading}");
             RemovePowerUpFromGroundSection();
         }
     }

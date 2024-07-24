@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startPlayerHealth: 3
   _startSpeedMultiplier: 5
-  _startBombsAtTime: 4
+  _startBombsAtTime: 1
   _startBombsSpreading: 1
   _startBombsCountdown: 3
+  _startBombsDamage: 1
