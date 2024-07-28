@@ -6,6 +6,7 @@ namespace MonoBehaviours.GroundSectionSystem.PowerUps
     public class BomberSpeedUp : PowerUp
     {
         [Header("Power up settings")]
+        [Header("Power up settings")]
         [SerializeField] private byte SpeedIncreaseValue = 1; 
         
         protected override void ApplyPowerUp(BaseBomberParameters Params)
@@ -13,8 +14,8 @@ namespace MonoBehaviours.GroundSectionSystem.PowerUps
             Visuals.SetActive(false);
             _isTaken = true;
             Params.SetSpeedMultiplier((byte)(Params.SpeedMultiplier + SpeedIncreaseValue));  
-            Debug.Log($"Current speed now: {Params.SpeedMultiplier}");
             RemovePowerUpFromGroundSection();
+            Destroy(gameObject);
         }
     }
 }

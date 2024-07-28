@@ -13,8 +13,8 @@ namespace MonoBehaviours.GroundSectionSystem.PowerUps
             Visuals.SetActive(false);
             _isTaken = true;
             Params.SetBombsAtTime((byte)(Params.BombsAtTime + BombsAmountIncreaseValue));  
-            Debug.Log($"Current Bombs st time now: {Params.BombsAtTime}");
             RemovePowerUpFromGroundSection();
+            Destroy(gameObject);
         }
     }
 }

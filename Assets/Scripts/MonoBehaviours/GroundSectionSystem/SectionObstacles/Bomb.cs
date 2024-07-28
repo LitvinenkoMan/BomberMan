@@ -183,7 +183,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
                 colliders[i].gameObject.TryGetComponent(out health);
                 if (health && !colliders[i].gameObject.GetComponent<Obstacle>())    //TODO: recode this check, looks bad
                 {
-                    health.SetHealth((byte)(health.HealthPoints - bomberParams.BombsDamage));
+                    health.SetHealth(health.HealthPoints - bomberParams.BombsDamage);
                 }
             }
         }

@@ -14,8 +14,8 @@ namespace MonoBehaviours.GroundSectionSystem.PowerUps
             Visuals.SetActive(false);
             _isTaken = true;
             Params.SetBombsSpreading((byte)(Params.BombsSpreading + SpreadingIncreaseValue));
-            Debug.Log($"Current BombsSpreading now: {Params.BombsSpreading}");
             RemovePowerUpFromGroundSection();
+            Destroy(gameObject);
         }
     }
 }

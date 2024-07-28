@@ -73,6 +73,7 @@ namespace MonoBehaviours.GroundSectionSystem
             if (!_isTaken)
             {
                 RemovePowerUpFromGroundSection();
+                Destroy(gameObject);
             }
         }
     }

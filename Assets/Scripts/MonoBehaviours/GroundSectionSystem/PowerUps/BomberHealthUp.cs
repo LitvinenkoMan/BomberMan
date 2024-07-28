@@ -12,10 +12,9 @@ namespace MonoBehaviours.GroundSectionSystem.PowerUps
         {
             Visuals.SetActive(false);
             _isTaken = true;
-            Params.SetActorHealth((byte)(Params.ActorHealth + HealingValue));   
-            Debug.Log($"Current Health now: {Params.ActorHealth}");
-
+            Params.SetActorHealth((byte)(Params.ActorHealth + HealingValue));
             RemovePowerUpFromGroundSection();
+            Destroy(gameObject);
         }
     }
 }
