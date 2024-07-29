@@ -46,7 +46,7 @@ public class SceneLoader : MonoBehaviour
 
     public void LoadScene()
     {
-        if (SceneManager.GetSceneByName(SceneData.SceneName).isLoaded)
+        if (SceneManager.GetSceneByName(SceneData.SceneName).isLoaded && !UnloadInsteadOfLoading)
         {
             return;
         }

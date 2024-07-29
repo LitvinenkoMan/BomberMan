@@ -1,44 +1,42 @@
-using System;
 using System.Collections.Generic;
 using Cinemachine;
-using Unity.VisualScripting;
+using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace MonoBehaviours
 {
-    public class PlayerSpawner : MonoBehaviour
+    public class PlayerSpawner : NetworkBehaviour
     {
         [SerializeField] private GameObject Player;
         [SerializeField] private GameObject Camera;
+        [SerializeField] private bool SpawnOnStart;
         [SerializeField] private List<GameObject> SpawnPositions;
 
         private void OnEnable()
         {
-            SpawnPlayer();
+            if (SpawnOnStart)
+            {
+                SpawnPlayerRpc();
+            }
         }
 
-        private void OnDisable()
-        {
-            // make it return everything back;
-        }
-
-        void Update()
-        {
-            
-        }
-
-        public void SpawnPlayer()
+        [Rpc(SendTo.Server)]
+        public void SpawnPlayerRpc(RpcParams rpcParams = default)
         {
             GameObject player = Instantiate(Player, Vector3.zero, new Quaternion(0, 0, 0, 0));
-            GameObject camera = Instantiate(Camera, Vector3.zero, new Quaternion(0, 0, 0, 0));
+            if (IsOwner)
+            {
+                GameObject camera = Instantiate(Camera, Vector3.zero, new Quaternion(0, 0, 0, 0));
+                
+                if (camera.GetComponentInChildren<CinemachineTargetGroup>())
+                {
+                    camera.GetComponentInChildren<CinemachineTargetGroup>().AddMember(player.transform, 1, 0);
+                }                   
+            }
             player.transform.position = GetRandomSpawnGameObject().transform.position;
 
-
-            if (camera.GetComponentInChildren<CinemachineTargetGroup>())
-            {
-                camera.GetComponentInChildren<CinemachineTargetGroup>().AddMember(player.transform, 1, 0);
-            }                                              
+                           
         }
 
         private GameObject GetRandomSpawnGameObject()
