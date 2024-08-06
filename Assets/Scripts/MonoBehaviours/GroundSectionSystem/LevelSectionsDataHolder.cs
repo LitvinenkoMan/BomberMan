@@ -5,8 +5,10 @@ namespace MonoBehaviours.GroundSectionSystem
 {
     public class LevelSectionsDataHolder : MonoBehaviour
     {
-        
+        [Header("Main Values")]
         public List<GroundSection> sections;
+
+        public List<GameObject> SpawnPlaces;
 
         private void OnEnable()
         {
@@ -20,6 +22,7 @@ namespace MonoBehaviours.GroundSectionSystem
         void Start()
         {
             GroundSectionsUtils.Instance.SetNewDataHolder(this);
+            PlayerSpawner.Instance.SetUpCurrentDataHolder(this);
         }
 
         void Update()

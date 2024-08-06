@@ -20,7 +20,8 @@ namespace MonoBehaviours.GroundSectionSystem
             } 
             else 
             { 
-                Instance = this; 
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
             } 
         }
 
@@ -43,6 +44,11 @@ namespace MonoBehaviours.GroundSectionSystem
         public void SetNewDataHolder(LevelSectionsDataHolder dataHolder)
         {
             _sectionsDataHolder = dataHolder;
+        }
+
+        public LevelSectionsDataHolder GetCurrentSectionDataHolder()
+        {
+            return _sectionsDataHolder;
         }
     }
 }

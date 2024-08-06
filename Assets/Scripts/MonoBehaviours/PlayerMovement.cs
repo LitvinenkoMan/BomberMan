@@ -1,5 +1,6 @@
 using System;
 using ScriptableObjects;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
@@ -7,7 +8,7 @@ using UnityEngine.Serialization;
 namespace MonoBehaviours
 {
     [RequireComponent(typeof(CharacterController))]
-    public class PlayerMovement : MonoBehaviour
+    public class PlayerMovement : NetworkBehaviour
     {
         [FormerlySerializedAs("PlayerParameters")] [SerializeField, Tooltip("Used to take main player values (speed, amount of bombs, health and ex.)")]
         private BaseBomberParameters bomberParameters;
@@ -21,7 +22,18 @@ namespace MonoBehaviours
         private InputAction MoveAction;
         
         
-        
+        // NetworkVariables
+
+
+        public override void OnNetworkSpawn()
+        {
+            if (!IsOwner)
+            {
+                enabled = false;
+            }
+        }
+
+
         void Start()
         {
             _controller = GetComponent<CharacterController>();
@@ -47,6 +59,8 @@ namespace MonoBehaviours
             {
                 OnMove(MoveAction.ReadValue<Vector2>());
             }
+
+            //_netPosition.Value = transform.position;
         }
 
         public void OnMove(Vector2 inputValue)
