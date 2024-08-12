@@ -66,11 +66,6 @@ namespace MonoBehaviours.Network
                 yield return new WaitForSeconds(DelayInSeconds);
             }
 
-            if (!NetworkManager.Singleton.SceneManager.ActiveSceneSynchronizationEnabled)
-            {
-                
-            }
-        
             if (UnloadInsteadOfLoading)
             {
                 NetworkManager.Singleton.SceneManager.UnloadScene(SceneManager.GetSceneByName(SceneData.SceneName));

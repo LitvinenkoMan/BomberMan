@@ -11,7 +11,7 @@ namespace MonoBehaviours.GroundSectionSystem
         public bool CanPlayerStepOnIt { get; protected set; }
 
         protected Action<bool> OnAbilityToReciveDamageChanged;
-        protected Action<bool> OnAbilityToPlayerCanStepOnIt;
+        protected Action<bool> OnAbilityToPlayerCanStepOnItChanged;
 
         private void Start()
         {
@@ -27,7 +27,7 @@ namespace MonoBehaviours.GroundSectionSystem
         public void SetAbilityToPlayerCanStepOnIt(bool state)
         {
             CanPlayerStepOnIt = state;
-            OnAbilityToPlayerCanStepOnIt?.Invoke(CanReceiveDamage);
+            OnAbilityToPlayerCanStepOnItChanged?.Invoke(CanPlayerStepOnIt);
         }
 
         public virtual void SetNewPosition(Vector3 position)

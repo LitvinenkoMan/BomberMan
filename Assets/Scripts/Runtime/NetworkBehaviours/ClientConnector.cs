@@ -1,8 +1,10 @@
-using System;
+using System.Threading.Tasks;
 using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
+using Unity.Networking.Transport.Relay;
 using Unity.Services.Relay.Models;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -40,33 +42,21 @@ namespace MonoBehaviours.Network
         public async void JoinHost()
         {
             OnClientConnectionLaunched?.Invoke();
-            
-                    
-            Debug.Log($"Checking Client ({NetworkManager.Singleton.LocalClientId}) to be connected to any session");
-            if (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsClient)
-            {
-                NetworkManager.Singleton.DisconnectClient(NetworkManager.Singleton.LocalClientId);
-                NetworkManager.Singleton.Shutdown();
-                Debug.Log($"Disconnecting Client ({NetworkManager.Singleton.LocalClientId}) from Network");
-            }
-            
+
             string joinCode = RoomName.text;
             if (!string.IsNullOrEmpty(joinCode))
             {
                 JoinAllocation joinAllocation = await RelayManager.Instance.JoinRelay(joinCode);
+                
                 if (joinAllocation != null)
                 {
-                    NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(
-                        joinAllocation.RelayServer.IpV4,
-                        (ushort)joinAllocation.RelayServer.Port,
-                        joinAllocation.AllocationIdBytes,
-                        joinAllocation.Key,
-                        joinAllocation.ConnectionData,
-                        joinAllocation.HostConnectionData
-                    );
+                    NetworkManager.Singleton.GetComponent<UnityTransport>()
+                        .SetRelayServerData(new RelayServerData(joinAllocation,"dtls"));
                     
-                    NetworkManager.Singleton.StartClient();
+                    
+                    await Task.Delay(5000);
                     NetworkManager.Singleton.OnClientStarted += ClientConnected;
+                    NetworkManager.Singleton.StartClient();
                 }
             }
         }
@@ -74,7 +64,6 @@ namespace MonoBehaviours.Network
         private void ClientConnected()
         {
             Debug.Log("PlayerConnected");
-            PlayerSpawner.Instance.SpawnPlayerRpc();
             OnClientConnected?.Invoke();
         }
     }

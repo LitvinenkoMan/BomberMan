@@ -10,6 +10,8 @@ namespace MonoBehaviours.Network
 {
     public class RelayManager : MonoBehaviour
     {
+        public string JoinCode { get; private set; }
+
         public static RelayManager Instance;
 
         private void Awake()
@@ -58,6 +60,7 @@ namespace MonoBehaviours.Network
             {
                 string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
                 Debug.Log($"Join code: {joinCode}");
+                JoinCode = joinCode;
                 return joinCode;
             }
             catch (RelayServiceException e)
@@ -73,6 +76,7 @@ namespace MonoBehaviours.Network
             {
                 JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
                 Debug.Log($"Joined Relay with join code: {joinCode}");
+                JoinCode = joinCode;
                 return joinAllocation;
             }
             catch (RelayServiceException e)

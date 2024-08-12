@@ -1,17 +1,17 @@
-using System;
 using System.Collections;
+using MonoBehaviours;
 using MonoBehaviours.GroundSectionSystem;
 using MonoBehaviours.GroundSectionSystem.SectionObstacles;
 using ScriptableObjects;
-using UnityEditor.Rendering;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 
-namespace MonoBehaviours
+namespace Runtime.NetworkBehaviours
 {
     [RequireComponent(typeof(ObjectPoolQueue))]
-    public class BombDeployer : MonoBehaviour
+    public class BombDeployer : NetworkBehaviour
     {
         [FormerlySerializedAs("PlayerParams")] [SerializeField]
         private BaseBomberParameters bomberParams;
@@ -49,21 +49,35 @@ namespace MonoBehaviours
                 BombsPool = GetComponent<ObjectPoolQueue>();
             }
         }
-
+        
         private void DeployBomb(InputAction.CallbackContext context)
         {
-            Debug.Log("trying Deploy bomb");
-            var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
-            if (section && !section.PlacedObstacle && currentPlacedBombs < bomberParams.BombsAtTime)
+            if (IsOwner) return;
+
+            if (IsServer)
             {
-                Debug.Log("Deploying bomb");
-                var bomb = BombsPool.GetFromPool(true).GetComponent<Bomb>();
-                bomb.PlaceBomb(section.ObstaclePlacementPosition);
-                bomb.transform.SetParent(null);
-                bomb.onExplode += SubtractAmountOfCurrentBombs;
-                section.AddObstacle(bomb);
-                currentPlacedBombs++;
+                var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
+                if (section && !section.PlacedObstacle && currentPlacedBombs < bomberParams.BombsAtTime)
+                {
+                    var bomb = BombsPool.GetFromPool(true).GetComponent<Bomb>();
+                    bomb.PlaceBomb(section.ObstaclePlacementPosition);
+                    bomb.transform.SetParent(null);
+                    bomb.onExplode += SubtractAmountOfCurrentBombs;
+                    section.AddObstacle(bomb);
+                    currentPlacedBombs++;
+                }
             }
+            else
+            {
+                DeployBombRpc();
+            }
+           
+        } 
+        
+        [Rpc(SendTo.ClientsAndHost)]
+        private void DeployBombRpc()
+        {
+            DeployBomb(new InputAction.CallbackContext());      // TODO: Input callback looks bad 
         }
 
         private void SubtractAmountOfCurrentBombs(Bomb explodedBomb)

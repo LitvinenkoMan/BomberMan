@@ -1,7 +1,7 @@
-using System;
 using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
+using Unity.Networking.Transport.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
 using UnityEngine.Events;
@@ -45,7 +45,7 @@ namespace MonoBehaviours.Network
         {
             OnHostLaunched?.Invoke();
             
-            Allocation allocation = await RelayManager.Instance.CreateRelay(10);
+            Allocation allocation = await RelayManager.Instance.CreateRelay(8);
             
             if (allocation != null)
             {
@@ -53,26 +53,18 @@ namespace MonoBehaviours.Network
                 RoomJoinCodeText.text = joinCode;
                 if (!string.IsNullOrEmpty(joinCode))
                 {
-                    NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(
-                        allocation.RelayServer.IpV4,
-                        (ushort)allocation.RelayServer.Port,
-                        allocation.AllocationIdBytes,
-                        allocation.Key,
-                        allocation.ConnectionData
-                    );
-
+                    NetworkManager.Singleton.GetComponent<UnityTransport>()
+                        .SetRelayServerData(new RelayServerData(allocation, "dtls"));
+                        
                     NetworkManager.Singleton.StartHost();
-                    ServerStartedRpc();
-                    
-                    // Optionally, display the join code to the user
+                    ServerStarted();
                 }
             }
         }
 
-        [Rpc(SendTo.Server)]
-        private void ServerStartedRpc()
+        private void ServerStarted()
         {
-            PlayerSpawner.Instance.SpawnPlayerRpc();
+            //PlayerSpawner.Instance.SpawnPlayer();
             OnHostStarted?.Invoke();
         }
     }

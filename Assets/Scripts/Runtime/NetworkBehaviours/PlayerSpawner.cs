@@ -1,5 +1,5 @@
-using Cinemachine;
 using MonoBehaviours.GroundSectionSystem;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -9,8 +9,6 @@ namespace MonoBehaviours
     public class PlayerSpawner : NetworkBehaviour
     {
         [SerializeField] private GameObject Player;
-        [SerializeField] private GameObject Camera;
-        [SerializeField] private bool SpawnOnStart;
 
         public static PlayerSpawner Instance;
 
@@ -29,32 +27,38 @@ namespace MonoBehaviours
             }
         }
 
-        private void OnEnable()
+        public override void OnNetworkSpawn()
         {
-            if (SpawnOnStart)
+            if (IsHost)
             {
-                SpawnPlayerRpc();
+                NetworkManager.OnClientConnectedCallback += SpawnClient;
             }
         }
 
-        [Rpc(SendTo.ClientsAndHost)]
-        public void SpawnPlayerRpc(RpcParams rpcParams = default)
+        public override void OnNetworkDespawn()
+        {
+            if (IsHost)
+            {
+                NetworkManager.OnClientConnectedCallback -= SpawnClient;
+            }
+        }
+
+        private void SpawnClient(ulong clientId)
+        {
+            SpawnPlayerRpc(clientId);
+        }
+
+        [Rpc(SendTo.Server)]
+        public void SpawnPlayerRpc(ulong clientId)
         {
             GameObject player = Instantiate(Player, Vector3.zero, new Quaternion(0, 0, 0, 0));
-            if (IsOwner)
-            {
-                GameObject camera = Instantiate(Camera, Vector3.zero, new Quaternion(0, 0, 0, 0));
-                
-                if (camera.GetComponentInChildren<CinemachineTargetGroup>())
-                {
-                    camera.GetComponentInChildren<CinemachineTargetGroup>().AddMember(player.transform, 1, 0);
-                }                   
-            }
-            player.transform.position = GetRandomSpawnGameObject().transform.position;
-            player.GetComponent<NetworkObject>().Spawn();
+
+            player.name = $"Player {clientId}";
+            player.transform.position = GetRandomSpawnPosition().transform.position;
+            player.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
         }
 
-        private GameObject GetRandomSpawnGameObject()
+        private GameObject GetRandomSpawnPosition()
         {
             int chosenNumber = Random.Range(0, _currentLevelDataHolder.SpawnPlaces.Count);
             return _currentLevelDataHolder.SpawnPlaces[chosenNumber];
