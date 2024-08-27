@@ -1,8 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class ActorBaseParams : ScriptableObject
+namespace Core.ScriptableObjects
 {
-    public int ActorHealth { get; protected set; }
+    public class ActorBaseParams : ScriptableObject
+    {
+        [SerializeField]
+        public int _actorHealth;
+        public int ActorHealth
+        {
+            get => _actorHealth;
+            protected set => _actorHealth = value;
+        }
+    }
 }

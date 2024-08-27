@@ -1,10 +1,11 @@
 using System;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace MonoBehaviours.GroundSectionSystem
 {
     [RequireComponent(typeof(HealthComponent))]
-    public class Obstacle : MonoBehaviour
+    public class Obstacle : NetworkBehaviour, INetworkSerializable
     {
         public HealthComponent ObstacleHealthComponent;
         public bool CanReceiveDamage { get; protected set; }
@@ -12,6 +13,9 @@ namespace MonoBehaviours.GroundSectionSystem
 
         protected Action<bool> OnAbilityToReciveDamageChanged;
         protected Action<bool> OnAbilityToPlayerCanStepOnItChanged;
+
+
+        private Vector3 _position;
 
         private void Start()
         {
@@ -33,6 +37,12 @@ namespace MonoBehaviours.GroundSectionSystem
         public virtual void SetNewPosition(Vector3 position)
         {
             transform.position = position;
+            _position = position;
+        }
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref _position);
         }
     }
 }

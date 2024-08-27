@@ -10,6 +10,8 @@ namespace MonoBehaviours
 
         [SerializeField]
         private int StartingCount;
+        [SerializeField, Tooltip("If true, will reparent Objects on Get and Add to pool")]
+        private bool UseReparenting;
         
         
         private Queue<GameObject> _pool;
@@ -42,13 +44,24 @@ namespace MonoBehaviours
         public void AddToPool(GameObject newMember)
         {
             _pool.Enqueue(newMember);
-            newMember.transform.SetParent(transform);
+            if (UseReparenting)
+            {
+                newMember.transform.SetParent(transform);
+            }
             newMember.SetActive(false);
         }
         
         private GameObject InstantiateNewMember(bool activeFromStart)
         {
-            GameObject newObject = Instantiate(ObjectExample, Vector3.zero, new Quaternion(0, 0, 0, 0), transform);
+            GameObject newObject;
+            if (UseReparenting)
+            {
+                newObject = Instantiate(ObjectExample, Vector3.zero, new Quaternion(0, 0, 0, 0), transform);
+            }
+            else
+            {
+                newObject = Instantiate(ObjectExample, Vector3.zero, new Quaternion(0, 0, 0, 0));
+            }
             newObject.SetActive(activeFromStart);
             return newObject;
         }

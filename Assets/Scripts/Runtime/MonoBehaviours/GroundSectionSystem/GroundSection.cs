@@ -1,11 +1,12 @@
 using System;
 using MonoBehaviours.GroundSectionSystem;
 using Unity.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace MonoBehaviours.GroundSectionSystem
 {
-    public class GroundSection : MonoBehaviour
+    public class GroundSection : NetworkBehaviour, INetworkSerializable
     {
         public Vector3 ObstaclePlacementPosition { get; private set; }
         [ReadOnly]
@@ -45,6 +46,11 @@ namespace MonoBehaviours.GroundSectionSystem
             var lastObstacle = PlacedObstacle;
             PlacedObstacle = null;
             return lastObstacle;
+        }
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeNetworkSerializable<Obstacle>(ref PlacedObstacle);
         }
     }
 }

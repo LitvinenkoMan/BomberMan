@@ -4,6 +4,7 @@ using MonoBehaviours.GroundSectionSystem;
 using MonoBehaviours.GroundSectionSystem.SectionObstacles;
 using ScriptableObjects;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
@@ -18,7 +19,7 @@ namespace Runtime.NetworkBehaviours
         [SerializeField]
         private ObjectPoolQueue BombsPool;
 
-        private byte currentPlacedBombs;
+        private int currentPlacedBombs;
 
         // Input
         private PlayerMainControls _controls;
@@ -27,12 +28,12 @@ namespace Runtime.NetworkBehaviours
         private void OnEnable()
         {
             Initialize();
-            PlaceBombAction.performed += DeployBomb;
+            PlaceBombAction.performed += DeployBombAction;
         }
 
         private void OnDisable()
         {
-            PlaceBombAction.performed -= DeployBomb;
+            PlaceBombAction.performed -= DeployBombAction;
         }
 
         private void Initialize()
@@ -50,48 +51,71 @@ namespace Runtime.NetworkBehaviours
             }
         }
         
-        private void DeployBomb(InputAction.CallbackContext context)
+        private void DeployBombAction(InputAction.CallbackContext context)
         {
-            if (IsOwner) return;
+            if (!IsOwner)
+            {
+                return;
+            }
 
             if (IsServer)
             {
-                var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
-                if (section && !section.PlacedObstacle && currentPlacedBombs < bomberParams.BombsAtTime)
-                {
-                    var bomb = BombsPool.GetFromPool(true).GetComponent<Bomb>();
-                    bomb.PlaceBomb(section.ObstaclePlacementPosition);
-                    bomb.transform.SetParent(null);
-                    bomb.onExplode += SubtractAmountOfCurrentBombs;
-                    section.AddObstacle(bomb);
-                    currentPlacedBombs++;
-                }
+                Debug.Log("Deploying from Server");
+                DeployBomb();
             }
             else
             {
+                Debug.Log("Deploying from Client");
                 DeployBombRpc();
             }
-           
-        } 
-        
-        [Rpc(SendTo.ClientsAndHost)]
+        }
+
+        private void DeployBomb()
+        {
+            var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
+            if (section && !section.PlacedObstacle && currentPlacedBombs < bomberParams.BombsAtTime)
+            {
+                var bomb = BombsPool.GetFromPool(true).GetComponent<Bomb>();
+                bomb.PlaceBomb(section.ObstaclePlacementPosition);
+                bomb.transform.SetParent(null);
+                bomb.onExplode += SubtractAmountOfCurrentBombs;
+                section.AddObstacle(bomb);
+                if (!bomb.NetworkObject.IsSpawned)
+                {
+                    bomb.NetworkObject.Spawn();
+                }
+                currentPlacedBombs++;
+            }
+        }
+
+        [Rpc(SendTo.Server)]
         private void DeployBombRpc()
         {
-            DeployBomb(new InputAction.CallbackContext());      // TODO: Input callback looks bad 
+           DeployBomb();
         }
 
         private void SubtractAmountOfCurrentBombs(Bomb explodedBomb)
         {
             currentPlacedBombs--;
             explodedBomb.onExplode -= SubtractAmountOfCurrentBombs;
-            StartCoroutine(ReturnBombBackToPool(explodedBomb));
+            StartCoroutine(ReturnBombBackToPoolRoutine(explodedBomb));
         }
 
-        private IEnumerator ReturnBombBackToPool(Bomb bomb)
+        
+        private IEnumerator ReturnBombBackToPoolRoutine(Bomb bomb)
         {
-            yield return new WaitForSeconds(2.1f);  // I pushing bombs to return explosion effects back to ObjectPool, since I do that,
-            BombsPool.AddToPool(bomb.gameObject);   // I need to wait until coroutine will return them back, and after that I will return bomb,
-            bomb.Reset();                           // because coroutines won't work if Object is Disabled
+            yield return new WaitForSeconds(2.1f);                      // I pushing bombs to return explosion effects back to ObjectPool, since I do that,
+            ReturnBombToPool(bomb);                 // I need to wait until coroutine will return them back, and after that I will return bomb,
+        }
+
+        private void ReturnBombToPool(NetworkBehaviourReference bomb)
+        {
+            if (bomb.TryGet(out Bomb explodedBomb))
+            {
+                BombsPool.AddToPool(explodedBomb.gameObject);
+                explodedBomb.Reset();
+                explodedBomb.NetworkObject.Despawn(false);
+            }
         }
     }
 }

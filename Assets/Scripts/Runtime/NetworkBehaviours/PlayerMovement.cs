@@ -2,7 +2,6 @@ using ScriptableObjects;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
 
 namespace NetworkBehaviours
 {
@@ -17,7 +16,7 @@ namespace NetworkBehaviours
         private CharacterController _controller;
         private PlayerMainControls _controls;
         private InputAction MoveAction;
-
+        
 
         void Start()
         {

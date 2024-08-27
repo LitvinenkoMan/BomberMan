@@ -2,13 +2,13 @@ using System;
 using System.Collections;
 using Interfaces;
 using ScriptableObjects;
+using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 {
     [RequireComponent(typeof(SphereCollider))]
-    public class Bomb : Obstacle, IBomb
+    public class Bomb : Obstacle, IBomb, INetworkSerializable
     {
         public bool IgniteOnStart;
         public Action<Bomb> onExplode;
@@ -23,6 +23,16 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         private float _timer; 
         private bool _isTimerOn;
         private bool _isExploded;
+        
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref IgniteOnStart);
+            serializer.SerializeValue(ref _timer);
+            serializer.SerializeValue(ref _isTimerOn);
+            serializer.SerializeValue(ref _isExploded);
+            //bomberParams.NetworkSerialize(serializer);
+        }
 
         private void Start()
         {
@@ -156,6 +166,23 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
                 default:
                     throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
             }
+        }
+
+        private void PlaceExplosionEffectAction(GroundSection currentSection)
+        {
+            if (!IsOwner)
+            {
+                return;
+            }
+
+           
+            PlaceExplosionEffectRpc(currentSection);
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        private void PlaceExplosionEffectRpc(GroundSection currentSection)
+        {
+            PlaceExplosionEffect(currentSection);
         }
 
         private void PlaceExplosionEffect(GroundSection currentSection)

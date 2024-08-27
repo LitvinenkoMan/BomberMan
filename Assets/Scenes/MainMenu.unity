@@ -964,8 +964,6 @@ MonoBehaviour:
   RoomPassword: {fileID: 996351889}
   RoomJoinCodeText: {fileID: 833892022}
   LevelSelection: {fileID: 656679169}
-  PlayerSpawner: {fileID: 4941679796587064009, guid: 0dc3db77422b66b41aa780655626f80c,
-    type: 3}
   OnHostLaunched:
     m_PersistentCalls:
       m_Calls:
@@ -7240,9 +7238,6 @@ MonoBehaviour:
   RoomName: {fileID: 1394546891}
   OnClientConnectionLaunched:
     m_PersistentCalls:
-      m_Calls: []
-  OnClientConnected:
-    m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1997165220}
         m_TargetAssemblyTypeName: SceneLoader, Assembly-CSharp
@@ -7256,6 +7251,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  OnClientConnected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!4 &1991840784
 Transform:
   m_ObjectHideFlags: 0
