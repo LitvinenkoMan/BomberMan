@@ -181,6 +181,7 @@ MonoBehaviour:
   ObjectExample: {fileID: 8714386848068576198, guid: f3cee022495b2814ab9edb9278637df7,
     type: 3}
   StartingCount: 20
+  UseReparenting: 1
 --- !u!1 &849075579
 GameObject:
   m_ObjectHideFlags: 0

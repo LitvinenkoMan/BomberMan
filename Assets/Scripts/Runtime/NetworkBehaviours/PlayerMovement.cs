@@ -21,7 +21,6 @@ namespace NetworkBehaviours
         void Start()
         {
             _controller = GetComponent<CharacterController>();
-            BomberParameters.ResetValues();
         }
 
         public override void OnNetworkSpawn()
@@ -41,14 +40,14 @@ namespace NetworkBehaviours
             // TODO: remake it to listen events
             if (MoveAction.IsInProgress() && IsOwner)
             {
-                OnMoveRpc(MoveAction.ReadValue<Vector2>());
+                OnMoveRpc(MoveAction.ReadValue<Vector2>(), BomberParameters._speedMultiplier);
             }
         }
 
-        [Rpc(SendTo.ClientsAndHost)]
-        public void OnMoveRpc(Vector2 inputValue)
+        [Rpc(SendTo.Server)]
+        public void OnMoveRpc(Vector2 inputValue, float speedMultiplier)
         {
-            _controller.Move(new Vector3(inputValue.x, 0, inputValue.y) * (BomberParameters.SpeedMultiplier * Time.deltaTime));
+            _controller.Move(new Vector3(inputValue.x, 0, inputValue.y) * (speedMultiplier * NetworkManager.ServerTime.FixedDeltaTime));
         }
     }
 }

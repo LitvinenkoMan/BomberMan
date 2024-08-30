@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using MonoBehaviours.GroundSectionSystem;
+using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -84,6 +85,7 @@ namespace MonoBehaviours
             var powerUpObject = _powerUpsPool.GetFromPool(true);
             var powerUp = powerUpObject.GetComponent<PowerUp>();
             _currentSectionToSpawn.AddObstacle(powerUp);
+            //powerUp.NetworkObject.Spawn();
         } 
     }
 }

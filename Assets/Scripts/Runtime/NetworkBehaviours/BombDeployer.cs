@@ -61,25 +61,26 @@ namespace Runtime.NetworkBehaviours
             if (IsServer)
             {
                 Debug.Log("Deploying from Server");
-                DeployBomb();
+                DeployBomb(bomberParams.BombsAtTime);
             }
             else
             {
                 Debug.Log("Deploying from Client");
-                DeployBombRpc();
+                DeployBombRpc(bomberParams.BombsAtTime);
             }
         }
 
-        private void DeployBomb()
+        private void DeployBomb(int bombsAtTime)
         {
             var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
-            if (section && !section.PlacedObstacle && currentPlacedBombs < bomberParams.BombsAtTime)
+            if (section && !section.PlacedObstacle && currentPlacedBombs < bombsAtTime)
             {
                 var bomb = BombsPool.GetFromPool(true).GetComponent<Bomb>();
-                bomb.PlaceBomb(section.ObstaclePlacementPosition);
+                bomb.SetNewPosition(section.ObstaclePlacementPosition);
                 bomb.transform.SetParent(null);
                 bomb.onExplode += SubtractAmountOfCurrentBombs;
                 section.AddObstacle(bomb);
+                bomb.Ignite();
                 if (!bomb.NetworkObject.IsSpawned)
                 {
                     bomb.NetworkObject.Spawn();
@@ -89,9 +90,9 @@ namespace Runtime.NetworkBehaviours
         }
 
         [Rpc(SendTo.Server)]
-        private void DeployBombRpc()
+        private void DeployBombRpc(int bombsAtTime)
         {
-           DeployBomb();
+           DeployBomb(bombsAtTime);
         }
 
         private void SubtractAmountOfCurrentBombs(Bomb explodedBomb)
@@ -105,7 +106,7 @@ namespace Runtime.NetworkBehaviours
         private IEnumerator ReturnBombBackToPoolRoutine(Bomb bomb)
         {
             yield return new WaitForSeconds(2.1f);                      // I pushing bombs to return explosion effects back to ObjectPool, since I do that,
-            ReturnBombToPool(bomb);                 // I need to wait until coroutine will return them back, and after that I will return bomb,
+            ReturnBombToPool(bomb);                 // I need to wait until coroutine will return them back, and after that I will return bomb
         }
 
         private void ReturnBombToPool(NetworkBehaviourReference bomb)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using Interfaces;
+using Runtime.MonoBehaviours;
 using ScriptableObjects;
 using Unity.Netcode;
 using UnityEngine;
@@ -8,7 +9,7 @@ using UnityEngine;
 namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 {
     [RequireComponent(typeof(SphereCollider))]
-    public class Bomb : Obstacle, IBomb, INetworkSerializable
+    public class Bomb : Obstacle, INetworkSerializable
     {
         public bool IgniteOnStart;
         public Action<Bomb> onExplode;
@@ -64,7 +65,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
                 _timer -= Time.deltaTime;
                 if (_timer <= 0)
                 {
-                    Explode();
+                    ExplodeRpc();
                 }
             }
         }
@@ -87,24 +88,20 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             ObstacleHealthComponent.SetHealth(1);
         }
 
-        public void PlaceBomb(Vector3 newPos)
-        {
-            transform.position = newPos;
-        }
-
         public void Ignite()
         {
             _isTimerOn = true;
         }
 
-        public void Explode()
+        [Rpc(SendTo.ClientsAndHost)]
+        private void ExplodeRpc()
         {
             BombVisuals.SetActive(false);
             
             GroundSection startSection = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
             startSection.RemoveObstacle();
 
-            PlaceExplosionEffect(startSection);
+            PlaceExplosionEffect(startSection.ObstaclePlacementPosition);
 
             ExplodeToDirection(startSection.ConnectedSections.upperSection, bomberParams.BombsSpreading - 1,
                 SpreadDirections.Up);
@@ -133,7 +130,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
                 DamageObstacle(currentSection.PlacedObstacle);
             }
 
-            PlaceExplosionEffect(currentSection);
+            PlaceExplosionEffect(currentSection.ObstaclePlacementPosition);
 
             TryDamageHealthComponent(currentSection.ObstaclePlacementPosition);
             
@@ -156,8 +153,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
                     break;
                 case SpreadDirections.Right:
                     if (currentSection.ConnectedSections.rightSection)
-                        ExplodeToDirection(currentSection.ConnectedSections.rightSection, depth,
-                            SpreadDirections.Right);
+                        ExplodeToDirection(currentSection.ConnectedSections.rightSection, depth, SpreadDirections.Right);
                     break;
                 case SpreadDirections.Left:
                     if (currentSection.ConnectedSections.leftSection)
@@ -168,27 +164,10 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             }
         }
 
-        private void PlaceExplosionEffectAction(GroundSection currentSection)
-        {
-            if (!IsOwner)
-            {
-                return;
-            }
-
-           
-            PlaceExplosionEffectRpc(currentSection);
-        }
-
-        [Rpc(SendTo.ClientsAndHost)]
-        private void PlaceExplosionEffectRpc(GroundSection currentSection)
-        {
-            PlaceExplosionEffect(currentSection);
-        }
-
-        private void PlaceExplosionEffect(GroundSection currentSection)
+        private void PlaceExplosionEffect(Vector3 explPosition)
         {
             GameObject expl = GroundSectionsUtils.Instance.ExplosionsPool.GetFromPool(true);
-            expl.transform.position = currentSection.ObstaclePlacementPosition;
+            expl.transform.position = explPosition;
             StartCoroutine(ReturnExplosionToPool(expl));
         }
 
@@ -217,13 +196,18 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         private void OnHealthRunOutExplode()
         {
-            Explode();
+            ExplodeRpc();
         }
 
         private IEnumerator ReturnExplosionToPool(GameObject expl)
         {
             yield return new WaitForSeconds(2);
             GroundSectionsUtils.Instance.ExplosionsPool.AddToPool(expl);
+        }
+
+        public override void SetNewPosition(Vector3 position)
+        {
+            transform.position = position;
         }
     }
 }

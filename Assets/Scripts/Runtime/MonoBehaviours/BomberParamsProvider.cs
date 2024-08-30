@@ -1,3 +1,4 @@
+using System;
 using ScriptableObjects;
 using TMPro;
 using Unity.Netcode;
@@ -11,6 +12,11 @@ namespace MonoBehaviours
         private TMP_Text PlayerName;
         [SerializeField]
         private BaseBomberParameters BomberParams;
+
+        private void Start()
+        {
+            BomberParams.ResetValues();
+        }
 
         public BaseBomberParameters GetBomberParams()
         {

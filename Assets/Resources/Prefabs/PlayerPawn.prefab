@@ -292,6 +292,7 @@ MonoBehaviour:
   ObjectExample: {fileID: 6260933269128134215, guid: a19dc95892433e948a0a89d9befe479e,
     type: 3}
   StartingCount: 10
+  UseReparenting: 0
 --- !u!114 &7137738926094273680
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -3,7 +3,7 @@ using System.Collections;
 using Core.ScriptableObjects;
 using UnityEngine;
 
-namespace MonoBehaviours
+namespace Runtime.MonoBehaviours
 {
     public class HealthComponent : MonoBehaviour
     {
@@ -15,13 +15,16 @@ namespace MonoBehaviours
         private float ImmunityTime;
         [SerializeField, Tooltip("Will be used if Base Params is not set")]
         private byte StartingHealth;
+        
         public int HealthPoints { get; private set; }
 
         private bool _isImmune;
         
+        
         // Events
         public Action<int> OnHealthChanged;
         public Action OnHealthRunOut;
+        
 
         private void Start()
         {

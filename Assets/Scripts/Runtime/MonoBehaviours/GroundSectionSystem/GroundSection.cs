@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MonoBehaviours.GroundSectionSystem
 {
-    public class GroundSection : NetworkBehaviour, INetworkSerializable
+    public class GroundSection : MonoBehaviour
     {
         public Vector3 ObstaclePlacementPosition { get; private set; }
         [ReadOnly]
@@ -46,11 +46,6 @@ namespace MonoBehaviours.GroundSectionSystem
             var lastObstacle = PlacedObstacle;
             PlacedObstacle = null;
             return lastObstacle;
-        }
-
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-        {
-            serializer.SerializeNetworkSerializable<Obstacle>(ref PlacedObstacle);
         }
     }
 }
