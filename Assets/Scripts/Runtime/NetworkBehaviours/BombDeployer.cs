@@ -61,16 +61,16 @@ namespace Runtime.NetworkBehaviours
             if (IsServer)
             {
                 Debug.Log("Deploying from Server");
-                DeployBomb(bomberParams.BombsAtTime);
+                DeployBomb(bomberParams.BombsAtTime, bomberParams.BombsCountdown, bomberParams.BombsDamage, bomberParams.BombsSpreading);
             }
             else
             {
                 Debug.Log("Deploying from Client");
-                DeployBombRpc(bomberParams.BombsAtTime);
+                DeployBombRpc(bomberParams.BombsAtTime, bomberParams.BombsCountdown, bomberParams.BombsDamage, bomberParams.BombsSpreading);
             }
         }
 
-        private void DeployBomb(int bombsAtTime)
+        private void DeployBomb(int bombsAtTime, float timeToExplode, int bombDamage, int bombSpread)
         {
             var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
             if (section && !section.PlacedObstacle && currentPlacedBombs < bombsAtTime)
@@ -80,7 +80,7 @@ namespace Runtime.NetworkBehaviours
                 bomb.transform.SetParent(null);
                 bomb.onExplode += SubtractAmountOfCurrentBombs;
                 section.AddObstacle(bomb);
-                bomb.Ignite();
+                bomb.Ignite(timeToExplode, bombDamage, bombSpread);
                 if (!bomb.NetworkObject.IsSpawned)
                 {
                     bomb.NetworkObject.Spawn();
@@ -90,9 +90,9 @@ namespace Runtime.NetworkBehaviours
         }
 
         [Rpc(SendTo.Server)]
-        private void DeployBombRpc(int bombsAtTime)
+        private void DeployBombRpc(int bombsAtTime, float timeToExplode, int bombDamage, int bombSpread)
         {
-           DeployBomb(bombsAtTime);
+           DeployBomb(bombsAtTime, timeToExplode, bombDamage, bombSpread);
         }
 
         private void SubtractAmountOfCurrentBombs(Bomb explodedBomb)

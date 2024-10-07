@@ -8,30 +8,30 @@ namespace ScriptableObjects
     public class BaseBomberParameters : ActorBaseParams, INetworkSerializable
     {
         [SerializeField]
-        public int _startPlayerHealth = 3;
+        private int _startPlayerHealth = 3;
         [SerializeField]
-        public int _startSpeedMultiplier = 5;
+        private int _startSpeedMultiplier = 5;
         [SerializeField]
-        public int _startBombsAtTime = 1;
+        private int _startBombsAtTime = 1;
         [SerializeField]
-        public int _startBombsSpreading = 1;
+        private int _startBombsSpreading = 1;
         [SerializeField]
-        public int _startBombsCountdown = 3;
+        private int _startBombsCountdown = 3;
         [SerializeField]
-        public int _startBombsDamage = 1;
+        private int _startBombsDamage = 1;
         
         [Space(20)]
         [Header("Current Values:")]
         [SerializeField]
-        public int _speedMultiplier;
+        private int _speedMultiplier;
         [SerializeField]
-        public int _bombsAtTime;
+        private int _bombsAtTime;
         [SerializeField]
-        public int _bombsSpreading;
+        private int _bombsSpreading;
         [SerializeField]
-        public int _bombsCountdown;
+        private int _bombsCountdown;
         [SerializeField]
-        public int _bombsDamage;
+        private int _bombsDamage;
         
         public int SpeedMultiplier 
         {

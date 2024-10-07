@@ -24,9 +24,13 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         private float _timer; 
         private bool _isTimerOn;
         private bool _isExploded;
+
+        private int _bombSpread;
+        private float _timeToExplode;
+        private int _bombDamage;
         
 
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        public new void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref IgniteOnStart);
             serializer.SerializeValue(ref _timer);
@@ -44,11 +48,11 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         private void OnEnable()
         {
-            _timer = bomberParams.BombsCountdown;
-            if (IgniteOnStart)
-            {
-                Ignite();
-            }
+            // if (IgniteOnStart)
+            // {
+            //     Ignite(3, 1, );              TODO: Change Ignite on start logic
+            // }
+            //_timer = _timeToExplode;
 
             ObstacleHealthComponent.OnHealthRunOut += OnHealthRunOutExplode;
         }
@@ -65,7 +69,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
                 _timer -= Time.deltaTime;
                 if (_timer <= 0)
                 {
-                    ExplodeRpc();
+                    ExplodeRpc(_bombSpread);
                 }
             }
         }
@@ -80,7 +84,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         public void Reset()
         {
-            _timer = bomberParams.BombsCountdown;
+            _timer = _timeToExplode;
             _isTimerOn = false;
             _isExploded = false;
             _bombCollider.isTrigger = true;
@@ -88,13 +92,18 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             ObstacleHealthComponent.SetHealth(1);
         }
 
-        public void Ignite()
+        public void Ignite(float timeToExplode, int bombDamage, int bombSpread)
         {
+            _timeToExplode = timeToExplode;
+            _bombDamage = bombDamage;
+            _bombSpread = bombSpread;
+            
+            _timer = _timeToExplode;
             _isTimerOn = true;
         }
 
-        [Rpc(SendTo.ClientsAndHost)]
-        private void ExplodeRpc()
+        [Rpc(SendTo.Everyone)]
+        private void ExplodeRpc(int bombSpreading)
         {
             BombVisuals.SetActive(false);
             
@@ -103,13 +112,13 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
             PlaceExplosionEffect(startSection.ObstaclePlacementPosition);
 
-            ExplodeToDirection(startSection.ConnectedSections.upperSection, bomberParams.BombsSpreading - 1,
+            ExplodeToDirection(startSection.ConnectedSections.upperSection, bombSpreading - 1,
                 SpreadDirections.Up);
-            ExplodeToDirection(startSection.ConnectedSections.lowerSection, bomberParams.BombsSpreading - 1,
+            ExplodeToDirection(startSection.ConnectedSections.lowerSection, bombSpreading - 1,
                 SpreadDirections.Down);
-            ExplodeToDirection(startSection.ConnectedSections.rightSection, bomberParams.BombsSpreading - 1,
+            ExplodeToDirection(startSection.ConnectedSections.rightSection, bombSpreading - 1,
                 SpreadDirections.Right);
-            ExplodeToDirection(startSection.ConnectedSections.leftSection, bomberParams.BombsSpreading - 1,
+            ExplodeToDirection(startSection.ConnectedSections.leftSection, bombSpreading - 1,
                 SpreadDirections.Left);
 
             _isTimerOn = false;
@@ -175,7 +184,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         {
             if (obstacle.CanReceiveDamage)
             {
-                obstacle.ObstacleHealthComponent.SetHealth(obstacle.ObstacleHealthComponent.HealthPoints - bomberParams.BombsDamage);
+                obstacle.ObstacleHealthComponent.SetHealth(obstacle.ObstacleHealthComponent.HealthPoints - _bombDamage);
             }
         }
 
@@ -196,7 +205,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         private void OnHealthRunOutExplode()
         {
-            ExplodeRpc();
+            ExplodeRpc(bomberParams.BombsSpreading);
         }
 
         private IEnumerator ReturnExplosionToPool(GameObject expl)

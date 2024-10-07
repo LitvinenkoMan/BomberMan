@@ -12,9 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 037790be67ce2864caad0cbf556944bb, type: 3}
   m_Name: BasePlayerParameters
   m_EditorClassIdentifier: 
+  _actorHealth: 3
   _startPlayerHealth: 3
-  _startSpeedMultiplier: 5
+  _startSpeedMultiplier: 3
   _startBombsAtTime: 1
   _startBombsSpreading: 1
   _startBombsCountdown: 3
   _startBombsDamage: 1
+  _speedMultiplier: 2
+  _bombsAtTime: 1
+  _bombsSpreading: 1
+  _bombsCountdown: 3
+  _bombsDamage: 1

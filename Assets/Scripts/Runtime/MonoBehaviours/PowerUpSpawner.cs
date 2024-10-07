@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using MonoBehaviours.GroundSectionSystem;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Android;
 using Random = UnityEngine.Random;
 
 namespace MonoBehaviours
 {
     [RequireComponent(typeof(ObjectPoolQueue))]
-    public class PowerUpSpawner : MonoBehaviour
+    public class PowerUpSpawner : NetworkBehaviour
     {
         [Header("List of Power ups to spawn")]
         [SerializeField]
@@ -31,9 +32,20 @@ namespace MonoBehaviours
 
         private void Start()
         {
-            _powerUpsPool = GetComponent<ObjectPoolQueue>();
+           
+            if (!IsServer)
+            {
+                Debug.Log("Exiting from creating Power ups Queue");
+                _canSpawn = false;
+                return;
+            }  
+            Debug.Log("Creating Queue");
             CreatePowerUpsQueue();
             EnableSpawning();
+        }
+
+        public override void OnNetworkSpawn()
+        {
         }
 
         private void Update()
@@ -41,7 +53,9 @@ namespace MonoBehaviours
             _timer += Time.deltaTime;
             if (_canSpawn && _timer >= TimePerSpawn)
             {
-                SpawnPowerUp();
+                var powerUpObject = _powerUpsPool.GetFromPool(true);
+                var powerUp = powerUpObject.GetComponent<PowerUp>();            //TODO: Change this!
+                SpawnPowerUpRpc(powerUp);
                 _timer = 0;
             }
         }
@@ -59,8 +73,9 @@ namespace MonoBehaviours
         {
             _canSpawn = true;
         }
-
-        private void SpawnPowerUp()
+        
+        [Rpc(SendTo.Server)]
+        private void SpawnPowerUpRpc(PowerUp powerUpRef)
         {
             _currentSectionToSpawn = null;
             var randomSection = SpawnPlaces[Random.Range(0, SpawnPlaces.Count)];
@@ -81,12 +96,10 @@ namespace MonoBehaviours
             }
 
             if (!_currentSectionToSpawn) return;
-            
-            var powerUpObject = _powerUpsPool.GetFromPool(true);
-            var powerUp = powerUpObject.GetComponent<PowerUp>();
-            _currentSectionToSpawn.AddObstacle(powerUp);
-            //powerUp.NetworkObject.Spawn();
-        } 
+
+            _currentSectionToSpawn.AddObstacle(powerUpRef);
+            powerUpRef.NetworkObject.Spawn();
+        }
     }
 }
 

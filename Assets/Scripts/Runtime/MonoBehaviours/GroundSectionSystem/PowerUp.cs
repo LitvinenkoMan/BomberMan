@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using ScriptableObjects;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace MonoBehaviours.GroundSectionSystem
@@ -75,6 +76,16 @@ namespace MonoBehaviours.GroundSectionSystem
                 RemovePowerUpFromGroundSection();
                 Destroy(gameObject);
             }
+        }
+
+        public new void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref TimedPowerUp);
+            serializer.SerializeValue(ref LifeTime);
+            serializer.SerializeValue(ref TimedEffect);
+            serializer.SerializeValue(ref EffectTime);
+            
+            serializer.SerializeValue(ref _isTaken);
         }
     }
 }

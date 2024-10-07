@@ -96,6 +96,7 @@ GameObject:
   - component: {fileID: 4885410379879364110}
   - component: {fileID: 5103486156327863509}
   - component: {fileID: 599266416405599715}
+  - component: {fileID: 1452392282775886734}
   - component: {fileID: 3237399570878482917}
   m_Layer: 0
   m_Name: BombsAtTimePowerUp
@@ -157,6 +158,27 @@ MonoBehaviour:
   ImmuneAfterGettingDamaged: 0
   ImmunityTime: 0
   StartingHealth: 1
+--- !u!114 &1452392282775886734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5447648150043509698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 1471606505
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!114 &3237399570878482917
 MonoBehaviour:
   m_ObjectHideFlags: 0

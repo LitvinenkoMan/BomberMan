@@ -45,6 +45,15 @@ public partial class @PlayerMainControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Quit"",
+                    ""type"": ""Button"",
+                    ""id"": ""88eef341-fb77-486a-b117-9dedd287bf48"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -113,6 +122,17 @@ public partial class @PlayerMainControls: IInputActionCollection2, IDisposable
                     ""action"": ""PlaceBomb"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b20f6312-e810-4271-a2ed-2a5d315fb53b"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""PlayerControllScheme"",
+                    ""action"": ""Quit"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -129,6 +149,7 @@ public partial class @PlayerMainControls: IInputActionCollection2, IDisposable
         m_PlayerMainActionMaps = asset.FindActionMap("PlayerMainActionMaps", throwIfNotFound: true);
         m_PlayerMainActionMaps_Move = m_PlayerMainActionMaps.FindAction("Move", throwIfNotFound: true);
         m_PlayerMainActionMaps_PlaceBomb = m_PlayerMainActionMaps.FindAction("PlaceBomb", throwIfNotFound: true);
+        m_PlayerMainActionMaps_Quit = m_PlayerMainActionMaps.FindAction("Quit", throwIfNotFound: true);
     }
 
     ~@PlayerMainControls()
@@ -197,12 +218,14 @@ public partial class @PlayerMainControls: IInputActionCollection2, IDisposable
     private List<IPlayerMainActionMapsActions> m_PlayerMainActionMapsActionsCallbackInterfaces = new List<IPlayerMainActionMapsActions>();
     private readonly InputAction m_PlayerMainActionMaps_Move;
     private readonly InputAction m_PlayerMainActionMaps_PlaceBomb;
+    private readonly InputAction m_PlayerMainActionMaps_Quit;
     public struct PlayerMainActionMapsActions
     {
         private @PlayerMainControls m_Wrapper;
         public PlayerMainActionMapsActions(@PlayerMainControls wrapper) { m_Wrapper = wrapper; }
         public InputAction @Move => m_Wrapper.m_PlayerMainActionMaps_Move;
         public InputAction @PlaceBomb => m_Wrapper.m_PlayerMainActionMaps_PlaceBomb;
+        public InputAction @Quit => m_Wrapper.m_PlayerMainActionMaps_Quit;
         public InputActionMap Get() { return m_Wrapper.m_PlayerMainActionMaps; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -218,6 +241,9 @@ public partial class @PlayerMainControls: IInputActionCollection2, IDisposable
             @PlaceBomb.started += instance.OnPlaceBomb;
             @PlaceBomb.performed += instance.OnPlaceBomb;
             @PlaceBomb.canceled += instance.OnPlaceBomb;
+            @Quit.started += instance.OnQuit;
+            @Quit.performed += instance.OnQuit;
+            @Quit.canceled += instance.OnQuit;
         }
 
         private void UnregisterCallbacks(IPlayerMainActionMapsActions instance)
@@ -228,6 +254,9 @@ public partial class @PlayerMainControls: IInputActionCollection2, IDisposable
             @PlaceBomb.started -= instance.OnPlaceBomb;
             @PlaceBomb.performed -= instance.OnPlaceBomb;
             @PlaceBomb.canceled -= instance.OnPlaceBomb;
+            @Quit.started -= instance.OnQuit;
+            @Quit.performed -= instance.OnQuit;
+            @Quit.canceled -= instance.OnQuit;
         }
 
         public void RemoveCallbacks(IPlayerMainActionMapsActions instance)
@@ -258,5 +287,6 @@ public partial class @PlayerMainControls: IInputActionCollection2, IDisposable
     {
         void OnMove(InputAction.CallbackContext context);
         void OnPlaceBomb(InputAction.CallbackContext context);
+        void OnQuit(InputAction.CallbackContext context);
     }
 }

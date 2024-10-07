@@ -40,14 +40,14 @@ namespace NetworkBehaviours
             // TODO: remake it to listen events
             if (MoveAction.IsInProgress() && IsOwner)
             {
-                OnMoveRpc(MoveAction.ReadValue<Vector2>(), BomberParameters._speedMultiplier);
+                OnMoveRpc(MoveAction.ReadValue<Vector2>(), BomberParameters.SpeedMultiplier);
             }
         }
 
         [Rpc(SendTo.Server)]
         public void OnMoveRpc(Vector2 inputValue, float speedMultiplier)
         {
-            _controller.Move(new Vector3(inputValue.x, 0, inputValue.y) * (speedMultiplier * NetworkManager.ServerTime.FixedDeltaTime));
+            _controller.Move(new Vector3(inputValue.x, 0, inputValue.y) * (speedMultiplier * 100 * Time.deltaTime * NetworkManager.NetworkTickSystem.ServerTime.FixedDeltaTime));
         }
     }
 }
