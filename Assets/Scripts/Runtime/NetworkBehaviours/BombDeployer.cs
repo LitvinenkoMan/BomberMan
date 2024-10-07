@@ -92,7 +92,8 @@ namespace Runtime.NetworkBehaviours
         [Rpc(SendTo.Server)]
         private void DeployBombRpc(int bombsAtTime, float timeToExplode, int bombDamage, int bombSpread)
         {
-           DeployBomb(bombsAtTime, timeToExplode, bombDamage, bombSpread);
+            Debug.Log("Sended ask to deploy bomb to server");
+            DeployBomb(bombsAtTime, timeToExplode, bombDamage, bombSpread);
         }
 
         private void SubtractAmountOfCurrentBombs(Bomb explodedBomb)

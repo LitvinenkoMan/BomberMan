@@ -1,4 +1,7 @@
 using System;
+using Runtime.MonoBehaviours.GroundSectionSystem;
+using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
@@ -9,17 +12,29 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         [SerializeField] private GameObject Visuals;
 
         private Collider _collider;
-        
-        private void OnEnable()
+
+        private void Initialize()
         {
+            if (!NetworkObject.IsSpawned)
+            {
+                NetworkObject.Spawn();
+                Debug.Log($"Brick {name} Spawned");
+            }
             CanReceiveDamage = true;
             CanPlayerStepOnIt = false;
-            ObstacleHealthComponent.OnHealthRunOut += BreakBricks;
+            Debug.Log($"Brick {name} Initialized");
+        }
+
+        private void OnEnable()
+        {
+            NetworkManager.OnServerStarted += Initialize;
+            ObstacleHealthComponent.OnHealthRunOut += OnHealthRunOutResponce;
         }
 
         private void OnDisable()
         {
-            ObstacleHealthComponent.OnHealthRunOut -= BreakBricks;
+            NetworkManager.OnServerStarted -= Initialize;
+            ObstacleHealthComponent.OnHealthRunOut -= OnHealthRunOutResponce;
         }
 
         void Start()
@@ -32,6 +47,17 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             Visuals.SetActive(true);
             _collider.isTrigger = false;
             ObstacleHealthComponent.SetHealth(1);
+        }
+
+        private void OnHealthRunOutResponce()
+        {
+            BreakBricksRpc();
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        private void BreakBricksRpc()
+        {
+            BreakBricks();
         }
 
         private void BreakBricks()

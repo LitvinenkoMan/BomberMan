@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
-namespace _Scripts.UI
+namespace Runtime.MonoBehaviours.UI
 {
     public class ViewPanelChanger : MonoBehaviour
     {

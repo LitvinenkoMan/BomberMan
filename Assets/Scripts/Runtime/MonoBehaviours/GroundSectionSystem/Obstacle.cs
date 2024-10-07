@@ -1,9 +1,8 @@
 using System;
-using Runtime.MonoBehaviours;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace MonoBehaviours.GroundSectionSystem
+namespace Runtime.MonoBehaviours.GroundSectionSystem
 {
     [RequireComponent(typeof(HealthComponent))]
     public class Obstacle : NetworkBehaviour, INetworkSerializable

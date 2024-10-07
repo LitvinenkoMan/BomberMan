@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
-using Interfaces;
 using Runtime.MonoBehaviours;
+using Runtime.MonoBehaviours.GroundSectionSystem;
 using ScriptableObjects;
 using Unity.Netcode;
 using UnityEngine;
@@ -102,7 +102,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             _isTimerOn = true;
         }
 
-        [Rpc(SendTo.Everyone)]
+        [Rpc(SendTo.ClientsAndHost)]
         private void ExplodeRpc(int bombSpreading)
         {
             BombVisuals.SetActive(false);
