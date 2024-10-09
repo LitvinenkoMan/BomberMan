@@ -6,7 +6,7 @@ namespace Core.ScriptableObjects
     public class ActorBaseParams : ScriptableObject
     {
         [SerializeField]
-        public int _actorHealth;
+        protected int _actorHealth;
         public int ActorHealth
         {
             get => _actorHealth;

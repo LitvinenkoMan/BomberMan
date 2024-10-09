@@ -1,12 +1,11 @@
-using System;
 using System.Collections.Generic;
+using MonoBehaviours;
 using MonoBehaviours.GroundSectionSystem;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Android;
 using Random = UnityEngine.Random;
 
-namespace MonoBehaviours
+namespace Runtime.MonoBehaviours
 {
     [RequireComponent(typeof(ObjectPoolQueue))]
     public class PowerUpSpawner : NetworkBehaviour
@@ -30,32 +29,42 @@ namespace MonoBehaviours
         private float _timer;
         private bool _canSpawn;
 
-        private void Start()
+        public override void OnNetworkSpawn()
         {
-           
+            _powerUpsPool = GetComponent<ObjectPoolQueue>();
+            
+            EnableSpawning();
             if (!IsServer)
             {
                 Debug.Log("Exiting from creating Power ups Queue");
-                _canSpawn = false;
                 return;
             }  
             Debug.Log("Creating Queue");
             CreatePowerUpsQueue();
-            EnableSpawning();
-        }
-
-        public override void OnNetworkSpawn()
-        {
         }
 
         private void Update()
         {
+            if (!_canSpawn || !IsServer)
+            {
+                return;
+            }
             _timer += Time.deltaTime;
-            if (_canSpawn && _timer >= TimePerSpawn)
+            if (_timer >= TimePerSpawn)
             {
                 var powerUpObject = _powerUpsPool.GetFromPool(true);
-                var powerUp = powerUpObject.GetComponent<PowerUp>();            //TODO: Change this!
-                SpawnPowerUpRpc(powerUp);
+                if (powerUpObject.TryGetComponent(out PowerUp powerUp))
+                {
+                    
+                    
+                        SpawnPowerUpRpc(powerUp);
+                }
+                else
+                {
+                    Debug.Log("Cant Get Power Up");
+                }
+
+                //TODO: Change this!
                 _timer = 0;
             }
         }
@@ -74,7 +83,7 @@ namespace MonoBehaviours
             _canSpawn = true;
         }
         
-        [Rpc(SendTo.Server)]
+        [Rpc(SendTo.ClientsAndHost)]
         private void SpawnPowerUpRpc(PowerUp powerUpRef)
         {
             _currentSectionToSpawn = null;

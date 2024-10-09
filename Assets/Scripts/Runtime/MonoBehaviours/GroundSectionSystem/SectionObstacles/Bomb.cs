@@ -141,7 +141,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
             PlaceExplosionEffect(currentSection.ObstaclePlacementPosition);
 
-            TryDamageHealthComponent(currentSection.ObstaclePlacementPosition);
+            TryDamageActorsOrPlayer(currentSection.ObstaclePlacementPosition);
             
             
             if (depth <= 0 )
@@ -188,17 +188,23 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             }
         }
 
-        private void TryDamageHealthComponent(Vector3 position)
+        private void TryDamageActorsOrPlayer(Vector3 position)
         {
-            Collider[] colliders = Physics.OverlapBox(position, new Vector3(1,1,1));
+            Collider[] colliders = Physics.OverlapBox(position, new Vector3(1, 1, 1));
 
             for (int i = 0; i < colliders.Length; i++)
             {
-                HealthComponent health;
-                colliders[i].gameObject.TryGetComponent(out health);
-                if (health && !colliders[i].gameObject.GetComponent<Obstacle>())    //TODO: recode this check, looks bad
+                if (colliders[i].gameObject.TryGetComponent(out HealthComponent health) 
+                    &&
+                    !colliders[i].gameObject.GetComponent<Obstacle>()) //TODO: recode this check, looks bad
                 {
                     health.SetHealth(health.HealthPoints - bomberParams.BombsDamage);
+                }
+
+                if (colliders[i].gameObject.TryGetComponent(out BomberParamsProvider paramsProvider))
+                {
+                    paramsProvider.GetBomberParams()
+                        .SetActorHealth((byte)(paramsProvider.GetBomberParams().ActorHealth - _bombDamage));
                 }
             }
         }

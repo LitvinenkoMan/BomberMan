@@ -1,10 +1,9 @@
-using System;
 using ScriptableObjects;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace MonoBehaviours
+namespace Runtime.MonoBehaviours
 {
     public class BomberParamsProvider : NetworkBehaviour
     {
