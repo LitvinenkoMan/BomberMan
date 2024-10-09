@@ -29,10 +29,14 @@ namespace Runtime.MonoBehaviours
         private float _timer;
         private bool _canSpawn;
 
-        public override void OnNetworkSpawn()
+        private void Awake()
         {
             _powerUpsPool = GetComponent<ObjectPoolQueue>();
-            
+            _currentSectionToSpawn = null;
+        }
+
+        public override void OnNetworkSpawn()
+        {
             EnableSpawning();
             if (!IsServer)
             {
@@ -52,18 +56,16 @@ namespace Runtime.MonoBehaviours
             _timer += Time.deltaTime;
             if (_timer >= TimePerSpawn)
             {
-                var powerUpObject = _powerUpsPool.GetFromPool(true);
-                if (powerUpObject.TryGetComponent(out PowerUp powerUp))
+                if (ChooseSectionForSpawning())
                 {
-                    
-                    
-                        SpawnPowerUpRpc(powerUp);
-                }
-                else
-                {
-                    Debug.Log("Cant Get Power Up");
-                }
+                    var powerUpObject = _powerUpsPool.GetFromPool(true);
+                    if (powerUpObject.TryGetComponent(out PowerUp powerUp))
+                    {
+                        if (!powerUp.IsSpawned) powerUp.NetworkObject.Spawn();
 
+                        SpawnPowerUpRpc(powerUp, _currentSectionToSpawn.ObstaclePlacementPosition);
+                    }
+                }
                 //TODO: Change this!
                 _timer = 0;
             }
@@ -75,7 +77,6 @@ namespace Runtime.MonoBehaviours
             {
                 _powerUpsPool.AddToPool(Instantiate(PowerUpsExamples[Random.Range(0, PowerUpsExamples.Count)]));
             }
-            _currentSectionToSpawn = SpawnPlaces[Random.Range(0, SpawnPlaces.Count)];
         }
 
         public void EnableSpawning()
@@ -84,11 +85,23 @@ namespace Runtime.MonoBehaviours
         }
         
         [Rpc(SendTo.ClientsAndHost)]
-        private void SpawnPowerUpRpc(PowerUp powerUpRef)
+        private void SpawnPowerUpRpc(NetworkBehaviourReference powerUpRef, Vector3 position)
         {
+            if (_currentSectionToSpawn == null) return;
+
+            if (powerUpRef.TryGet(out PowerUp powerUp))
+            {
+                _currentSectionToSpawn.AddObstacle(powerUp);
+                powerUp.SetNewPosition(position);
+            }
+        }
+
+        private bool ChooseSectionForSpawning()
+        {
+            
             _currentSectionToSpawn = null;
             var randomSection = SpawnPlaces[Random.Range(0, SpawnPlaces.Count)];
-            if (!randomSection.PlacedObstacle)
+            if (randomSection.PlacedObstacle == null)
             {
                 _currentSectionToSpawn = randomSection;
             }
@@ -96,7 +109,7 @@ namespace Runtime.MonoBehaviours
             {
                 for (int i = 0; i < SpawnPlaces.Count; i++)
                 {
-                    if (!SpawnPlaces[i].PlacedObstacle)
+                    if (SpawnPlaces[i].PlacedObstacle == null)
                     {
                         _currentSectionToSpawn = SpawnPlaces[i];
                         break;
@@ -104,10 +117,7 @@ namespace Runtime.MonoBehaviours
                 }
             }
 
-            if (!_currentSectionToSpawn) return;
-
-            _currentSectionToSpawn.AddObstacle(powerUpRef);
-            powerUpRef.NetworkObject.Spawn();
+            return _currentSectionToSpawn != null;
         }
     }
 }

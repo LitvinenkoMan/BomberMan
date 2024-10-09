@@ -6188,6 +6188,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SceneData: {fileID: 11400000, guid: 603024ee14198ec4d84def88ae1a777e, type: 2}
+  MakeItMain: 1
   UnloadInsteadOfLoading: 0
   LoadSceneAsync: 1
   LoadOnStart: 0
@@ -7321,6 +7322,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SceneData: {fileID: 11400000, guid: bddc9102c051ef4418f472860fd882f5, type: 2}
+  MakeItMain: 0
   UnloadInsteadOfLoading: 1
   LoadSceneAsync: 1
   LoadOnStart: 0

@@ -13,6 +13,7 @@ public class SceneLoader : MonoBehaviour
 
     [Space(10)]
     [Header("Settings")]
+    [SerializeField] private bool MakeItMain;
     [SerializeField] private bool UnloadInsteadOfLoading;
     [SerializeField] private bool LoadSceneAsync = true;
     [SerializeField] private bool LoadOnStart;
@@ -77,5 +78,10 @@ public class SceneLoader : MonoBehaviour
     private void SceneLoaded(AsyncOperation op)
     {
         OnScenLoaded?.Invoke(SceneData.SceneName);
+        if (MakeItMain)
+        {
+            SceneManager.SetActiveScene(SceneManager.GetSceneByName(SceneData.SceneName));
+        }
+        
     }
 }
