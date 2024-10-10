@@ -50,7 +50,7 @@ namespace MonoBehaviours.Network
             if (allocation != null)
             {
                 string joinCode = await RelayManager.Instance.GetJoinCode(allocation);
-                RoomJoinCodeText.text = joinCode;
+                //RoomJoinCodeText.text = joinCode;
                 if (!string.IsNullOrEmpty(joinCode))
                 {
                     NetworkManager.Singleton.GetComponent<UnityTransport>()
