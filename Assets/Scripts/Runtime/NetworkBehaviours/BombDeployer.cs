@@ -102,7 +102,6 @@ namespace Runtime.NetworkBehaviours
             explodedBomb.onExplode -= SubtractAmountOfCurrentBombs;
             StartCoroutine(ReturnBombBackToPoolRoutine(explodedBomb));
         }
-
         
         private IEnumerator ReturnBombBackToPoolRoutine(Bomb bomb)
         {

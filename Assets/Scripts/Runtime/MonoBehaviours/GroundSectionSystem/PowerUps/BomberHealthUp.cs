@@ -14,7 +14,7 @@ namespace MonoBehaviours.GroundSectionSystem.PowerUps
             _isTaken = true;
             Params.SetActorHealth((byte)(Params.ActorHealth + HealingValue));
             RemovePowerUpFromGroundSection();
-            Destroy(gameObject);
+            base.ApplyPowerUp(Params);
         }
     }
 }

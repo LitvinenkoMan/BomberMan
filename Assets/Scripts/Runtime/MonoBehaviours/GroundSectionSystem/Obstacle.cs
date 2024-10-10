@@ -1,4 +1,5 @@
 using System;
+using MonoBehaviours.GroundSectionSystem;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -38,6 +39,12 @@ namespace Runtime.MonoBehaviours.GroundSectionSystem
         {
             transform.position = position;
             _position = position;
+        }
+
+        public void AutoPlaceToNearestSection()
+        {
+            var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
+            section.AddObstacle(this);
         }
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter

@@ -15,7 +15,7 @@ namespace MonoBehaviours.GroundSectionSystem.PowerUps
             _isTaken = true;
             Params.SetBombsSpreading((byte)(Params.BombsSpreading + SpreadingIncreaseValue));
             RemovePowerUpFromGroundSection();
-            Destroy(gameObject);
+            base.ApplyPowerUp(Params);
         }
     }
 }

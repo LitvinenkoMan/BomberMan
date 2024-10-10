@@ -8,14 +8,22 @@ namespace MonoBehaviours.GroundSectionSystem
 {
     public class GroundSection : MonoBehaviour
     {
-        public Vector3 ObstaclePlacementPosition { get; private set; }
+        
         [ReadOnly]
         public Obstacle PlacedObstacle;
         public SectionPathways ConnectedSections;
 
+        public Vector3 ObstaclePlacementPosition
+        { 
+            get => _obstaclePosition;
+            private set => _obstaclePosition = value;
+        }
+
+        private Vector3 _obstaclePosition;
+
         private void Start()
         {
-            ObstaclePlacementPosition = transform.position + new Vector3(0, 0.5f, 0);
+            _obstaclePosition = transform.position + new Vector3(0, 0.5f, 0);
         }
 
         /// <summary>
@@ -26,15 +34,15 @@ namespace MonoBehaviours.GroundSectionSystem
         public void AddObstacle(Obstacle newObstacle)
         {
             PlacedObstacle = newObstacle;
-            PlacedObstacle.transform.position = ObstaclePlacementPosition;
+            PlacedObstacle.transform.position = _obstaclePosition;
         }
 
         public void SetNewSectionPosition(Vector3 position)
         {
             transform.position = position;
-            ObstaclePlacementPosition = transform.position + new Vector3(0, 0.5f, 0);
+            _obstaclePosition = transform.position + new Vector3(0, 0.5f, 0);
             
-            if (PlacedObstacle) PlacedObstacle.SetNewPosition(ObstaclePlacementPosition);
+            if (PlacedObstacle) PlacedObstacle.SetNewPosition(_obstaclePosition);
         }
 
         /// <summary>

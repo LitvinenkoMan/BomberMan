@@ -11,36 +11,31 @@ namespace MonoBehaviours.GroundSectionSystem
     public class PowerUp : Obstacle
     {
         [Header("Base values settings")]
-        [SerializeField, Tooltip("Set to true if you want this power up to disappear after time")] 
+        [SerializeField, Tooltip("Set to true if you want this power up to disappear after time")]
         private bool TimedPowerUp;
-        [SerializeField] 
-        private float LifeTime;
+
+        [SerializeField] private float LifeTime;
 
         [Space(20)]
-        [SerializeField, Tooltip("Set to True, if you want this power up to have timed effect on Bomber Params")] 
+        [SerializeField, Tooltip("Set to True, if you want this power up to have timed effect on Bomber Params")]
         private bool TimedEffect;
-        [SerializeField]
-        private float EffectTime;
-        
-        [Space(10)]
-        [SerializeField]
-        protected GameObject Visuals;
-        [Space(20)]
-        
-        
-        protected bool _isTaken; 
 
-        protected virtual void Initialize()
+        [SerializeField] private float EffectTime;
+
+        [Space(10)] [SerializeField] protected GameObject Visuals;
+        [Space(20)] protected bool _isTaken;
+
+        public virtual void Initialize()
         {
             ObstacleHealthComponent.SetHealth(1);
             CanReceiveDamage = true;
             CanPlayerStepOnIt = true;
             _isTaken = false;
+            gameObject.SetActive(true);
         }
 
         private void OnEnable()
         {
-            Initialize();
             if (TimedPowerUp)
             {
                 StartCoroutine(CountLifeTime());
@@ -53,6 +48,16 @@ namespace MonoBehaviours.GroundSectionSystem
             ObstacleHealthComponent.OnHealthRunOut -= RemovePowerUpFromGroundSection;
         }
 
+        public override void OnNetworkSpawn()
+        {
+            
+        }
+
+        public override void OnNetworkDespawn()
+        {
+           Destroy(gameObject);
+        }
+
         private void OnTriggerEnter(Collider other)
         {
             if (other.gameObject.TryGetComponent(out BomberParamsProvider provider) && !_isTaken)
@@ -61,7 +66,10 @@ namespace MonoBehaviours.GroundSectionSystem
             }
         }
 
-        protected virtual void ApplyPowerUp(BaseBomberParameters Params) { }
+        protected virtual void ApplyPowerUp(BaseBomberParameters Params)
+        {
+            NetworkObject.Despawn();
+        }
 
         protected virtual void RemovePowerUpFromGroundSection()
         {

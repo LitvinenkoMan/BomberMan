@@ -15,7 +15,7 @@ namespace MonoBehaviours.GroundSectionSystem.PowerUps
             _isTaken = true;
             Params.SetSpeedMultiplier((byte)(Params.SpeedMultiplier + SpeedIncreaseValue));  
             RemovePowerUpFromGroundSection();
-            Destroy(gameObject);
+            base.ApplyPowerUp(Params);
         }
     }
 }

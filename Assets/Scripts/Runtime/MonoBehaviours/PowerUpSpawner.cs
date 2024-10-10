@@ -87,18 +87,16 @@ namespace Runtime.MonoBehaviours
         [Rpc(SendTo.ClientsAndHost)]
         private void SpawnPowerUpRpc(NetworkBehaviourReference powerUpRef, Vector3 position)
         {
-            if (_currentSectionToSpawn == null) return;
-
             if (powerUpRef.TryGet(out PowerUp powerUp))
             {
-                _currentSectionToSpawn.AddObstacle(powerUp);
                 powerUp.SetNewPosition(position);
+                powerUp.Initialize();
+                powerUp.AutoPlaceToNearestSection();
             }
         }
 
         private bool ChooseSectionForSpawning()
         {
-            
             _currentSectionToSpawn = null;
             var randomSection = SpawnPlaces[Random.Range(0, SpawnPlaces.Count)];
             if (randomSection.PlacedObstacle == null)
