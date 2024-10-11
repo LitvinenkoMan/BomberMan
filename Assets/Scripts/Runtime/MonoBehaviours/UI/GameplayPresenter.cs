@@ -51,7 +51,7 @@ namespace Runtime.MonoBehaviours.UI
         }
 
         private void UpdateHealthText(int newValue) => HealtText.text = $"{newValue}";
-        private void UpdateSpeedText(int newValue) => SpeedText.text = $"{newValue}";
+        private void UpdateSpeedText(float newValue) => SpeedText.text = $"{newValue}";
         private void UpdateBombsDamageText(int newValue) => BombsDamageText.text = $"{newValue}";
         private void UpdateSpreadText(int newValue) => SpreadText.text = $"{newValue}";
         private void UpdateBombsPerTimeText(int newValue) => BombsPerTimeText.text = $"{newValue}";

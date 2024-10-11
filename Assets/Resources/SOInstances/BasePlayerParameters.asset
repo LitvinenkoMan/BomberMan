@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _actorHealth: 3
   _startPlayerHealth: 3
-  _startSpeedMultiplier: 3
+  _startSpeedMultiplier: 0.1
   _startBombsAtTime: 1
   _startBombsSpreading: 1
   _startBombsCountdown: 3
   _startBombsDamage: 1
-  _speedMultiplier: 2
+  _speedMultiplier: 3
   _bombsAtTime: 1
   _bombsSpreading: 1
   _bombsCountdown: 3

@@ -33,17 +33,18 @@ namespace Runtime.MonoBehaviours.UI
             PanelsStack = new Stack<RectTransform>(8);
             input = new PlayerMainControls();
             
-            input.PlayerMainActionMaps.Enable();
             QuitAction = input.PlayerMainActionMaps.Quit;
         }
 
         private void OnEnable()
         {
+            input.PlayerMainActionMaps.Enable();
             QuitAction.performed += RemovePanelWrapper;
         }
 
         private void OnDisable()
         {
+            input.PlayerMainActionMaps.Disable();
             QuitAction.performed -= RemovePanelWrapper;
         }
 

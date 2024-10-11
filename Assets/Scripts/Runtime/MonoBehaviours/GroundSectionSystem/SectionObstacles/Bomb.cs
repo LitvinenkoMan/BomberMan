@@ -4,6 +4,7 @@ using Runtime.MonoBehaviours;
 using Runtime.MonoBehaviours.GroundSectionSystem;
 using ScriptableObjects;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
@@ -190,7 +191,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         private void TryDamageActorsOrPlayer(Vector3 position)
         {
-            Collider[] colliders = Physics.OverlapBox(position, new Vector3(1, 1, 1));
+            Collider[] colliders = Physics.OverlapBox(position, new Vector3(0.5f, 0.5f, 0.5f));
 
             for (int i = 0; i < colliders.Length; i++)
             {

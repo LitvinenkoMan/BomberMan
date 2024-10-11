@@ -7,13 +7,13 @@ namespace MonoBehaviours.GroundSectionSystem.PowerUps
     {
         [Header("Power up settings")]
         [Header("Power up settings")]
-        [SerializeField] private byte SpeedIncreaseValue = 1; 
+        [SerializeField] private float SpeedIncreaseValue = 0.1f; 
         
         protected override void ApplyPowerUp(BaseBomberParameters Params)
         {
             Visuals.SetActive(false);
             _isTaken = true;
-            Params.SetSpeedMultiplier((byte)(Params.SpeedMultiplier + SpeedIncreaseValue));  
+            Params.SetSpeedMultiplier(Params.SpeedMultiplier + SpeedIncreaseValue);  
             RemovePowerUpFromGroundSection();
             base.ApplyPowerUp(Params);
         }

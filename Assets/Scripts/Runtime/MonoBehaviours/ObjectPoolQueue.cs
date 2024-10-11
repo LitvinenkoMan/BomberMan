@@ -33,7 +33,7 @@ namespace MonoBehaviours
         {
             if (_pool.Count > 0)
             {
-                GameObject newObject = _pool.Dequeue();
+                var newObject = _pool.Dequeue();
                 newObject.SetActive(isEnabled);
                 return newObject;
             }

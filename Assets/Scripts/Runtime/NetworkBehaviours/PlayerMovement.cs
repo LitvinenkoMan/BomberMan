@@ -16,7 +16,8 @@ namespace NetworkBehaviours
         private CharacterController _controller;
         private PlayerMainControls _controls;
         private InputAction MoveAction;
-        
+
+        private const float CONSTANTSPEEDDEVIDER = 2;
 
         void Start()
         {
@@ -40,14 +41,13 @@ namespace NetworkBehaviours
             // TODO: remake it to listen events
             if (MoveAction.IsInProgress() && IsOwner)
             {
-                OnMoveRpc(MoveAction.ReadValue<Vector2>(), BomberParameters.SpeedMultiplier);
+                OnMove(MoveAction.ReadValue<Vector2>(), BomberParameters.SpeedMultiplier);
             }
         }
-
-        [Rpc(SendTo.Server)]
-        public void OnMoveRpc(Vector2 inputValue, float speedMultiplier)
+        
+        private void OnMove(Vector2 inputValue, float speedMultiplier)
         {
-            _controller.Move(new Vector3(inputValue.x, 0, inputValue.y) * (speedMultiplier * 100 * Time.deltaTime * NetworkManager.NetworkTickSystem.ServerTime.FixedDeltaTime));
+            _controller.Move(new Vector3(inputValue.x, 0, inputValue.y) * speedMultiplier / CONSTANTSPEEDDEVIDER);
         }
     }
 }

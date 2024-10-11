@@ -89,13 +89,13 @@ GameObject:
   - component: {fileID: 7211535355868605204}
   - component: {fileID: 3192485037731634668}
   - component: {fileID: 7043332111894801736}
-  - component: {fileID: 2462017253319086401}
   - component: {fileID: 4454664985879038347}
   - component: {fileID: 1320740036372020134}
   - component: {fileID: 6133191061836779383}
   - component: {fileID: 7137738926094273680}
   - component: {fileID: 7731251428465038235}
   - component: {fileID: 7409379502734523520}
+  - component: {fileID: 9181407408975216252}
   m_Layer: 0
   m_Name: PlayerPawn
   m_TagString: Untagged
@@ -219,37 +219,6 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &2462017253319086401
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4821896025292580154}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  UseUnreliableDeltas: 0
-  SyncPositionX: 1
-  SyncPositionY: 1
-  SyncPositionZ: 1
-  SyncRotAngleX: 0
-  SyncRotAngleY: 0
-  SyncRotAngleZ: 0
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  UseQuaternionSynchronization: 0
-  UseQuaternionCompression: 0
-  UseHalfFloatPrecision: 0
-  InLocalSpace: 0
-  Interpolate: 1
-  SlerpPosition: 0
 --- !u!114 &4454664985879038347
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -337,6 +306,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CameraExample: {fileID: 8884432705468536314, guid: 9668e2850a18e354ebfdb9130c74cbef,
     type: 3}
+--- !u!114 &9181407408975216252
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4821896025292580154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71f687b6b4821664c9c5013da94685f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 0
+  SyncRotAngleY: 0
+  SyncRotAngleZ: 0
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
 --- !u!1 &5012474147548761335
 GameObject:
   m_ObjectHideFlags: 0

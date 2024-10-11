@@ -8,10 +8,11 @@ namespace ScriptableObjects
     [CreateAssetMenu]
     public class BaseBomberParameters : ActorBaseParams, INetworkSerializable
     {
+        [Header("Initial Values")]
         [SerializeField]
         private int _startPlayerHealth = 3;
         [SerializeField]
-        private int _startSpeedMultiplier = 5;
+        private float _startSpeedMultiplier = 5;
         [SerializeField]
         private int _startBombsAtTime = 1;
         [SerializeField]
@@ -24,7 +25,7 @@ namespace ScriptableObjects
         [Space(20)]
         [Header("Current Values:")]
         [SerializeField]
-        private int _speedMultiplier;
+        private float _speedMultiplier;
         [SerializeField]
         private int _bombsAtTime;
         [SerializeField]
@@ -36,12 +37,12 @@ namespace ScriptableObjects
 
 
         public Action<int> OnHealthChangedEvent;
-        public Action<int> OnSpeedChangedEvent;
+        public Action<float> OnSpeedChangedEvent;
         public Action<int> OnDamageChangedEvent;
         public Action<int> OnBombsPerTimeChangedEvent;
         public Action<int> OnSpreadingChangedEvent;
         
-        public int SpeedMultiplier 
+        public float SpeedMultiplier 
         {
             get => _speedMultiplier;
             protected set => _speedMultiplier = value;
@@ -81,33 +82,33 @@ namespace ScriptableObjects
             BombsDamage = _startBombsDamage;
         }
 
-        public void SetActorHealth(byte newValue)
+        public void SetActorHealth(int newValue)
         {
             ActorHealth = newValue;
             OnHealthChangedEvent?.Invoke(ActorHealth);            
         }
 
-        public void SetSpeedMultiplier(byte newValue)
+        public void SetSpeedMultiplier(float newValue)
         {
             SpeedMultiplier = newValue;
             OnSpeedChangedEvent?.Invoke(_speedMultiplier);            
         }
 
-        public void SetBombsAtTime(byte newValue)
+        public void SetBombsAtTime(int newValue)
         {
             BombsAtTime = newValue;
             OnBombsPerTimeChangedEvent?.Invoke(BombsAtTime);            
         }
 
-        public void SetBombsSpreading(byte newValue)
+        public void SetBombsSpreading(int newValue)
         {
             BombsSpreading = newValue;
             OnSpreadingChangedEvent?.Invoke(BombsSpreading);
         }
 
-        public void SetBombsCountdown(byte newValue) => BombsCountdown = newValue;
+        public void SetBombsCountdown(int newValue) => BombsCountdown = newValue;
 
-        public void SetBombsDamage(byte newValue)
+        public void SetBombsDamage(int newValue)
         {
             BombsDamage = newValue;
             OnDamageChangedEvent?.Invoke(_bombsDamage);

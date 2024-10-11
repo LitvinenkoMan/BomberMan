@@ -85,7 +85,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1483839603
+  GlobalObjectIdHash: 3984451149
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -112,7 +112,7 @@ MonoBehaviour:
   TimedEffect: 0
   EffectTime: 0
   Visuals: {fileID: 9207213807940266067}
-  SpeedIncreaseValue: 1
+  SpeedIncreaseValue: 0.025
 --- !u!1 &8450219486580588625
 GameObject:
   m_ObjectHideFlags: 0
