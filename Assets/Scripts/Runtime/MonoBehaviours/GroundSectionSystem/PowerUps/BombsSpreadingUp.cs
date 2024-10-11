@@ -13,7 +13,7 @@ namespace MonoBehaviours.GroundSectionSystem.PowerUps
         {
             Visuals.SetActive(false);
             _isTaken = true;
-            Params.SetBombsSpreading((byte)(Params.BombsSpreading + SpreadingIncreaseValue));
+            Params.SetBombsSpreading(Params.BombsSpreading + SpreadingIncreaseValue);
             RemovePowerUpFromGroundSection();
             base.ApplyPowerUp(Params);
         }

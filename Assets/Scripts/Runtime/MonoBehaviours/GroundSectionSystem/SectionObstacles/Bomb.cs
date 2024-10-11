@@ -70,7 +70,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
                 _timer -= Time.deltaTime;
                 if (_timer <= 0)
                 {
-                    ExplodeRpc(_bombSpread);
+                    ExplodeRpc(_bombSpread, _bombDamage);
                 }
             }
         }
@@ -104,7 +104,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         }
 
         [Rpc(SendTo.ClientsAndHost)]
-        private void ExplodeRpc(int bombSpreading)
+        private void ExplodeRpc(int bombSpreading, int bombDamage)
         {
             BombVisuals.SetActive(false);
             
@@ -113,13 +113,13 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
             PlaceExplosionEffect(startSection.ObstaclePlacementPosition);
 
-            ExplodeToDirection(startSection.ConnectedSections.upperSection, bombSpreading - 1,
+            ExplodeToDirection(startSection.ConnectedSections.upperSection, bombSpreading - 1, bombDamage,
                 SpreadDirections.Up);
-            ExplodeToDirection(startSection.ConnectedSections.lowerSection, bombSpreading - 1,
+            ExplodeToDirection(startSection.ConnectedSections.lowerSection, bombSpreading - 1, bombDamage,
                 SpreadDirections.Down);
-            ExplodeToDirection(startSection.ConnectedSections.rightSection, bombSpreading - 1,
+            ExplodeToDirection(startSection.ConnectedSections.rightSection, bombSpreading - 1, bombDamage,
                 SpreadDirections.Right);
-            ExplodeToDirection(startSection.ConnectedSections.leftSection, bombSpreading - 1,
+            ExplodeToDirection(startSection.ConnectedSections.leftSection, bombSpreading - 1, bombDamage,
                 SpreadDirections.Left);
 
             _isTimerOn = false;
@@ -128,7 +128,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             onExplode?.Invoke(this);
         }
 
-        private void ExplodeToDirection(GroundSection currentSection, int depth, SpreadDirections direction)
+        private void ExplodeToDirection(GroundSection currentSection, int depth, int damage, SpreadDirections direction)
         {
             if (currentSection.PlacedObstacle)
             {
@@ -142,7 +142,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
             PlaceExplosionEffect(currentSection.ObstaclePlacementPosition);
 
-            TryDamageActorsOrPlayer(currentSection.ObstaclePlacementPosition);
+            TryDamageActorsOrPlayer(currentSection.ObstaclePlacementPosition, damage);
             
             
             if (depth <= 0 )
@@ -155,19 +155,19 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             {
                 case SpreadDirections.Up:
                     if (currentSection.ConnectedSections.upperSection)
-                        ExplodeToDirection(currentSection.ConnectedSections.upperSection, depth, SpreadDirections.Up);
+                        ExplodeToDirection(currentSection.ConnectedSections.upperSection, depth, damage, SpreadDirections.Up);
                     break;
                 case SpreadDirections.Down:
                     if (currentSection.ConnectedSections.lowerSection)
-                        ExplodeToDirection(currentSection.ConnectedSections.lowerSection, depth, SpreadDirections.Down);
+                        ExplodeToDirection(currentSection.ConnectedSections.lowerSection, depth, damage, SpreadDirections.Down);
                     break;
                 case SpreadDirections.Right:
                     if (currentSection.ConnectedSections.rightSection)
-                        ExplodeToDirection(currentSection.ConnectedSections.rightSection, depth, SpreadDirections.Right);
+                        ExplodeToDirection(currentSection.ConnectedSections.rightSection, depth, damage, SpreadDirections.Right);
                     break;
                 case SpreadDirections.Left:
                     if (currentSection.ConnectedSections.leftSection)
-                        ExplodeToDirection(currentSection.ConnectedSections.leftSection, depth, SpreadDirections.Left);
+                        ExplodeToDirection(currentSection.ConnectedSections.leftSection, depth, damage, SpreadDirections.Left);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
@@ -189,30 +189,27 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             }
         }
 
-        private void TryDamageActorsOrPlayer(Vector3 position)
+        private void TryDamageActorsOrPlayer(Vector3 position, int damage)
         {
             Collider[] colliders = Physics.OverlapBox(position, new Vector3(0.5f, 0.5f, 0.5f));
 
             for (int i = 0; i < colliders.Length; i++)
             {
-                if (colliders[i].gameObject.TryGetComponent(out HealthComponent health) 
-                    &&
-                    !colliders[i].gameObject.GetComponent<Obstacle>()) //TODO: recode this check, looks bad
+                if (colliders[i].gameObject.TryGetComponent(out HealthComponent health) ) //TODO: recode this check, looks bad
                 {
-                    health.SetHealth(health.HealthPoints - bomberParams.BombsDamage);
-                }
-
-                if (colliders[i].gameObject.TryGetComponent(out BomberParamsProvider paramsProvider))
-                {
-                    paramsProvider.GetBomberParams()
-                        .SetActorHealth((byte)(paramsProvider.GetBomberParams().ActorHealth - _bombDamage));
+                    Debug.LogWarning($"Fiend Health component on {health.gameObject.name}");
+                    if (health.gameObject.TryGetComponent(out BomberParamsProvider bomberParamsProvider) && bomberParamsProvider.NetworkObject.IsOwner)
+                    {
+                        Debug.LogWarning($"Damaged player {bomberParamsProvider.name}");
+                        health.SetHealth(health.HealthPoints - damage);
+                    }
                 }
             }
         }
 
         private void OnHealthRunOutExplode()
         {
-            ExplodeRpc(bomberParams.BombsSpreading);
+            ExplodeRpc(_bombSpread, _bombDamage);
         }
 
         private IEnumerator ReturnExplosionToPool(GameObject expl)

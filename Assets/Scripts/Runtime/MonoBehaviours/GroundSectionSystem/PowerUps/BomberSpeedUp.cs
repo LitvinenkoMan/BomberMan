@@ -6,7 +6,6 @@ namespace MonoBehaviours.GroundSectionSystem.PowerUps
     public class BomberSpeedUp : PowerUp
     {
         [Header("Power up settings")]
-        [Header("Power up settings")]
         [SerializeField] private float SpeedIncreaseValue = 0.1f; 
         
         protected override void ApplyPowerUp(BaseBomberParameters Params)

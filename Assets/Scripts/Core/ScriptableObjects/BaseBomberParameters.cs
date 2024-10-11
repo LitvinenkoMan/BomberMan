@@ -36,7 +36,6 @@ namespace ScriptableObjects
         private int _bombsDamage;
 
 
-        public Action<int> OnHealthChangedEvent;
         public Action<float> OnSpeedChangedEvent;
         public Action<int> OnDamageChangedEvent;
         public Action<int> OnBombsPerTimeChangedEvent;
@@ -80,12 +79,6 @@ namespace ScriptableObjects
             BombsSpreading = _startBombsSpreading;
             BombsCountdown = _startBombsCountdown;
             BombsDamage = _startBombsDamage;
-        }
-
-        public void SetActorHealth(int newValue)
-        {
-            ActorHealth = newValue;
-            OnHealthChangedEvent?.Invoke(ActorHealth);            
         }
 
         public void SetSpeedMultiplier(float newValue)

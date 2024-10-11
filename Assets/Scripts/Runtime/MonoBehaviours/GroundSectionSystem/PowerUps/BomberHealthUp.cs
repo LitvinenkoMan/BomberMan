@@ -12,7 +12,7 @@ namespace MonoBehaviours.GroundSectionSystem.PowerUps
         {
             Visuals.SetActive(false);
             _isTaken = true;
-            Params.SetActorHealth((byte)(Params.ActorHealth + HealingValue));
+            Params.SetActorHealth(Params.ActorHealth + HealingValue);
             RemovePowerUpFromGroundSection();
             base.ApplyPowerUp(Params);
         }

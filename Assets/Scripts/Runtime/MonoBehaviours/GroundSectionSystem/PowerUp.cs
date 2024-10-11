@@ -60,7 +60,7 @@ namespace MonoBehaviours.GroundSectionSystem
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.gameObject.TryGetComponent(out BomberParamsProvider provider) && !_isTaken)
+            if (other.gameObject.TryGetComponent(out BomberParamsProvider provider) && !_isTaken && provider.IsOwner)
             {
                 ApplyPowerUp(provider.GetBomberParams());
             }
@@ -68,7 +68,7 @@ namespace MonoBehaviours.GroundSectionSystem
 
         protected virtual void ApplyPowerUp(BaseBomberParameters Params)
         {
-            NetworkObject.Despawn();
+            //NetworkObject.Despawn();
         }
 
         protected virtual void RemovePowerUpFromGroundSection()

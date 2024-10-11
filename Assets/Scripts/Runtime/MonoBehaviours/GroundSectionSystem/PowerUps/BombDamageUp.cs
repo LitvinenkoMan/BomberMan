@@ -12,7 +12,7 @@ namespace MonoBehaviours.GroundSectionSystem.PowerUps
         {
             Visuals.SetActive(false);
             _isTaken = true;
-            Params.SetBombsDamage((byte)(Params.BombsDamage + BombsDamageIncreaseValue));  
+            Params.SetBombsDamage(Params.BombsDamage + BombsDamageIncreaseValue);  
             RemovePowerUpFromGroundSection();
             base.ApplyPowerUp(Params);
         }

@@ -68,6 +68,12 @@ namespace Runtime.MonoBehaviours
                 }
             }
             HealthPoints = newHealth;
+            
+            if (baseParams != null)
+            {
+                baseParams.SetActorHealth(HealthPoints);
+            }
+            
             OnHealthChanged?.Invoke(HealthPoints);
             if (HealthPoints <= 0)
             {

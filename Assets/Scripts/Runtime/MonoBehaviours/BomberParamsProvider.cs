@@ -15,6 +15,10 @@ namespace Runtime.MonoBehaviours
         private void Start()
         {
             BomberParams.ResetValues();
+            if (!IsOwner)
+            {
+                Destroy(this);
+            }
         }
 
         public BaseBomberParameters GetBomberParams()
