@@ -33,7 +33,10 @@ namespace MonoBehaviours.Network
         private void OnEnable()
         {
             CreateHostButton.onClick.AddListener(CreateHost);
-            NetworkManager.Singleton.Shutdown();
+            if (NetworkManager.Singleton.RunInBackground)
+            {
+                NetworkManager.Singleton.Shutdown();
+            }
         }
 
         private void OnDisable()

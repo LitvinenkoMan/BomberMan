@@ -27,17 +27,17 @@ namespace MonoBehaviours.Network
             }
         }
 
-        private async void Start()
-        {
-            await UnityServices.InitializeAsync();
-            await SignInAnonymously();
-        }
-
-        private async Task SignInAnonymously()
-        {
-            await AuthenticationService.Instance.SignInAnonymouslyAsync();
-            Debug.Log($"Signed in as: {AuthenticationService.Instance.PlayerId}");
-        }
+        // private async void Start()
+        // {
+        //     await UnityServices.InitializeAsync();
+        //     await SignInAnonymously();
+        // }
+        //
+        // private async Task SignInAnonymously()
+        // {
+        //     await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        //     Debug.Log($"Signed in as: {AuthenticationService.Instance.PlayerId}");
+        // }
 
         public async Task<Allocation> CreateRelay(int maxPlayers)
         {

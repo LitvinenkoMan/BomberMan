@@ -1,10 +1,13 @@
+using System;
 using System.Threading.Tasks;
 using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
+using Unity.Services.Authentication;
+using Unity.Services.Core;
+using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -26,8 +29,26 @@ namespace MonoBehaviours.Network
         [Space(10)]
         public UnityEvent OnClientConnectionLaunched;
         public UnityEvent OnClientConnected;
+        public UnityEvent OnWrongCodeUsed;
+        
 
         //private string _joinCodeResult;
+        
+
+        private async void Start()
+        {
+            await UnityServices.InitializeAsync();
+            await SignInAnonymously();
+        }
+
+        private async Task SignInAnonymously()
+        {
+            if (!AuthenticationService.Instance.IsAuthorized)
+            {
+                await AuthenticationService.Instance.SignInAnonymouslyAsync();
+            }
+            Debug.Log($"Signed in as: {AuthenticationService.Instance.PlayerId}");
+        }
         
         private void OnEnable()
         {
@@ -41,23 +62,30 @@ namespace MonoBehaviours.Network
         
         public async void JoinHost()
         {
-            OnClientConnectionLaunched?.Invoke();
 
             string joinCode = RoomName.text;
             if (!string.IsNullOrEmpty(joinCode))
             {
-                JoinAllocation joinAllocation = await RelayManager.Instance.JoinRelay(joinCode);
-                
-                if (joinAllocation != null)
+                try
                 {
+                    JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+                    
+                    OnClientConnectionLaunched?.Invoke();
+                
+
                     NetworkManager.Singleton.GetComponent<UnityTransport>()
-                        .SetRelayServerData(new RelayServerData(joinAllocation,"dtls"));
-                    
-                    
-                    await Task.Delay(5000);
+                        .SetRelayServerData(new RelayServerData(joinAllocation, "dtls"));
+
                     NetworkManager.Singleton.OnClientStarted += ClientConnected;
                     NetworkManager.Singleton.StartClient();
                 }
+                catch (RelayServiceException e)
+                {
+                    OnWrongCodeUsed?.Invoke();
+                    Debug.LogError(e);
+                    throw;
+                }
+
             }
         }
 
