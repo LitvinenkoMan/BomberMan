@@ -68,14 +68,30 @@ namespace MonoBehaviours.GroundSectionSystem
 
         protected virtual void ApplyPowerUp(BaseBomberParameters Params)
         {
-            //NetworkObject.Despawn();
+            // NetworkObject.Despawn();
         }
 
         protected virtual void RemovePowerUpFromGroundSection()
         {
             GroundSection startSection = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
             startSection.RemoveObstacle();
-            gameObject.SetActive(false);
+
+            if (!IsServer)
+            {
+                RemovePowerUpFromGroundSectionRpc();
+            }
+            else
+            {
+                NetworkObject.Despawn();
+            }
+        }
+
+        [Rpc(SendTo.Server)]
+        protected virtual void RemovePowerUpFromGroundSectionRpc()
+        {
+            GroundSection startSection = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
+            startSection.RemoveObstacle();
+            NetworkObject.Despawn();
         }
 
         protected virtual IEnumerator CountLifeTime()

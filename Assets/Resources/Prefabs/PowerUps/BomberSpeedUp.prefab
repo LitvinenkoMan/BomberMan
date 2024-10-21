@@ -19,7 +19,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &9174798595976297673
 Transform:
   m_ObjectHideFlags: 0
@@ -112,7 +112,7 @@ MonoBehaviour:
   TimedEffect: 0
   EffectTime: 0
   Visuals: {fileID: 9207213807940266067}
-  SpeedIncreaseValue: 0.025
+  SpeedIncreaseValue: 0.0125
 --- !u!1 &8450219486580588625
 GameObject:
   m_ObjectHideFlags: 0
