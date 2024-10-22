@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using Core.ScriptableObjects;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Runtime.MonoBehaviours
 {
@@ -20,10 +21,11 @@ namespace Runtime.MonoBehaviours
 
         private bool _isImmune;
         
-        
+        [Space(20)]
         // Events
         public Action<int> OnHealthChanged;
         public Action OnHealthRunOut;
+        public UnityEvent OnHealthRunOutUnityEvent;
         
 
         private void Start()
@@ -78,6 +80,7 @@ namespace Runtime.MonoBehaviours
             if (HealthPoints <= 0)
             {
                 OnHealthRunOut?.Invoke();
+                OnHealthRunOutUnityEvent?.Invoke();
             }
         }
 

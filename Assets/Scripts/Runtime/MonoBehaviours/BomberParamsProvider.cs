@@ -17,7 +17,7 @@ namespace Runtime.MonoBehaviours
             BomberParams.ResetValues();
             if (!IsOwner)
             {
-                Destroy(this);
+                enabled = false;
             }
         }
 
