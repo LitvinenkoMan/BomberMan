@@ -1,8 +1,10 @@
+using System;
 using NetworkBehaviours;
 using Runtime.NetworkBehaviours;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace Runtime.MonoBehaviours
 {
@@ -18,7 +20,8 @@ namespace Runtime.MonoBehaviours
         private BomberParamsProvider bomberParamsProvider;
 
         [Space(20)]
-        public UnityEvent OnPlayerDeath;
+        public UnityEvent OnPlayerDeathUnityEvent;
+        public Action<ulong> OnPlayerDeathAction;
 
 
         public void OnZeroHealthResponse()
@@ -31,7 +34,8 @@ namespace Runtime.MonoBehaviours
         {
             EnableViewerMode();
             
-            OnPlayerDeath?.Invoke();
+            OnPlayerDeathUnityEvent?.Invoke();
+            OnPlayerDeathAction?.Invoke(NetworkObject.OwnerClientId);
         }
 
 
@@ -40,7 +44,6 @@ namespace Runtime.MonoBehaviours
             NetworkObject.Despawn();
             playerMovement.enabled = false;
             bombDeployer.enabled = false;
-            bomberParamsProvider.enabled = false;
             visuals.SetActive(false);
         }
     }

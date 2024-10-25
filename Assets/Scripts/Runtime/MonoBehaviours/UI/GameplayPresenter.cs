@@ -55,5 +55,6 @@ namespace Runtime.MonoBehaviours.UI
         private void UpdateBombsDamageText(int newValue) => BombsDamageText.text = $"{newValue}";
         private void UpdateSpreadText(int newValue) => SpreadText.text = $"{newValue}";
         private void UpdateBombsPerTimeText(int newValue) => BombsPerTimeText.text = $"{newValue}";
+        
     }
 }

@@ -73,12 +73,12 @@ namespace ScriptableObjects
         
         public void ResetValues()
         {
-            ActorHealth = _startPlayerHealth;
-            SpeedMultiplier = _startSpeedMultiplier;
-            BombsAtTime = _startBombsAtTime;
-            BombsSpreading = _startBombsSpreading;
-            BombsCountdown = _startBombsCountdown;
-            BombsDamage = _startBombsDamage;
+            SetActorHealth(_startPlayerHealth);
+            SetSpeedMultiplier(_startSpeedMultiplier);
+            SetBombsAtTime(_startBombsAtTime);
+            SetBombsSpreading(_startBombsSpreading);
+            SetBombsCountdown(_startBombsCountdown);
+            SetBombsDamage(_startBombsDamage);
         }
 
         public void SetSpeedMultiplier(float newValue)
@@ -106,7 +106,6 @@ namespace ScriptableObjects
             BombsDamage = newValue;
             OnDamageChangedEvent?.Invoke(_bombsDamage);
         }
-
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
