@@ -116,6 +116,12 @@ namespace Runtime.NetworkBehaviours
         {
             _currentLevelDataHolder = dataHolder;
         }
+
+        public void SetToDefaults()
+        {
+            _currentLevelDataHolder = null;
+            _associatedPositions.Clear();
+        }
     }
 
     public struct ClientIdAssociatedSpawn

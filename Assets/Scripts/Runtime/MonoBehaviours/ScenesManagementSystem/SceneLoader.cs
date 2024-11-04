@@ -14,6 +14,7 @@ public class SceneLoader : MonoBehaviour
     [Space(10)]
     [Header("Settings")]
     [SerializeField] private bool MakeItMain;
+    [SerializeField] private bool UseMainIfDataIsNull;
     [SerializeField] private bool UnloadInsteadOfLoading;
     [SerializeField] private bool LoadSceneAsync = true;
     [SerializeField] private bool LoadOnStart;
@@ -24,6 +25,8 @@ public class SceneLoader : MonoBehaviour
     [SerializeField] private UnityEvent<string> OnScenUnloaded;
     private Action<AsyncOperation> OnScenLoadedAction;
     private Action<AsyncOperation> OnScenUnloadedAction;
+
+    private string _activeUnloadedSceneName;
 
     void Start()
     {
@@ -48,14 +51,22 @@ public class SceneLoader : MonoBehaviour
 
     public void LoadScene()
     {
-        if (SceneManager.GetSceneByName(SceneData.SceneName).isLoaded && !UnloadInsteadOfLoading)
+        if (SceneData != null)
         {
-            return;
+            if (SceneManager.GetSceneByName(SceneData.SceneName).isLoaded && !UnloadInsteadOfLoading)
+            {
+                return;
+            }
         }
         
         if (UnloadInsteadOfLoading)
         {
-            SceneManager.UnloadSceneAsync(SceneData.SceneName, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects).completed += OnScenUnloadedAction;
+            if (UseMainIfDataIsNull)
+            {
+                _activeUnloadedSceneName = SceneManager.GetActiveScene().name;
+                SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene()).completed += OnScenUnloadedAction;
+            }
+            else SceneManager.UnloadSceneAsync(SceneData.SceneName, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects).completed += OnScenUnloadedAction;
         }
         else
         {
@@ -70,9 +81,14 @@ public class SceneLoader : MonoBehaviour
         }
     }
 
+    public void SetSceneData(SceneDataScriptableObject data)
+    {
+        SceneData = data;
+    }
+
     private void SceneUnloaded(AsyncOperation op)
     {
-        OnScenUnloaded?.Invoke(SceneData.SceneName);
+        OnScenUnloaded?.Invoke(UseMainIfDataIsNull ? _activeUnloadedSceneName : SceneData.SceneName);
     }
 
     private void SceneLoaded(AsyncOperation op)

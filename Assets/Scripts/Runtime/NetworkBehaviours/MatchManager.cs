@@ -32,6 +32,7 @@ namespace MonoBehaviours
             if (IsServer)
             {
                 NetworkManager.OnClientConnectedCallback -= RegisterPlayerForEvents;
+                PlayerSpawner.Instance.SetToDefaults();
             }
         }
 

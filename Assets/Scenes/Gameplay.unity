@@ -515,6 +515,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   JoinCodeText: {fileID: 1672077361}
+  ConnectedPlayers: 0
+  CurrentPlayers: 0
   StartMatch:
     m_PersistentCalls:
       m_Calls: []
@@ -749,6 +751,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SceneData: {fileID: 11400000, guid: 603024ee14198ec4d84def88ae1a777e, type: 2}
   MakeItMain: 0
+  UseMainIfDataIsNull: 1
   UnloadInsteadOfLoading: 1
   LoadSceneAsync: 1
   LoadOnStart: 0
@@ -1065,6 +1068,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SceneData: {fileID: 11400000, guid: bddc9102c051ef4418f472860fd882f5, type: 2}
   MakeItMain: 1
+  UseMainIfDataIsNull: 0
   UnloadInsteadOfLoading: 0
   LoadSceneAsync: 1
   LoadOnStart: 0
@@ -1579,6 +1583,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SceneData: {fileID: 11400000, guid: e8c611c1ed6723146908f989be18ab3e, type: 2}
   MakeItMain: 0
+  UseMainIfDataIsNull: 0
   UnloadInsteadOfLoading: 1
   LoadSceneAsync: 1
   LoadOnStart: 0
@@ -2257,18 +2262,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1930258071}
-        m_TargetAssemblyTypeName: Runtime.MonoBehaviours.UI.GameplayPresenter, Assembly-CSharp
-        m_MethodName: ExitToMainMenu
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
       - m_Target: {fileID: 496574718}
         m_TargetAssemblyTypeName: SceneLoader, Assembly-CSharp
         m_MethodName: LoadScene
@@ -2931,6 +2924,6 @@ SceneRoots:
   - {fileID: 56755960}
   - {fileID: 1930258069}
   - {fileID: 213117850}
+  - {fileID: 496574717}
   - {fileID: 725487106}
   - {fileID: 1103939627}
-  - {fileID: 496574717}

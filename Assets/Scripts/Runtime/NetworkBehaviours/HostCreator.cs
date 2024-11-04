@@ -1,3 +1,6 @@
+using Core.ScriptableObjects;
+using MonoBehaviours.Network;
+using ScriptableObjects;
 using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -7,7 +10,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace MonoBehaviours.Network
+namespace Runtime.NetworkBehaviours
 {
     public class HostCreator : MonoBehaviour
     {
@@ -16,10 +19,8 @@ namespace MonoBehaviours.Network
         
         [SerializeField]
         private TMP_InputField RoomPassword;
-        [SerializeField]
-        private TMP_Text RoomJoinCodeText;
-        [SerializeField]
-        private TMP_Dropdown LevelSelection;
+
+        private LevelData _levelDataToLoad;
 
         
         [Space(20)]
@@ -33,7 +34,7 @@ namespace MonoBehaviours.Network
         private void OnEnable()
         {
             CreateHostButton.onClick.AddListener(CreateHost);
-            if (NetworkManager.Singleton.RunInBackground)
+            if (NetworkManager.Singleton)
             {
                 NetworkManager.Singleton.Shutdown();
             }
@@ -48,7 +49,7 @@ namespace MonoBehaviours.Network
         {
             OnHostLaunched?.Invoke();
             
-            Allocation allocation = await RelayManager.Instance.CreateRelay(8);
+            Allocation allocation = await RelayManager.Instance.CreateRelay(_levelDataToLoad.MaxAmountOfPlayers);
             
             if (allocation != null)
             {
@@ -69,6 +70,12 @@ namespace MonoBehaviours.Network
         {
             //PlayerSpawner.Instance.SpawnPlayer();
             OnHostStarted?.Invoke();
+        }
+        
+
+        public void SetNewLevelForLoading(LevelData levelData)
+        {
+            _levelDataToLoad = levelData;
         }
     }
 }
