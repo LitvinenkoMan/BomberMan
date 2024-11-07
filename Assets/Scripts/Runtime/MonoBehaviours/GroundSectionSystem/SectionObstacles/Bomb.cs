@@ -2,15 +2,21 @@ using System;
 using System.Collections;
 using Runtime.MonoBehaviours;
 using Runtime.MonoBehaviours.GroundSectionSystem;
+using ScriptableObjects;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 {
+    [RequireComponent(typeof(SphereCollider))]
     public class Bomb : Obstacle, INetworkSerializable
     {
         public bool IgniteOnStart;
         public Action<Bomb> onExplode;
+        
+        [SerializeField]
+        private BaseBomberParameters bomberParams;
         [SerializeField]
         private GameObject BombVisuals;
         
@@ -38,7 +44,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         {
             CanReceiveDamage = true;
             CanPlayerStepOnIt = false;
-            _bombCollider = GetComponent<Collider>();
+            _bombCollider = GetComponent<SphereCollider>();
         }
 
         private void OnEnable()
@@ -106,8 +112,6 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             startSection.RemoveObstacle();
 
             PlaceExplosionEffect(startSection.ObstaclePlacementPosition);
-
-            TryDamageActorsOrPlayer(startSection.ObstaclePlacementPosition, bombDamage);
 
             ExplodeToDirection(startSection.ConnectedSections.upperSection, bombSpreading - 1, bombDamage,
                 SpreadDirections.Up);

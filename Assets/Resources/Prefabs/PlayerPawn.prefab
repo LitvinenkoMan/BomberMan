@@ -424,7 +424,7 @@ MonoBehaviour:
   playerMovement: {fileID: 4454664985879038347}
   bombDeployer: {fileID: 1320740036372020134}
   bomberParamsProvider: {fileID: 7731251428465038235}
-  OnPlayerDeathUnityEvent:
+  OnPlayerDeath:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &5012474147548761335
