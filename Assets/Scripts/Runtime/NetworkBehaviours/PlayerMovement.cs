@@ -49,5 +49,7 @@ namespace NetworkBehaviours
         {
             _controller.Move(new Vector3(inputValue.x, 0, inputValue.y) * speedMultiplier / CONSTANTSPEEDDEVIDER);
         }
+        
+        
     }
 }

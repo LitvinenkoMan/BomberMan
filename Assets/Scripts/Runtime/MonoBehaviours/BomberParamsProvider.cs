@@ -37,5 +37,7 @@ namespace Runtime.MonoBehaviours
             name = $"P{GetComponent<NetworkObject>().OwnerClientId}";
             PlayerName.text = name;
         }
+        
+        private void 
     }
 }

@@ -30,7 +30,10 @@ public class SceneLoader : MonoBehaviour
 
     void Start()
     {
-        SceneData.Initialize();
+        if (SceneData)
+        {
+            SceneData.Initialize();
+        }
         if (LoadOnStart)
         {
             LoadScene();
