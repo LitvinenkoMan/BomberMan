@@ -14,7 +14,7 @@ namespace Runtime.MonoBehaviours
 
         private void Start()
         {
-            BomberParams.ResetValues();
+            ResetLocalValues();
             if (!IsOwner)
             {
                 enabled = false;
@@ -36,6 +36,15 @@ namespace Runtime.MonoBehaviours
         {
             name = $"P{GetComponent<NetworkObject>().OwnerClientId}";
             PlayerName.text = name;
+        }
+        
+
+        public void ResetLocalValues()
+        {
+            if (IsOwner)
+            {   
+                BomberParams.ResetValues();
+            }
         }
     }
 }
