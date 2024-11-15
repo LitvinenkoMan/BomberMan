@@ -14,7 +14,6 @@ namespace Runtime.MonoBehaviours
 
         private void Start()
         {
-            ResetLocalValues();
             if (!IsOwner)
             {
                 enabled = false;
@@ -41,10 +40,21 @@ namespace Runtime.MonoBehaviours
 
         public void ResetLocalValues()
         {
-            if (IsOwner)
-            {   
+            if (IsServer && !IsOwner)
+            {
+                ResetLocalValuesClientRpc();
+            }
+            else
+            {
                 BomberParams.ResetValues();
             }
+        }
+        
+
+        [ClientRpc]
+        public void ResetLocalValuesClientRpc()
+        {
+            BomberParams.ResetValues();
         }
     }
 }

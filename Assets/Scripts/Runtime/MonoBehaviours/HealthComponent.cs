@@ -16,14 +16,16 @@ namespace Runtime.MonoBehaviours
         private float ImmunityTime;
         [SerializeField, Tooltip("Will be used if Base Params is not set")]
         private byte StartingHealth;
-        
-        public int HealthPoints { get; private set; }
+
+        private int _nonBaseActorHealth;
+        public int HealthPoints { get => _nonBaseActorHealth; private set => _nonBaseActorHealth = value; }
 
         private bool _isImmune;
         
         [Space(20)]
         // Events
         public Action<int> OnHealthChanged;
+        public Action<float> OnGetImmune;
         public Action OnHealthRunOut;
         public UnityEvent OnHealthRunOutUnityEvent;
         
@@ -32,22 +34,22 @@ namespace Runtime.MonoBehaviours
         {
             if (baseParams)
             {
-                HealthPoints = baseParams.ActorHealth;
-            }
-            else
-            {
-                HealthPoints = StartingHealth;
+                _nonBaseActorHealth = baseParams.ActorHealth;
             }
         }
 
         private void OnEnable()
         {
             _isImmune = false;
+            if (baseParams)
+            {
+                //baseParams.
+            }
         }
 
         private void OnDisable()
         {
-            
+            _isImmune = false;
         }
 
         /// <summary>
@@ -56,28 +58,33 @@ namespace Runtime.MonoBehaviours
         /// <param name="newHealth">New amount of health</param>
         public void SetHealth(int newHealth)
         {
-            int deltaHealth = newHealth - HealthPoints;
-            if (deltaHealth < 0)        // if new health is 2, and previous was 3, then 2-3=-1 - means owner was Damaged 
+            int deltaHealth = newHealth - _nonBaseActorHealth;
+            if (deltaHealth < 0) // if new health is 2, and previous was 3, then 2-3=-1 - means owner was Damaged 
             {
                 if (_isImmune)
                 {
                     return;
                 }
-                
+
                 if (ImmuneAfterGettingDamaged)
                 {
                     StartCoroutine(Immunity());
                 }
             }
-            HealthPoints = newHealth;
             
-            if (baseParams != null)
+            if (!baseParams)
             {
-                baseParams.SetActorHealth(HealthPoints);
+                _nonBaseActorHealth = newHealth;
+                OnHealthChanged?.Invoke(_nonBaseActorHealth);
+            }
+            else
+            {
+                baseParams.SetActorHealth(newHealth);
+                _nonBaseActorHealth = baseParams.ActorHealth;
+                OnHealthChanged?.Invoke(_nonBaseActorHealth);
             }
             
-            OnHealthChanged?.Invoke(HealthPoints);
-            if (HealthPoints <= 0)
+            if (newHealth <= 0)
             {
                 OnHealthRunOut?.Invoke();
                 OnHealthRunOutUnityEvent?.Invoke();
@@ -87,6 +94,7 @@ namespace Runtime.MonoBehaviours
         private IEnumerator Immunity()
         {
             _isImmune = true;
+            OnGetImmune?.Invoke(ImmunityTime);
             // TODO: Add some kind of animation
             yield return new WaitForSeconds(ImmunityTime);
             _isImmune = false;

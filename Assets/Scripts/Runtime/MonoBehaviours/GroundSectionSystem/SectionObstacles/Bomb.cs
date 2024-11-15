@@ -138,7 +138,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
                 DamageObstacle(currentSection.PlacedObstacle);
             }
 
-            PlaceExplosionEffect(currentSection.ObstaclePlacementPosition);
+            PlaceExplosionsEffect(currentSection.ObstaclePlacementPosition);
 
             TryDamageActorsOrPlayer(currentSection.ObstaclePlacementPosition, damage);
             
@@ -199,7 +199,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
                     if (health.gameObject.TryGetComponent(out BomberParamsProvider bomberParamsProvider) && bomberParamsProvider.NetworkObject.IsOwner)
                     {
                         Debug.LogWarning($"Damaged player {bomberParamsProvider.name}");
-                        health.SetHealth(health.HealthPoints - damage);
+                        health.SetHealth(bomberParamsProvider.GetBomberParams().ActorHealth - damage);
                     }
                 }
             }
