@@ -1,3 +1,4 @@
+using System;
 using ScriptableObjects;
 using Unity.Netcode;
 using UnityEngine;
@@ -17,7 +18,7 @@ namespace NetworkBehaviours
         private PlayerMainControls _controls;
         private InputAction MoveAction;
 
-        private const float CONSTANTSPEEDDEVIDER = 2;
+        private const float CONSTANTSPEEDDEVIDER = 1.25f;
 
         void Start()
         {
@@ -36,15 +37,14 @@ namespace NetworkBehaviours
             MoveAction = _controls.PlayerMainActionMaps.Move;
         }
 
-        void Update()
+        private void FixedUpdate()
         {
-            // TODO: remake it to listen events
             if (MoveAction.IsInProgress() && IsOwner)
             {
                 OnMove(MoveAction.ReadValue<Vector2>(), BomberParameters.SpeedMultiplier);
             }
         }
-        
+
         private void OnMove(Vector2 inputValue, float speedMultiplier)
         {
             _controller.Move(new Vector3(inputValue.x, 0, inputValue.y) * speedMultiplier / CONSTANTSPEEDDEVIDER);

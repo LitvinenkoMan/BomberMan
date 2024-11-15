@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using MonoBehaviours.Network;
 using Runtime.MonoBehaviours;
@@ -25,6 +26,7 @@ namespace MonoBehaviours
                 NetworkManager.OnClientConnectedCallback += RegisterPlayerForEvents;
                 RegisterPlayerForEvents(NetworkManager.Singleton.LocalClientId);
             }
+            JoinCodeText.text = RelayManager.Instance.JoinCode;
         }
 
         public override void OnNetworkDespawn()
@@ -36,10 +38,6 @@ namespace MonoBehaviours
             }
         }
 
-        private void Start()
-        {
-            JoinCodeText.text = RelayManager.Instance.JoinCode;
-        }
 
         private void RegisterPlayerForEvents(ulong clientID)
         {

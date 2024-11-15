@@ -1,8 +1,6 @@
-using System;
 using ScriptableObjects;
 using TMPro;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Runtime.MonoBehaviours.UI
@@ -47,7 +45,6 @@ namespace Runtime.MonoBehaviours.UI
         {
             NetworkManager.Singleton.Shutdown();
             //TODO: Make Exit Menu
-
         }
 
         private void UpdateHealthText(int newValue) => HealtText.text = $"{newValue}";

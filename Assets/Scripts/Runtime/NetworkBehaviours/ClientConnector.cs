@@ -68,11 +68,11 @@ namespace MonoBehaviours.Network
             {
                 try
                 {
-                    JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+                    JoinAllocation joinAllocation = await RelayManager.Instance.JoinRelay(joinCode);
                     
                     OnClientConnectionLaunched?.Invoke();
-                
 
+                    
                     NetworkManager.Singleton.GetComponent<UnityTransport>()
                         .SetRelayServerData(new RelayServerData(joinAllocation, "dtls"));
 

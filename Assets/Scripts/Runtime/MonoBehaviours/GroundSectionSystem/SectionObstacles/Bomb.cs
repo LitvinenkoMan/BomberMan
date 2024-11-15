@@ -138,7 +138,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
                 DamageObstacle(currentSection.PlacedObstacle);
             }
 
-            PlaceExplosionsEffect(currentSection.ObstaclePlacementPosition);
+            PlaceExplosionEffect(currentSection.ObstaclePlacementPosition);
 
             TryDamageActorsOrPlayer(currentSection.ObstaclePlacementPosition, damage);
             
