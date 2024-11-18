@@ -18,11 +18,14 @@ namespace NetworkBehaviours
         private PlayerMainControls _controls;
         private InputAction MoveAction;
 
+        private bool canMove;
+
         private const float CONSTANTSPEEDDEVIDER = 1.25f;
 
         void Start()
         {
             _controller = GetComponent<CharacterController>();
+            canMove = true;
         }
 
         public override void OnNetworkSpawn()
@@ -39,7 +42,7 @@ namespace NetworkBehaviours
 
         private void FixedUpdate()
         {
-            if (MoveAction.IsInProgress() && IsOwner)
+            if (MoveAction.IsInProgress() && IsOwner && canMove)
             {
                 OnMove(MoveAction.ReadValue<Vector2>(), BomberParameters.SpeedMultiplier);
             }
@@ -48,6 +51,17 @@ namespace NetworkBehaviours
         private void OnMove(Vector2 inputValue, float speedMultiplier)
         {
             _controller.Move(new Vector3(inputValue.x, 0, inputValue.y) * speedMultiplier / CONSTANTSPEEDDEVIDER);
+        }
+
+        public void SetAbilityToMove(bool canIt)
+        {
+            canMove = canIt;
+        }
+
+        [ClientRpc]
+        public void SetAbilityToMoveClientRpc(bool canIt)
+        {
+            canMove = canIt;
         }
     }
 }
