@@ -36,25 +36,14 @@ namespace Runtime.MonoBehaviours
             name = $"P{GetComponent<NetworkObject>().OwnerClientId}";
             PlayerName.text = name;
         }
-        
-
-        public void ResetLocalValues()
-        {
-            if (IsServer && !IsOwner)
-            {
-                ResetLocalValuesClientRpc();
-            }
-            else
-            {
-                BomberParams.ResetValues();
-            }
-        }
-        
 
         [ClientRpc]
         public void ResetLocalValuesClientRpc()
         {
-            BomberParams.ResetValues();
+            if (IsOwner)
+            {
+                BomberParams.ResetValues();
+            }
         }
     }
 }

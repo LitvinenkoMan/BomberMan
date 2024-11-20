@@ -42,7 +42,9 @@ namespace NetworkBehaviours
 
         private void FixedUpdate()
         {
-            if (MoveAction.IsInProgress() && IsOwner && canMove)
+            if (!canMove) return;
+            
+            if (MoveAction.IsInProgress() && IsOwner)
             {
                 OnMove(MoveAction.ReadValue<Vector2>(), BomberParameters.SpeedMultiplier);
             }
@@ -61,7 +63,7 @@ namespace NetworkBehaviours
         [ClientRpc]
         public void SetAbilityToMoveClientRpc(bool canIt)
         {
-            canMove = canIt;
+            SetAbilityToMove(canIt);
         }
     }
 }

@@ -262,7 +262,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1898818222369800095}
         m_TargetAssemblyTypeName: Runtime.MonoBehaviours.DeathResultHandler, Assembly-CSharp
-        m_MethodName: OnZeroHealthResponse
+        m_MethodName: OnZeroHealthResponseRpc
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -315,7 +315,6 @@ MonoBehaviour:
   visuals: {fileID: 8504387927702592247}
   playerMovement: {fileID: 4454664985879038347}
   bombDeployer: {fileID: 1320740036372020134}
-  bomberParamsProvider: {fileID: 7731251428465038235}
   OnPlayerDeathUnityEvent:
     m_PersistentCalls:
       m_Calls: []

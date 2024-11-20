@@ -16,8 +16,6 @@ namespace Runtime.MonoBehaviours
         private PlayerMovement playerMovement;
         [SerializeField]
         private BombDeployer bombDeployer;
-        [SerializeField]
-        private BomberParamsProvider bomberParamsProvider;
 
         [Space(20)]
         public UnityEvent OnPlayerDeathUnityEvent;
@@ -26,18 +24,17 @@ namespace Runtime.MonoBehaviours
 
         public void OnZeroHealthResponse()
         {
-            OnZeroHealthResponseRpc();
-        }
-        
-        [Rpc(SendTo.Server)]
-        public void OnZeroHealthResponseRpc()
-        {
             EnableViewerMode();
             
             OnPlayerDeathUnityEvent?.Invoke();
             OnPlayerDeathAction?.Invoke(NetworkObject.OwnerClientId);
         }
-
+        
+        [Rpc(SendTo.Server)]
+        public void OnZeroHealthResponseRpc()
+        {
+            OnZeroHealthResponse();
+        }
 
         private void EnableViewerMode()
         {

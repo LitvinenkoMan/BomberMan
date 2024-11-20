@@ -87,8 +87,9 @@ namespace Runtime.NetworkBehaviours
                     }
                 }
             );
+            
             player.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
-            player.GetComponent<BomberParamsProvider>().ResetLocalValues();
+            player.GetComponent<BomberParamsProvider>().ResetLocalValuesClientRpc();
         }
 
         private void AssociateNewSpawnPlaceForClient(ulong clientID)
