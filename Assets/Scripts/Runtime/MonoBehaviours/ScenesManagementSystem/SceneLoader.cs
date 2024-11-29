@@ -70,7 +70,8 @@ public class SceneLoader : MonoBehaviour
                 _activeUnloadedSceneName = SceneManager.GetActiveScene().name;
                 SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene()).completed += OnScenUnloadedAction;
             }
-            else SceneManager.UnloadSceneAsync(SceneData.SceneName, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects).completed += OnScenUnloadedAction;
+            else if (SceneManager.GetSceneByName(SceneData.SceneName) != null)
+                SceneManager.UnloadSceneAsync(SceneData.SceneName, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects).completed += OnScenUnloadedAction;
         }
         else
         {

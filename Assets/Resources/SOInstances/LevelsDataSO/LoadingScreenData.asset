@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb580f3bfb7822c45b7b07e20f2f9225, type: 3}
   m_Name: LoadingScreenData
   m_EditorClassIdentifier: 
-  _sceneName: 
+  _sceneName: LoadingScreen

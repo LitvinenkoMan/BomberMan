@@ -20,7 +20,7 @@ namespace Runtime.NetworkBehaviours
         private ObjectPoolQueue BombsPool;
 
         private int currentPlacedBombs;
-        private bool CanPlacBombs;
+        private bool CanPlaceBombs;
 
         // Input
         private PlayerMainControls _controls;
@@ -30,7 +30,7 @@ namespace Runtime.NetworkBehaviours
         {
             Initialize();
             PlaceBombAction.performed += DeployBombAction;
-            CanPlacBombs = true;
+            CanPlaceBombs = true;
         }
 
         private void OnDisable()
@@ -40,7 +40,7 @@ namespace Runtime.NetworkBehaviours
 
         public void SetAbilityToDeployBombs(bool canIt)
         {
-            CanPlacBombs = canIt;
+            CanPlaceBombs = canIt;
         }
 
         [ClientRpc]
@@ -66,11 +66,10 @@ namespace Runtime.NetworkBehaviours
         
         private void DeployBombAction(InputAction.CallbackContext context)
         {
-            if (!IsOwner)
-            {
-                return;
-            }
-
+            if (!CanPlaceBombs) return;
+            
+            if (!IsOwner) return;
+            
             if (IsServer)
             {
                 Debug.Log("Deploying from Server");
@@ -85,8 +84,6 @@ namespace Runtime.NetworkBehaviours
 
         private void DeployBomb(int bombsAtTime, float timeToExplode, int bombDamage, int bombSpread)
         {
-            if (!CanPlacBombs) return;
-            
             var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
             if (section && !section.PlacedObstacle && currentPlacedBombs < bombsAtTime)
             {

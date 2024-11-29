@@ -26,14 +26,14 @@ namespace Runtime.MonoBehaviours
         {
             _healthComponent.OnGetImmune -= ApplyGhostEffect;
         }
-
+        
+        
         private void ApplyGhostEffect(float time)
         {
             var mainColor = _renderer.material.color;
             StartCoroutine(ReturnBackBaseColor(time, mainColor));
             mainColor = new Color(mainColor.r, mainColor.g, mainColor.b, 0.5f);
             _renderer.material.color = mainColor;
-            
         }
 
         private IEnumerator ReturnBackBaseColor(float time, Color baseColor)

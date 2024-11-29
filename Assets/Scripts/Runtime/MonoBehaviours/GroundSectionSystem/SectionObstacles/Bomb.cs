@@ -109,6 +109,8 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             GroundSection startSection = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
             startSection.RemoveObstacle();
 
+            TryDamageActorsOrPlayer(startSection.ObstaclePlacementPosition, bombDamage);
+
             PlaceExplosionEffect(startSection.ObstaclePlacementPosition);
 
             ExplodeToDirection(startSection.ConnectedSections.upperSection, bombSpreading - 1, bombDamage,

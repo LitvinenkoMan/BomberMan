@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MonoBehaviours.GroundSectionSystem;
@@ -18,6 +19,8 @@ namespace Runtime.NetworkBehaviours
 
         private List<ClientIdAssociatedSpawn> _associatedPositions;
 
+        public Action<ulong> OnPlayerSpawned;
+
 
         private void Awake()
         {
@@ -36,23 +39,10 @@ namespace Runtime.NetworkBehaviours
 
         public override void OnNetworkSpawn()
         {
-            if (IsHost)
-            {
-                NetworkManager.OnClientConnectedCallback += AssociateNewSpawnPlaceForClient;
-                NetworkManager.OnClientConnectedCallback += SpawnClient;
-            }
+            
         }
 
-        public override void OnNetworkDespawn()
-        {
-            if (IsHost)
-            {
-                NetworkManager.OnClientConnectedCallback -= SpawnClient;
-                NetworkManager.OnClientConnectedCallback -= AssociateNewSpawnPlaceForClient;
-            }
-        }
 
-        
         /// <summary>
         /// Will spawn player GameObject for Client at Associated position for spawning, which is chosen randomly at moment when Client is Connected.
         /// </summary>
@@ -90,27 +80,24 @@ namespace Runtime.NetworkBehaviours
             
             player.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
             player.GetComponent<BomberParamsProvider>().ResetLocalValuesClientRpc();
+            
+            OnPlayerSpawned?.Invoke(clientId);
         }
 
-        private void AssociateNewSpawnPlaceForClient(ulong clientID)
+        public void AssociateRandomSpawnPlaceForClient(ulong clientID)
         {
             var spawnPos = GetRandomSpawnPosition();
+            
             
             _associatedPositions.ForEach(x =>
             {
                 if (x.position == spawnPos.transform.position)
                 {
-                    AssociateNewSpawnPlaceForClient(clientID);
+                    AssociateRandomSpawnPlaceForClient(clientID);
                 }
             });
             Debug.Log($"Associated spawn position: {spawnPos.name} for {clientID}");
             _associatedPositions.Add(new ClientIdAssociatedSpawn(clientID, spawnPos.transform.position));
-        }
-
-        private GameObject GetRandomSpawnPosition()
-        {
-            int chosenNumber = Random.Range(0, _currentLevelDataHolder.SpawnPlaces.Count);
-            return _currentLevelDataHolder.SpawnPlaces[chosenNumber];
         }
 
         public void SetUpCurrentDataHolder(LevelSectionsDataHolder dataHolder)
@@ -118,10 +105,30 @@ namespace Runtime.NetworkBehaviours
             _currentLevelDataHolder = dataHolder;
         }
 
+        public void RemoveSpawnPositionForPlayer(ulong clientId)
+        {
+            foreach (var associatedPosition in _associatedPositions)
+            {
+                if (associatedPosition.clientId == clientId)
+                {
+                    Debug.Log($"Removed Player from spawn with position: {associatedPosition.position}");
+                    
+                    _associatedPositions.Remove(associatedPosition);
+                    return;
+                }
+            }
+        }
+
         public void SetToDefaults()
         {
             _currentLevelDataHolder = null;
             _associatedPositions.Clear();
+        }
+
+        private GameObject GetRandomSpawnPosition()
+        {
+            int chosenNumber = Random.Range(0, _currentLevelDataHolder.SpawnPlaces.Count);
+            return _currentLevelDataHolder.SpawnPlaces[chosenNumber];
         }
     }
 

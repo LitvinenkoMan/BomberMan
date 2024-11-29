@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Gameplay.unity
     guid: 3f2b61e3cee26784591dbb60ead0eaa9
+  - enabled: 1
+    path: Assets/Scenes/LoadingScreen.unity
+    guid: cfa19074871f7574f8cb53ac273f1ae5
   - enabled: 0
     path: Assets/Samples/Relay/1.0.5/Simple Relay Sample (using UTP)/SimpleRelayUtp.unity
     guid: 3573da1ccba6a412e965f523d689fbd6

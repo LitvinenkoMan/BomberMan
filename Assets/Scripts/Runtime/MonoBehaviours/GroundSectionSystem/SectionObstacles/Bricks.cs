@@ -13,11 +13,11 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         private void Initialize()
         {
-            if (!NetworkObject.IsSpawned)
-            {
-                NetworkObject.Spawn();
-                Debug.Log($"Brick {name} Spawned");
-            }
+            // if (!NetworkObject.IsSpawned)
+            // {
+            //     NetworkObject.Spawn();
+            //     Debug.Log($"Brick {name} Spawned");
+            // }
             CanReceiveDamage = true;
             CanPlayerStepOnIt = false;
             Debug.Log($"Brick {name} Initialized");

@@ -1,3 +1,4 @@
+using MonoBehaviours;
 using ScriptableObjects;
 using TMPro;
 using Unity.Netcode;
@@ -9,6 +10,8 @@ namespace Runtime.MonoBehaviours.UI
     {
         [SerializeField]
         private BaseBomberParameters BomberParams;
+        [SerializeField]
+        private MatchManager CurrentMatchManager;
 
         [Header("Player Info UI")]
         [SerializeField] private TMP_Text HealtText;
@@ -43,7 +46,7 @@ namespace Runtime.MonoBehaviours.UI
         
         public void ExitToMainMenu()
         {
-            NetworkManager.Singleton.Shutdown();
+            CurrentMatchManager.SendDisconnectRequestServerRpc(NetworkManager.Singleton.LocalClient.ClientId);
             //TODO: Make Exit Menu
         }
 
