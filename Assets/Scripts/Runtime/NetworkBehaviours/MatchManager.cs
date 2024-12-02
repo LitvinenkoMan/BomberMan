@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Threading.Tasks;
 using MonoBehaviours.Network;
 using Runtime.MonoBehaviours;
@@ -16,7 +18,7 @@ namespace MonoBehaviours
         [SerializeField] private GameObject ClientPannel;
 
         private bool _hasMatchBegan;
-
+        private float _spawnCheckTimer = 0f;
 
         public UnityEvent StartMatchUnityEvent;
 
@@ -26,21 +28,19 @@ namespace MonoBehaviours
             ClientPannel.SetActive(false);
             if (IsServer)
             {
-                NetworkManager.OnClientConnectedCallback += PlayerSpawner.Instance.AssociateRandomSpawnPlaceForClient;
-                NetworkManager.OnClientConnectedCallback += PlayerSpawner.Instance.SpawnClient;
+                NetworkManager.OnClientConnectedCallback += PlayerSpawner.Instance.SpawnClientRpc;
                 
-                NetworkManager.OnClientDisconnectCallback += PlayerSpawner.Instance.RemoveSpawnPositionForPlayer;
+                NetworkManager.OnClientDisconnectCallback += PlayerSpawner.Instance.ClearSpawnPositionOfPlayer;
                 
                 PlayerSpawner.Instance.OnPlayerSpawned += RegisterPlayerForEvents;
                 PlayerSpawner.Instance.OnPlayerSpawned += DisablePlayerAbilitiesOnConnect;
 
                 foreach (var client in NetworkManager.Singleton.ConnectedClients)
                 {
-                    PlayerSpawner.Instance.AssociateRandomSpawnPlaceForClient(client.Key);
-                    PlayerSpawner.Instance.SpawnClient(client.Key);
+                    PlayerSpawner.Instance.SpawnClientRpc(client.Key);
                 }
 
-                RegisterPlayerForEvents(NetworkManager.Singleton.LocalClientId);
+                //RegisterPlayerForEvents(NetworkManager.Singleton.LocalClientId);
                 HostPanel.SetActive(true);
             }
             else
@@ -55,10 +55,9 @@ namespace MonoBehaviours
         {
             if (IsServer)
             {
-                NetworkManager.OnClientConnectedCallback -= PlayerSpawner.Instance.AssociateRandomSpawnPlaceForClient;
-                NetworkManager.OnClientConnectedCallback -= PlayerSpawner.Instance.SpawnClient;
+                NetworkManager.OnClientConnectedCallback -= PlayerSpawner.Instance.SpawnClientRpc;
 
-                NetworkManager.OnClientDisconnectCallback -= PlayerSpawner.Instance.RemoveSpawnPositionForPlayer;
+                NetworkManager.OnClientDisconnectCallback -= PlayerSpawner.Instance.ClearSpawnPositionOfPlayer;
                 
                 PlayerSpawner.Instance.OnPlayerSpawned -= RegisterPlayerForEvents;
                 PlayerSpawner.Instance.OnPlayerSpawned -= DisablePlayerAbilitiesOnConnect;
@@ -96,7 +95,6 @@ namespace MonoBehaviours
 
             if (newClientObject.TryGetComponent(out BombDeployer bombDeployer))
             {
-                Debug.Log($"disabled BomDeploying for player with ID {clientId}");
                 bombDeployer.SetAbilityToDeployBombsClientRpc(canUse);
             }
             //
@@ -128,23 +126,16 @@ namespace MonoBehaviours
                 .TryGetComponent(out DeathResultHandler deathResultHandler))
             {
                 deathResultHandler.OnPlayerDeathAction += SendRespawnRequestForPlayerWrapper;
-                Debug.LogWarning($"Registered player with ID: {clientID}");
-            }
-            else
-            {
-                Debug.LogError(
-                    $"Unable to find DeathResultHandler on object {NetworkManager.Singleton.ConnectedClients[clientID].PlayerObject}: {clientID}");
             }
         }
 
-        private void SendRespawnRequestForPlayerWrapper(ulong clientID) => SendRespawnRequestForPlayer(clientID);
+        private async void SendRespawnRequestForPlayerWrapper(ulong clientID) => await SendRespawnRequestForPlayer(clientID);
 
         private async Task SendRespawnRequestForPlayer(ulong clientID)
         {
             // TODO Add check for ability to respawn
-            await PlayerSpawner.Instance.SpawnClient(clientID, 3); // TODO Set this Time to variable
-            RegisterPlayerForEvents(clientID);
-
+            await PlayerSpawner.Instance.SpawnPlayer(clientID, 3);         // TODO Set this Time to variable
+            //RegisterPlayerForEvents(clientID);
         }
     }
 }

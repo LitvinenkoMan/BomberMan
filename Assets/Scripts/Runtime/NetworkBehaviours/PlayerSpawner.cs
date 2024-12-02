@@ -5,6 +5,7 @@ using MonoBehaviours.GroundSectionSystem;
 using Runtime.MonoBehaviours;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Android;
 using Random = UnityEngine.Random;
 
 namespace Runtime.NetworkBehaviours
@@ -47,9 +48,10 @@ namespace Runtime.NetworkBehaviours
         /// Will spawn player GameObject for Client at Associated position for spawning, which is chosen randomly at moment when Client is Connected.
         /// </summary>
         /// <param name="clientId">Id of a client</param>
-        public void SpawnClient(ulong clientId)
+        [Rpc(SendTo.Server)]
+        public void SpawnClientRpc(ulong clientId)
         {
-            SpawnPlayerRpc(clientId);
+            SpawnPlayer(clientId, 0);
         }
         
         /// <summary>
@@ -57,17 +59,25 @@ namespace Runtime.NetworkBehaviours
         /// </summary>
         /// <param name="clientId">Id of a client</param>
         /// <param name="spawnDelay">Delay for spawning, in seconds </param>
-        public async Task SpawnClient(ulong clientId, int spawnDelay)
+        [Rpc(SendTo.Server)]
+        public void SpawnClientRpc(ulong clientId, float spawnDelay)
         {
-            await Task.Delay(spawnDelay * 1000);
-            SpawnPlayerRpc(clientId);
+            SpawnPlayer(clientId, spawnDelay);
         }
 
-        [Rpc(SendTo.Server)]
-        private void SpawnPlayerRpc(ulong clientId)
+        public async Task SpawnPlayer(ulong clientId, float spawnDelay)
         {
+            Debug.LogWarning("Spawning Player");
+            await Task.Delay((int)(spawnDelay * 1000));
+            
             GameObject player = Instantiate(Player, Vector3.zero, new Quaternion(0, 0, 0, 0));
-
+            
+            Debug.LogWarning("Checking if player have its spawn");
+            if (!CheckIfPlayerHaveSpawnPlace(clientId))
+            {
+                await AssociateRandomSpawnPlaceForClient(clientId);
+            }
+            
             player.name = $"Player {clientId}";
             _associatedPositions.ForEach(x =>
                 {
@@ -79,41 +89,52 @@ namespace Runtime.NetworkBehaviours
             );
             
             player.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
-            player.GetComponent<BomberParamsProvider>().ResetLocalValuesClientRpc();
+            player.GetComponent<BomberParamsProvider>().ResetLocalValuesClientRpc();  
+            Debug.LogWarning($"Spawned P{clientId}");
             
             OnPlayerSpawned?.Invoke(clientId);
         }
 
-        public void AssociateRandomSpawnPlaceForClient(ulong clientID)
+        private async Task AssociateRandomSpawnPlaceForClient(ulong clientID)
         {
-            var spawnPos = GetRandomSpawnPosition();
-            
-            
-            _associatedPositions.ForEach(x =>
+            int chosenNumber = Random.Range(0, _currentLevelDataHolder.SpawnPlaces.Count);
+
+            if (!_associatedPositions[chosenNumber].isTaken)
             {
-                if (x.position == spawnPos.transform.position)
-                {
-                    AssociateRandomSpawnPlaceForClient(clientID);
-                }
-            });
-            Debug.Log($"Associated spawn position: {spawnPos.name} for {clientID}");
-            _associatedPositions.Add(new ClientIdAssociatedSpawn(clientID, spawnPos.transform.position));
+                
+                Debug.LogWarning($"assigning new spawn for player: {_currentLevelDataHolder.name} for P{clientID}");
+                var spawnPlace = _associatedPositions[chosenNumber];
+                spawnPlace.clientId = clientID;                         //TODO: is it okey to do like this?
+                spawnPlace.isTaken = true;                         
+                _associatedPositions[chosenNumber] = spawnPlace;
+            }
+            else
+            {
+                await AssociateRandomSpawnPlaceForClient(clientID);
+            }
         }
 
         public void SetUpCurrentDataHolder(LevelSectionsDataHolder dataHolder)
         {
             _currentLevelDataHolder = dataHolder;
+            foreach (var spawnPosition in _currentLevelDataHolder.SpawnPlaces)
+            {
+                _associatedPositions.Add(new ClientIdAssociatedSpawn(ulong.MaxValue, spawnPosition.transform.position, false));
+            }
         }
 
-        public void RemoveSpawnPositionForPlayer(ulong clientId)
+        public void ClearSpawnPositionOfPlayer(ulong clientId)
         {
-            foreach (var associatedPosition in _associatedPositions)
+            for (int i = 0; i < _associatedPositions.Count; i++)
             {
-                if (associatedPosition.clientId == clientId)
+                if (_associatedPositions[i].clientId == clientId)
                 {
-                    Debug.Log($"Removed Player from spawn with position: {associatedPosition.position}");
+                    Debug.Log($"Removed Player from spawn with position: {_associatedPositions[i].position}");
                     
-                    _associatedPositions.Remove(associatedPosition);
+                    var spawnPos = _associatedPositions[i];
+                    spawnPos.clientId = ulong.MaxValue;
+                    spawnPos.isTaken = false;
+                    _associatedPositions[i] = spawnPos;
                     return;
                 }
             }
@@ -124,24 +145,34 @@ namespace Runtime.NetworkBehaviours
             _currentLevelDataHolder = null;
             _associatedPositions.Clear();
         }
-
-        private GameObject GetRandomSpawnPosition()
+        
+        private bool CheckIfPlayerHaveSpawnPlace(ulong clientId)
         {
-            int chosenNumber = Random.Range(0, _currentLevelDataHolder.SpawnPlaces.Count);
-            return _currentLevelDataHolder.SpawnPlaces[chosenNumber];
+            foreach (var clientIdAssociatedSpawn in _associatedPositions)
+            {
+                if (clientIdAssociatedSpawn.clientId == clientId)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
+    
 
     public struct ClientIdAssociatedSpawn
     {
-        public ClientIdAssociatedSpawn(ulong clientId, Vector3 position)
+        public ClientIdAssociatedSpawn(ulong clientId, Vector3 position, bool isTaken)
         {
             this.clientId = clientId;
             this.position = position;
+            this.isTaken = isTaken;
         }
 
         public ulong clientId;
         public Vector3 position;
+        public bool isTaken;
     }
 }
 

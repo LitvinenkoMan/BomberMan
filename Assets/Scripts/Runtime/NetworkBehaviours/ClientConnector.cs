@@ -28,6 +28,7 @@ namespace MonoBehaviours.Network
         [Header("Connection Events:")]
         [Space(10)]
         public UnityEvent OnClientConnectionLaunched;
+        public UnityEvent OnJoinToRelay;
         public UnityEvent OnClientConnected;
         public UnityEvent OnWrongCodeUsed;
         
@@ -62,22 +63,23 @@ namespace MonoBehaviours.Network
         
         public async void JoinHost()
         {
-
             string joinCode = RoomName.text;
             if (!string.IsNullOrEmpty(joinCode))
             {
+                OnClientConnectionLaunched?.Invoke();
                 try
                 {
                     JoinAllocation joinAllocation = await RelayManager.Instance.JoinRelay(joinCode);
                     
-                    OnClientConnectionLaunched?.Invoke();
 
                     
                     NetworkManager.Singleton.GetComponent<UnityTransport>()
                         .SetRelayServerData(new RelayServerData(joinAllocation, "dtls"));
 
-                    NetworkManager.Singleton.OnClientStarted += ClientConnected;
+                    NetworkManager.Singleton.OnConnectionEvent += ClientConnected;
                     NetworkManager.Singleton.StartClient();
+
+                    OnJoinToRelay?.Invoke();
                 }
                 catch (RelayServiceException e)
                 {
@@ -89,9 +91,9 @@ namespace MonoBehaviours.Network
             }
         }
 
-        private void ClientConnected()
+        private void ClientConnected(NetworkManager networkManager, ConnectionEventData connectionEventData)
         {
-            Debug.Log("PlayerConnected");
+            Debug.Log("Player Connected");
             OnClientConnected?.Invoke();
         }
     }
