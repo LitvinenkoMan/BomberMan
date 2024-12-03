@@ -119,7 +119,7 @@ namespace MonoBehaviours
             HostPanel.SetActive(false);
             ClientPannel.SetActive(false);
         }
-
+ 
         private void RegisterPlayerForEvents(ulong clientID)
         {
             if (NetworkManager.Singleton.ConnectedClients[clientID].PlayerObject
