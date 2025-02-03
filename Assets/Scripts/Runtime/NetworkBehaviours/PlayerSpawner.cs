@@ -102,7 +102,7 @@ namespace Runtime.NetworkBehaviours
             if (!_associatedPositions[chosenNumber].isTaken)
             {
                 
-                Debug.LogWarning($"assigning new spawn for player: {_currentLevelDataHolder.name} for P{clientID}");
+                Debug.LogWarning($"assigning new spawn for player: {_currentLevelDataHolder.SpawnPlaces[chosenNumber].name} for P{clientID}");
                 var spawnPlace = _associatedPositions[chosenNumber];
                 spawnPlace.clientId = clientID;                         //TODO: is it okey to do like this?
                 spawnPlace.isTaken = true;                         

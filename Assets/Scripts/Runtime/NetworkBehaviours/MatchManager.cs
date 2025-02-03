@@ -1,15 +1,12 @@
-using System;
-using System.Collections;
 using System.Threading.Tasks;
 using MonoBehaviours.Network;
 using Runtime.MonoBehaviours;
-using Runtime.NetworkBehaviours;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace MonoBehaviours
+namespace Runtime.NetworkBehaviours
 {
     public class MatchManager : NetworkBehaviour
     {
@@ -28,12 +25,7 @@ namespace MonoBehaviours
             ClientPannel.SetActive(false);
             if (IsServer)
             {
-                NetworkManager.OnClientConnectedCallback += PlayerSpawner.Instance.SpawnClientRpc;
-                
-                NetworkManager.OnClientDisconnectCallback += PlayerSpawner.Instance.ClearSpawnPositionOfPlayer;
-                
-                PlayerSpawner.Instance.OnPlayerSpawned += RegisterPlayerForEvents;
-                PlayerSpawner.Instance.OnPlayerSpawned += DisablePlayerAbilitiesOnConnect;
+                SubscribeToRespawnEvents();
 
                 foreach (var client in NetworkManager.Singleton.ConnectedClients)
                 {
@@ -55,14 +47,7 @@ namespace MonoBehaviours
         {
             if (IsServer)
             {
-                NetworkManager.OnClientConnectedCallback -= PlayerSpawner.Instance.SpawnClientRpc;
-
-                NetworkManager.OnClientDisconnectCallback -= PlayerSpawner.Instance.ClearSpawnPositionOfPlayer;
-                
-                PlayerSpawner.Instance.OnPlayerSpawned -= RegisterPlayerForEvents;
-                PlayerSpawner.Instance.OnPlayerSpawned -= DisablePlayerAbilitiesOnConnect;
-
-                PlayerSpawner.Instance.SetToDefaults();
+                ResetRespawnSubscriptions();
             }
         }
 
@@ -89,7 +74,7 @@ namespace MonoBehaviours
             }
         }
 
-        private void SetAbilityToUseMainActionsForConnected(bool canUse, ulong clientId)
+        protected virtual void SetAbilityToUseMainActionsForConnected(bool canUse, ulong clientId)
         {
             var newClientObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
 
@@ -105,7 +90,7 @@ namespace MonoBehaviours
             // }
         }
 
-        private void DisablePlayerAbilitiesOnConnect(ulong clientId)
+        private void DisablePlayerAbilities(ulong clientId)
         {
             if (!_hasMatchBegan)
             {
@@ -114,13 +99,13 @@ namespace MonoBehaviours
         }
 
         [Rpc(SendTo.ClientsAndHost)]
-        private void DisableStartingPanelsRpc()
+        protected void DisableStartingPanelsRpc()
         {
             HostPanel.SetActive(false);
             ClientPannel.SetActive(false);
         }
  
-        private void RegisterPlayerForEvents(ulong clientID)
+        protected virtual void RegisterPlayerForEvents(ulong clientID)
         {
             if (NetworkManager.Singleton.ConnectedClients[clientID].PlayerObject
                 .TryGetComponent(out DeathResultHandler deathResultHandler))
@@ -136,6 +121,28 @@ namespace MonoBehaviours
             // TODO Add check for ability to respawn
             await PlayerSpawner.Instance.SpawnPlayer(clientID, 3);         // TODO Set this Time to variable
             //RegisterPlayerForEvents(clientID);
+        }
+
+        protected virtual void SubscribeToRespawnEvents()
+        {
+            NetworkManager.OnClientConnectedCallback += PlayerSpawner.Instance.SpawnClientRpc;
+
+            NetworkManager.OnClientDisconnectCallback += PlayerSpawner.Instance.ClearSpawnPositionOfPlayer;
+
+            PlayerSpawner.Instance.OnPlayerSpawned += RegisterPlayerForEvents;
+            PlayerSpawner.Instance.OnPlayerSpawned += DisablePlayerAbilities;
+        }
+
+        protected virtual void ResetRespawnSubscriptions()
+        {
+            NetworkManager.OnClientConnectedCallback -= PlayerSpawner.Instance.SpawnClientRpc;
+
+            NetworkManager.OnClientDisconnectCallback -= PlayerSpawner.Instance.ClearSpawnPositionOfPlayer;
+
+            PlayerSpawner.Instance.OnPlayerSpawned -= RegisterPlayerForEvents;
+            PlayerSpawner.Instance.OnPlayerSpawned -= DisablePlayerAbilities;
+
+            PlayerSpawner.Instance.SetToDefaults();
         }
     }
 }

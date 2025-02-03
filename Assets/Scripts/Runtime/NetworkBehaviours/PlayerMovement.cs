@@ -1,4 +1,3 @@
-using System;
 using ScriptableObjects;
 using Unity.Netcode;
 using UnityEngine;
@@ -12,19 +11,28 @@ namespace NetworkBehaviours
     {
         [SerializeField, Tooltip("Used to take main player values (speed, amount of bombs, health and ex.)")]
         private BaseBomberParameters BomberParameters;
+        
+        [SerializeField] 
+        private float GravityAcceleration = -9.8f;
+        [SerializeField]
+        private bool IsGravityOn = true;
+        [SerializeField]
+        private float GravityMultiplyer = 0.0001f;
 
         
         private CharacterController _controller;
         private PlayerMainControls _controls;
         private InputAction MoveAction;
 
+        private Vector3 _moveDirection;
+        private float _velocity;
         private bool canMove;
 
         private const float CONSTANTSPEEDDEVIDER = 1.25f;
 
         void Start()
         {
-            _controller = GetComponent<CharacterController>();
+            
             canMove = true;
         }
 
@@ -34,25 +42,59 @@ namespace NetworkBehaviours
             {
                 _controls = new PlayerMainControls();
             }
-            
+
+            if (!_controller)
+            {
+                _controller = GetComponent<CharacterController>();
+            }
+            _velocity = 0;
             _controls.PlayerMainActionMaps.Enable();
             
             MoveAction = _controls.PlayerMainActionMaps.Move;
+
+            _controller.enabled = true;
         }
 
         private void FixedUpdate()
         {
             if (!canMove) return;
             
-            if (MoveAction.IsInProgress() && IsOwner)
+            if (IsOwner)
             {
-                OnMove(MoveAction.ReadValue<Vector2>(), BomberParameters.SpeedMultiplier);
+                if (MoveAction.IsInProgress())
+                {
+                    ApplyMovement();
+                }
+
+                if (IsGravityOn)
+                {
+                    ApplyGravity();
+                }
+                
+                MoveController();
             }
         }
 
-        private void OnMove(Vector2 inputValue, float speedMultiplier)
+        private void MoveController()
         {
-            _controller.Move(new Vector3(inputValue.x, 0, inputValue.y) * speedMultiplier / CONSTANTSPEEDDEVIDER);
+            _controller.Move(_moveDirection);
+            _moveDirection = Vector3.zero;
+        }
+
+        private void ApplyMovement()
+        {
+            Vector2 inputValue = MoveAction.ReadValue<Vector2>();
+            _moveDirection += new Vector3(inputValue.x, 0, inputValue.y) * BomberParameters.SpeedMultiplier / CONSTANTSPEEDDEVIDER;
+        }
+        
+        private void ApplyGravity()
+        {
+            if (!_controller.isGrounded)
+            {
+                _velocity += GravityAcceleration * GravityMultiplyer;
+                _moveDirection += new Vector3(0, _velocity, 0); 
+            }
+            else _velocity = 0;
         }
 
         public void SetAbilityToMove(bool canIt)
