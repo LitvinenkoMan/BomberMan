@@ -6,18 +6,20 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Runtime.NetworkBehaviours
+namespace Runtime.NetworkBehaviours.MatchManagers
 {
     public class MatchManager : NetworkBehaviour
     {
-        [SerializeField] private TMP_Text JoinCodeText;
-        [SerializeField] private GameObject HostPanel;
-        [SerializeField] private GameObject ClientPannel;
+        [Header("Base Params")]
+        [SerializeField] public TMP_Text JoinCodeText;
+        [SerializeField] public GameObject HostPanel;
+        [SerializeField] public GameObject ClientPannel;
 
-        private bool _hasMatchBegan;
-        private float _spawnCheckTimer = 0f;
+        protected bool _hasMatchBegan;
+        protected float _spawnCheckTimer = 0f;
 
         public UnityEvent StartMatchUnityEvent;
+        public UnityEvent EndMatchUnityEvent;
 
         public override void OnNetworkSpawn()
         {
@@ -27,7 +29,7 @@ namespace Runtime.NetworkBehaviours
             {
                 SubscribeToRespawnEvents();
 
-                foreach (var client in NetworkManager.Singleton.ConnectedClients)
+                foreach (var client in NetworkManager.ConnectedClients)
                 {
                     PlayerSpawner.Instance.SpawnClientRpc(client.Key);
                 }
@@ -47,7 +49,7 @@ namespace Runtime.NetworkBehaviours
         {
             if (IsServer)
             {
-                ResetRespawnSubscriptions();
+                UnsubscribeFromRespawnEvents();
             }
         }
 
@@ -66,7 +68,7 @@ namespace Runtime.NetworkBehaviours
         }
 
         [ServerRpc]
-        public void SendDisconnectRequestServerRpc(ulong clientId)
+        public virtual void SendDisconnectRequestServerRpc(ulong clientId)
         {
             if (IsServer)
             {
@@ -90,7 +92,7 @@ namespace Runtime.NetworkBehaviours
             // }
         }
 
-        private void DisablePlayerAbilities(ulong clientId)
+        protected void DisablePlayerAbilities(ulong clientId)
         {
             if (!_hasMatchBegan)
             {
@@ -114,13 +116,12 @@ namespace Runtime.NetworkBehaviours
             }
         }
 
-        private async void SendRespawnRequestForPlayerWrapper(ulong clientID) => await SendRespawnRequestForPlayer(clientID);
+        protected virtual async void SendRespawnRequestForPlayerWrapper(ulong clientID) => await SendRespawnRequestForPlayer(clientID);
 
-        private async Task SendRespawnRequestForPlayer(ulong clientID)
+        protected virtual async Task SendRespawnRequestForPlayer(ulong clientID)
         {
-            // TODO Add check for ability to respawn
             await PlayerSpawner.Instance.SpawnPlayer(clientID, 3);         // TODO Set this Time to variable
-            //RegisterPlayerForEvents(clientID);
+            RegisterPlayerForEvents(clientID);
         }
 
         protected virtual void SubscribeToRespawnEvents()
@@ -133,7 +134,7 @@ namespace Runtime.NetworkBehaviours
             PlayerSpawner.Instance.OnPlayerSpawned += DisablePlayerAbilities;
         }
 
-        protected virtual void ResetRespawnSubscriptions()
+        protected virtual void UnsubscribeFromRespawnEvents()
         {
             NetworkManager.OnClientConnectedCallback -= PlayerSpawner.Instance.SpawnClientRpc;
 
