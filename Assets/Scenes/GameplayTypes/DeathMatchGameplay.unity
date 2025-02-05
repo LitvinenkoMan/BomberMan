@@ -580,8 +580,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 467042948}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &402356694
@@ -674,7 +673,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 402356693}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &467042949
 MonoBehaviour:
@@ -1879,8 +1878,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: MonoBehaviours.MatchManager, Assembly-CSharp
+      - m_Target: {fileID: 402356694}
+        m_TargetAssemblyTypeName: Runtime.NetworkBehaviours.MatchManagers.MatchManager,
+          Assembly-CSharp
         m_MethodName: StartMatch
         m_Mode: 1
         m_Arguments:
@@ -3637,6 +3637,7 @@ CanvasRenderer:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 467042948}
   - {fileID: 1646455178}
   - {fileID: 402356693}
   - {fileID: 2045558055}

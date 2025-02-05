@@ -11,6 +11,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
     public class MatchManager : NetworkBehaviour
     {
         [Header("Base Params")]
+        [Space(10)]
         [SerializeField] public TMP_Text JoinCodeText;
         [SerializeField] public GameObject HostPanel;
         [SerializeField] public GameObject ClientPannel;

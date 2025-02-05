@@ -10,6 +10,8 @@ namespace Runtime.NetworkBehaviours.MatchManagers
     {
         [Space(20)]
         [Header("Death Match Params")]
+        [Space(10)]
+
         [SerializeField]
         private byte InitialPlayersLifeCount = 3;
         
@@ -17,6 +19,8 @@ namespace Runtime.NetworkBehaviours.MatchManagers
 
         public override void OnNetworkSpawn()
         {
+            _playersLifeCount = new Dictionary<ulong, int>();
+            
             HostPanel.SetActive(false);
             ClientPannel.SetActive(false);
             if (IsServer)
@@ -37,7 +41,6 @@ namespace Runtime.NetworkBehaviours.MatchManagers
             }
 
             JoinCodeText.text = RelayManager.Instance.JoinCode;
-            _playersLifeCount = new Dictionary<ulong, int>();
         }
 
         private void AddPlayerToLifeCounter(ulong clientId)
