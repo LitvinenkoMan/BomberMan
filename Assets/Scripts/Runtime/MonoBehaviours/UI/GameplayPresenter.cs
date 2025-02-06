@@ -22,7 +22,7 @@ namespace Runtime.MonoBehaviours.UI
         [SerializeField] private TMP_Text SpreadText;
         [SerializeField] private TMP_Text BombsPerTimeText;
 
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
             UpdateHealthText(BomberParams.ActorHealth);
             UpdateSpeedText(BomberParams.SpeedMultiplier);
@@ -37,7 +37,7 @@ namespace Runtime.MonoBehaviours.UI
             BomberParams.OnBombsPerTimeChangedEvent += UpdateBombsPerTimeText;
         }
 
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
             BomberParams.OnHealthChangedEvent -= UpdateHealthText;
             BomberParams.OnSpeedChangedEvent -= UpdateSpeedText;

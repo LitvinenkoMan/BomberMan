@@ -14,8 +14,6 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         public Action<Bomb> onExplode;
         
         [SerializeField]
-        private BaseBomberParameters bomberParams;
-        [SerializeField]
         private GameObject BombVisuals;
         
         private Collider _bombCollider;

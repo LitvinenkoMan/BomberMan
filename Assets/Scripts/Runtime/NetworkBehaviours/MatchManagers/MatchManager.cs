@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using MonoBehaviours.Network;
 using Runtime.MonoBehaviours;
@@ -17,10 +18,13 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         [SerializeField] public GameObject ClientPannel;
 
         protected bool _hasMatchBegan;
+        protected bool _isInitialized;
         protected float _spawnCheckTimer = 0f;
 
         public UnityEvent StartMatchUnityEvent;
         public UnityEvent EndMatchUnityEvent;
+
+        public Action OnInitialized;
 
         public override void OnNetworkSpawn()
         {
@@ -44,6 +48,9 @@ namespace Runtime.NetworkBehaviours.MatchManagers
             }
 
             JoinCodeText.text = RelayManager.Instance.JoinCode;
+
+            _isInitialized = true;
+            OnInitialized.Invoke();
         }
 
         public override void OnNetworkDespawn()

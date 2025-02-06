@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MonoBehaviours.Network;
+using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Runtime.NetworkBehaviours.MatchManagers
 {
@@ -17,8 +19,11 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         
         private Dictionary<ulong, int> _playersLifeCount;
 
+        public Action<ulong, int> OnPlayerLifeCountSubtracted;
+
         public override void OnNetworkSpawn()
         {
+            _hasMatchBegan = false;
             _playersLifeCount = new Dictionary<ulong, int>();
             
             HostPanel.SetActive(false);
@@ -26,13 +31,13 @@ namespace Runtime.NetworkBehaviours.MatchManagers
             if (IsServer)
             {
                 SubscribeToRespawnEvents();
-
+                
                 foreach (var client in NetworkManager.ConnectedClients)
                 {
                     PlayerSpawner.Instance.SpawnClientRpc(client.Key);
                     AddPlayerToLifeCounter(client.Key);
                 }
-                //RegisterPlayerForEvents(NetworkManager.Singleton.LocalClientId);
+                RegisterPlayerForEvents(NetworkManager.Singleton.LocalClientId);
                 HostPanel.SetActive(true);
             }
             else
@@ -41,11 +46,16 @@ namespace Runtime.NetworkBehaviours.MatchManagers
             }
 
             JoinCodeText.text = RelayManager.Instance.JoinCode;
+            
+            _isInitialized = true;
+            OnInitialized.Invoke();
         }
-
+        
         private void AddPlayerToLifeCounter(ulong clientId)
         {
             _playersLifeCount.TryAdd(clientId, InitialPlayersLifeCount);
+            AddPlayerOnLocalDataRpc(clientId, InitialPlayersLifeCount);
+            Debug.Log($"Player {clientId} Added to life counter, {_playersLifeCount[clientId]} is left");
         }
 
         private void RemovePlayerFromLifeCounter(ulong clientId)
@@ -53,10 +63,28 @@ namespace Runtime.NetworkBehaviours.MatchManagers
             _playersLifeCount.Remove(clientId);
         }
 
+        public int GetPlayerLifeCount(ulong clientId)
+        {
+            return _playersLifeCount[clientId];
+        }
+
         private void SubtractLifeForPlayer(ulong clientId)
         {
-            _playersLifeCount[clientId] -= 1;
+            UpdateLocalDataForPlayerRpc(clientId, _playersLifeCount[clientId] - 1);
+            OnPlayerLifeCountSubtracted?.Invoke(clientId, _playersLifeCount[clientId]);
             Debug.Log($"Player {clientId} lost Life! {_playersLifeCount[clientId]} is left");
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        private void UpdateLocalDataForPlayerRpc(ulong clientId, int lifeCount)
+        {
+            _playersLifeCount[clientId] = lifeCount;
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        private void AddPlayerOnLocalDataRpc(ulong clientId, int lifeCount)
+        {
+            _playersLifeCount.TryAdd(clientId, lifeCount);
         }
 
         protected override void SendRespawnRequestForPlayerWrapper(ulong clientID)
