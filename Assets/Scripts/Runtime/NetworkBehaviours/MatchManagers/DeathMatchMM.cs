@@ -48,7 +48,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
             JoinCodeText.text = RelayManager.Instance.JoinCode;
             
             _isInitialized = true;
-            OnInitialized.Invoke();
+            OnInitialized?.Invoke();
         }
         
         private void AddPlayerToLifeCounter(ulong clientId)
@@ -103,16 +103,24 @@ namespace Runtime.NetworkBehaviours.MatchManagers
 
         protected override void SubscribeToRespawnEvents()
         {
-            base.SubscribeToRespawnEvents();
             NetworkManager.OnClientConnectedCallback += AddPlayerToLifeCounter;
             NetworkManager.OnClientDisconnectCallback += RemovePlayerFromLifeCounter;
+            
+            
+            NetworkManager.OnClientConnectedCallback += PlayerSpawner.Instance.SpawnClientRpc;
+
+            NetworkManager.OnClientDisconnectCallback += PlayerSpawner.Instance.ClearSpawnPositionOfPlayer;
+
+            PlayerSpawner.Instance.OnPlayerSpawned += RegisterPlayerForEvents;
+            PlayerSpawner.Instance.OnPlayerSpawned += DisablePlayerAbilities;
+            //base.SubscribeToRespawnEvents();
         }
 
         protected override void UnsubscribeFromRespawnEvents()
         {
-            base.UnsubscribeFromRespawnEvents();
             NetworkManager.OnClientConnectedCallback -= AddPlayerToLifeCounter;
             NetworkManager.OnClientDisconnectCallback -= RemovePlayerFromLifeCounter;
+            base.UnsubscribeFromRespawnEvents();
         }
     }
 }

@@ -50,7 +50,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
             JoinCodeText.text = RelayManager.Instance.JoinCode;
 
             _isInitialized = true;
-            OnInitialized.Invoke();
+            OnInitialized?.Invoke();
         }
 
         public override void OnNetworkDespawn()

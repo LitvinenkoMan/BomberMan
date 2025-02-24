@@ -30,7 +30,7 @@ namespace Runtime.NetworkBehaviours
         {
             Initialize();
             PlaceBombAction.performed += DeployBombAction;
-            CanPlaceBombs = true;
+            CanPlaceBombs = false;
         }
 
         private void OnDisable()
