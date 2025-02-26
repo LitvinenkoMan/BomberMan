@@ -9,6 +9,7 @@ namespace MonoBehaviours.Network
         [SerializeField] 
         private GameObject CameraExample;
         
+        
         public override void OnNetworkSpawn()
         {
             if (IsOwner)

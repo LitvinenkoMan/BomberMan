@@ -105,15 +105,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         {
             NetworkManager.OnClientConnectedCallback += AddPlayerToLifeCounter;
             NetworkManager.OnClientDisconnectCallback += RemovePlayerFromLifeCounter;
-            
-            
-            NetworkManager.OnClientConnectedCallback += PlayerSpawner.Instance.SpawnClientRpc;
-
-            NetworkManager.OnClientDisconnectCallback += PlayerSpawner.Instance.ClearSpawnPositionOfPlayer;
-
-            PlayerSpawner.Instance.OnPlayerSpawned += RegisterPlayerForEvents;
-            PlayerSpawner.Instance.OnPlayerSpawned += DisablePlayerAbilities;
-            //base.SubscribeToRespawnEvents();
+            base.SubscribeToRespawnEvents();
         }
 
         protected override void UnsubscribeFromRespawnEvents()

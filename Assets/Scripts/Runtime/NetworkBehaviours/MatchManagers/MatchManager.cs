@@ -106,6 +106,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
             {
                 SetAbilityToUseMainActionsForConnected(false, clientId);
             }
+            else SetAbilityToUseMainActionsForConnected(true, clientId);
         }
 
         [Rpc(SendTo.ClientsAndHost)]

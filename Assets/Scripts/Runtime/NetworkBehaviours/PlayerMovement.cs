@@ -32,7 +32,7 @@ namespace NetworkBehaviours
 
         void Start()
         {
-            
+
             canMove = true;
         }
 
