@@ -100,7 +100,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
             // }
         }
 
-        protected void DisablePlayerAbilities(ulong clientId)
+        protected void CheckForPlayerAbilities(ulong clientId)
         {
             if (!_hasMatchBegan)
             {
@@ -140,7 +140,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
             NetworkManager.OnClientDisconnectCallback += PlayerSpawner.Instance.ClearSpawnPositionOfPlayer;
 
             PlayerSpawner.Instance.OnPlayerSpawned += RegisterPlayerForEvents;
-            PlayerSpawner.Instance.OnPlayerSpawned += DisablePlayerAbilities;
+            PlayerSpawner.Instance.OnPlayerSpawned += CheckForPlayerAbilities;
         }
 
         protected virtual void UnsubscribeFromRespawnEvents()
@@ -150,7 +150,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
             NetworkManager.OnClientDisconnectCallback -= PlayerSpawner.Instance.ClearSpawnPositionOfPlayer;
 
             PlayerSpawner.Instance.OnPlayerSpawned -= RegisterPlayerForEvents;
-            PlayerSpawner.Instance.OnPlayerSpawned -= DisablePlayerAbilities;
+            PlayerSpawner.Instance.OnPlayerSpawned -= CheckForPlayerAbilities;
 
             PlayerSpawner.Instance.SetToDefaults();
         }
