@@ -17,29 +17,25 @@ namespace Runtime.MonoBehaviours.UI
         protected override void OnEnable()
         {
             base.OnEnable();
-            PlayerSpawner.Instance.OnPlayerSpawned += UpdateLifeCount;
             DeathMatchManager.OnInitialized += VisualiseBaseParams;
+            DeathMatchManager.OnLifeCountInfoReceived += UpdateLifeCount;
         }
 
         private void VisualiseBaseParams()
         {
-            LifeCountUI.text = DeathMatchManager.GetPlayerLifeCount(NetworkManager.Singleton.LocalClient.ClientId).ToString();
+            DeathMatchManager.RequestLifeCountDataRpc(NetworkManager.Singleton.LocalClientId);
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            PlayerSpawner.Instance.OnPlayerSpawned -= UpdateLifeCount;
             DeathMatchManager.OnInitialized -= VisualiseBaseParams;
 
         }
 
-        private void UpdateLifeCount(ulong clientId)
+        private void UpdateLifeCount(int lifeCount)
         {
-            if (NetworkManager.Singleton.LocalClient.ClientId == clientId)
-            {
-                LifeCountUI.text = DeathMatchManager.GetPlayerLifeCount(clientId).ToString();
-            }
+            LifeCountUI.text = lifeCount.ToString();
         }
     }
 }

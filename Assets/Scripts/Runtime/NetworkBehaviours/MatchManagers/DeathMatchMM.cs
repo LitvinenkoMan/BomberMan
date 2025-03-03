@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MonoBehaviours.Network;
+using Runtime.MonoBehaviours;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
@@ -19,7 +20,8 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         
         private Dictionary<ulong, int> _playersLifeCount;
 
-        public Action<ulong, int> OnPlayerLifeCountSubtracted;
+        public event Action<int> OnLocalPlayerLifeCountUIUpdate;
+        public event Action<int> OnLifeCountInfoReceived;
 
         public override void OnNetworkSpawn()
         {
@@ -53,8 +55,8 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         
         private void AddPlayerToLifeCounter(ulong clientId)
         {
-            _playersLifeCount.TryAdd(clientId, InitialPlayersLifeCount);
-            AddPlayerOnLocalDataRpc(clientId, InitialPlayersLifeCount);
+            _playersLifeCount.Add(clientId, InitialPlayersLifeCount);
+            SendLifeCountDataRpc(_playersLifeCount[clientId], RpcTarget.Single(clientId, RpcTargetUse.Temp));
             Debug.Log($"Player {clientId} Added to life counter, {_playersLifeCount[clientId]} is left");
         }
 
@@ -63,28 +65,13 @@ namespace Runtime.NetworkBehaviours.MatchManagers
             _playersLifeCount.Remove(clientId);
         }
 
-        public int GetPlayerLifeCount(ulong clientId)
+        protected override void RegisterPlayerForEvents(ulong clientID)
         {
-            return _playersLifeCount[clientId];
-        }
-
-        private void SubtractLifeForPlayer(ulong clientId)
-        {
-            UpdateLocalDataForPlayerRpc(clientId, _playersLifeCount[clientId] - 1);
-            OnPlayerLifeCountSubtracted?.Invoke(clientId, _playersLifeCount[clientId]);
-            Debug.Log($"Player {clientId} lost Life! {_playersLifeCount[clientId]} is left");
-        }
-
-        [Rpc(SendTo.ClientsAndHost)]
-        private void UpdateLocalDataForPlayerRpc(ulong clientId, int lifeCount)
-        {
-            _playersLifeCount[clientId] = lifeCount;
-        }
-
-        [Rpc(SendTo.ClientsAndHost)]
-        private void AddPlayerOnLocalDataRpc(ulong clientId, int lifeCount)
-        {
-            _playersLifeCount.TryAdd(clientId, lifeCount);
+            if (NetworkManager.Singleton.ConnectedClients[clientID].PlayerObject
+                .TryGetComponent(out DeathResultHandler deathResultHandler))
+            {
+                deathResultHandler.OnPlayerDeathAction += RequestRespawnRpc;
+            }
         }
 
         protected override void SendRespawnRequestForPlayerWrapper(ulong clientID)
@@ -94,11 +81,32 @@ namespace Runtime.NetworkBehaviours.MatchManagers
                 base.SendRespawnRequestForPlayerWrapper(clientID);
             }
         }
-
-        protected override Task SendRespawnRequestForPlayer(ulong clientID)
+        
+        [Rpc(SendTo.Server)]
+        private void RequestRespawnRpc(ulong clientId)
         {
-            SubtractLifeForPlayer(clientID);
-            return base.SendRespawnRequestForPlayer(clientID);
+            SubtractLifeForPlayerRpc(clientId);
+            SendRespawnRequestForPlayerWrapper(clientId);
+        }
+
+        [Rpc(SendTo.Server)]
+        private void SubtractLifeForPlayerRpc(ulong clientId)
+        {
+            _playersLifeCount[clientId] -= 1;
+            SendLifeCountDataRpc(_playersLifeCount[clientId], RpcTarget.Single(clientId, RpcTargetUse.Temp));
+            Debug.Log($"Player {clientId} lost Life! {_playersLifeCount[clientId]} is left");
+        }
+
+        [Rpc(SendTo.Server)]
+        public void RequestLifeCountDataRpc(ulong clientId)
+        {
+            SendLifeCountDataRpc(_playersLifeCount[clientId], RpcTarget.Single(clientId, RpcTargetUse.Temp));
+        }
+        
+        [Rpc(SendTo.SpecifiedInParams)]
+        private void SendLifeCountDataRpc(int lifeCount, RpcParams rpcParams = default)
+        {
+            OnLifeCountInfoReceived?.Invoke(lifeCount);
         }
 
         protected override void SubscribeToRespawnEvents()

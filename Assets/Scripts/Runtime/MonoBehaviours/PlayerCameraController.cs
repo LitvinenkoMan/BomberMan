@@ -19,6 +19,8 @@ namespace Runtime.MonoBehaviours
         private void OnEnable()
         {
             PlayerSpawner.Instance.OnPlayerSpawned += FollowSpawnedPlayer;
+            CheckForCameraInstance();
+            CheckForInstancedPlayer();
         }
 
         private void OnDisable()
@@ -44,20 +46,23 @@ namespace Runtime.MonoBehaviours
 
         private void CheckForInstancedPlayer()
         {
+            Debug.Log($"Searching for PlayerObject to follow");
             NetworkObject playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
             if (playerObject)
             {
-                CheckForCameraInstance(playerObject);
+                Debug.Log($"Got One");
+                FollowSpawnedPlayer(NetworkManager.Singleton.LocalClient.ClientId);
             }
         }
 
-        private void CheckForCameraInstance(NetworkObject playerObject)
+        private void CheckForCameraInstance()
         {
-            if (!_instantiatedCamera)
+            Debug.Log($"Checking if camera exist");
+            if (_instantiatedCamera == null)
             {
+                Debug.Log($"Instantiating camera");
                 _instantiatedCamera = Instantiate(CameraExample, Vector3.zero, new Quaternion(0, 0, 0, 0));
                 _cameraViewer = _instantiatedCamera.GetComponent<ICameraViewer>();
-                _cameraViewer.AddToViewTarget(playerObject.gameObject.transform);    
             }
         }
 
@@ -65,9 +70,7 @@ namespace Runtime.MonoBehaviours
         {
             Debug.Log($"Started to follow local player");
             NetworkObject playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
-            CheckForCameraInstance(playerObject);
             SwitchToGameplayMode();
-
 
             if (playerObject.gameObject.TryGetComponent(out DeathResultHandler handler))
             {

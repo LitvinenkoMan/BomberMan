@@ -20,7 +20,7 @@ namespace Runtime.NetworkBehaviours
 
         private List<ClientIdAssociatedSpawn> _associatedPositions;
 
-        public Action<ulong> OnPlayerSpawned;
+        public event Action<ulong> OnPlayerSpawned;
 
 
         private void Awake()
@@ -91,8 +91,8 @@ namespace Runtime.NetworkBehaviours
             player.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
             player.GetComponent<BomberParamsProvider>().ResetLocalValuesClientRpc();  
             Debug.LogWarning($"Spawned P{clientId}");
-            
-            OnPlayerSpawned?.Invoke(clientId);
+
+            SendPlayerSpawnEventRpc(clientId);
         }
 
         private async Task AssociateRandomSpawnPlaceForClient(ulong clientID)
@@ -157,6 +157,12 @@ namespace Runtime.NetworkBehaviours
             }
 
             return false;
+        }
+
+        [Rpc(SendTo.Everyone)]
+        private void SendPlayerSpawnEventRpc(ulong clientId)
+        {
+            OnPlayerSpawned?.Invoke(clientId);
         }
     }
     
