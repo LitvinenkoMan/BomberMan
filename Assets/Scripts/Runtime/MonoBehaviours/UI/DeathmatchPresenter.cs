@@ -13,12 +13,18 @@ namespace Runtime.MonoBehaviours.UI
 
         [Space(10)] 
         [SerializeField] private TMP_Text LifeCountUI;
+        [SerializeField]
+        private GameObject VictoryScreen;
+        [SerializeField]
+        private TMP_Text WinnerTextFielad;
 
         protected override void OnEnable()
         {
             base.OnEnable();
             DeathMatchManager.OnInitialized += VisualiseBaseParams;
             DeathMatchManager.OnLifeCountInfoReceived += UpdateLifeCount;
+            DeathMatchManager.OnWinnerAppeared += EnableVictoryScreen;
+            DeathMatchManager.OnResetUI += ResetUI;
         }
 
         private void VisualiseBaseParams()
@@ -36,6 +42,27 @@ namespace Runtime.MonoBehaviours.UI
         private void UpdateLifeCount(int lifeCount)
         {
             LifeCountUI.text = lifeCount.ToString();
+        }
+
+        private void EnableClientView()
+        {
+            
+        }
+
+        private void EnableServerView()
+        {
+            
+        }
+
+        private void EnableVictoryScreen(ulong winnerId)
+        {
+            WinnerTextFielad.text = $"Winner: P{winnerId}";
+            VictoryScreen.SetActive(true);
+        }
+
+        private void ResetUI(bool isServer)
+        {
+            VictoryScreen.SetActive(false);
         }
     }
 }

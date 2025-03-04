@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MonoBehaviours.Network;
 using Runtime.MonoBehaviours;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
@@ -22,14 +23,18 @@ namespace Runtime.NetworkBehaviours.MatchManagers
 
         public event Action<int> OnLocalPlayerLifeCountUIUpdate;
         public event Action<int> OnLifeCountInfoReceived;
+        public event Action<ulong> OnWinnerAppeared;
+        public event Action OnEnableClientView; // if send with true - is server, else is client
+        public event Action OnEnableServerView; // if send with true - is server, else is client
+        public event Action<bool> OnResetUI; // if send with true - is server, else is client
 
         public override void OnNetworkSpawn()
         {
             _hasMatchBegan = false;
             _playersLifeCount = new Dictionary<ulong, int>();
+
+            ResetUIRpc();
             
-            HostPanel.SetActive(false);
-            ClientPannel.SetActive(false);
             if (IsServer)
             {
                 SubscribeToRespawnEvents();
@@ -40,11 +45,6 @@ namespace Runtime.NetworkBehaviours.MatchManagers
                     AddPlayerToLifeCounter(client.Key);
                 }
                 RegisterPlayerForEvents(NetworkManager.Singleton.LocalClientId);
-                HostPanel.SetActive(true);
-            }
-            else
-            {
-                ClientPannel.SetActive(true);
             }
 
             JoinCodeText.text = RelayManager.Instance.JoinCode;
@@ -81,7 +81,48 @@ namespace Runtime.NetworkBehaviours.MatchManagers
                 base.SendRespawnRequestForPlayerWrapper(clientID);
             }
         }
+
+        private void CheckForVictoryConditions()
+        {
+            byte defeatedPlayers = 0;
+            ulong winnerId = 999;
+            foreach (var player in _playersLifeCount)
+            {
+                if (player.Value < 0)
+                {
+                    defeatedPlayers += 1;
+                }
+                else winnerId = player.Key;
+            }
+
+            if (_playersLifeCount.Count - 1 == defeatedPlayers)
+            {
+                ShowVictoryPanelRpc(winnerId);
+            }
+        }
         
+        [Rpc(SendTo.ClientsAndHost)]
+        private void ResetUIRpc()
+        {
+            OnResetUI?.Invoke(true);
+            if (IsServer)
+            {
+                HostPanel.SetActive(true);
+                ClientPannel.SetActive(false);
+            }
+            else
+            {
+                HostPanel.SetActive(false);
+                ClientPannel.SetActive(true);
+            }
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        private void ShowVictoryPanelRpc(ulong winnerId)
+        {
+            OnWinnerAppeared?.Invoke(winnerId);
+        }
+
         [Rpc(SendTo.Server)]
         private void RequestRespawnRpc(ulong clientId)
         {
@@ -94,6 +135,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         {
             _playersLifeCount[clientId] -= 1;
             SendLifeCountDataRpc(_playersLifeCount[clientId], RpcTarget.Single(clientId, RpcTargetUse.Temp));
+            CheckForVictoryConditions();
             Debug.Log($"Player {clientId} lost Life! {_playersLifeCount[clientId]} is left");
         }
 
