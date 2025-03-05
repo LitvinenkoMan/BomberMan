@@ -672,6 +672,79 @@ MonoBehaviour:
       enableFptlForForwardOpaque: 0
       enableBigTilePrepass: 0
       isFptlEnabled: 0
+--- !u!1001 &1737876666
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 73a79822e5f60464396c0eaf57702880,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.9966955
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 73a79822e5f60464396c0eaf57702880,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 73a79822e5f60464396c0eaf57702880,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2.9644394
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 73a79822e5f60464396c0eaf57702880,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 73a79822e5f60464396c0eaf57702880,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 73a79822e5f60464396c0eaf57702880,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 73a79822e5f60464396c0eaf57702880,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 73a79822e5f60464396c0eaf57702880,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 73a79822e5f60464396c0eaf57702880,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 73a79822e5f60464396c0eaf57702880,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 25913615693173091, guid: 73a79822e5f60464396c0eaf57702880,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 99f3132a5879f0d4d8afa8b8a41a5820, type: 2}
+    - target: {fileID: 919132149155446097, guid: 73a79822e5f60464396c0eaf57702880,
+        type: 3}
+      propertyPath: m_Name
+      value: Golem (1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 73a79822e5f60464396c0eaf57702880, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -679,3 +752,4 @@ SceneRoots:
   - {fileID: 1451439359}
   - {fileID: 211458661}
   - {fileID: 72562476}
+  - {fileID: 1737876666}
