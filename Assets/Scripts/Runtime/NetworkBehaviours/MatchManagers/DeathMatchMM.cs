@@ -44,7 +44,6 @@ namespace Runtime.NetworkBehaviours.MatchManagers
                     PlayerSpawner.Instance.SpawnClientRpc(client.Key);
                     AddPlayerToLifeCounter(client.Key);
                 }
-                RegisterPlayerForEvents(NetworkManager.Singleton.LocalClientId);
             }
 
             JoinCodeText.text = RelayManager.Instance.JoinCode;
@@ -70,6 +69,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
             if (NetworkManager.Singleton.ConnectedClients[clientID].PlayerObject
                 .TryGetComponent(out DeathResultHandler deathResultHandler))
             {
+                Debug.Log($"Player {clientID} Subscribed for Respawn request from DMM");
                 deathResultHandler.OnPlayerDeathAction += RequestRespawnRpc;
             }
         }
@@ -126,14 +126,17 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         [Rpc(SendTo.Server)]
         private void RequestRespawnRpc(ulong clientId)
         {
-            SubtractLifeForPlayerRpc(clientId);
+            Debug.Log($"Player {clientId} Requested for respawn");
+            SubtractLifeForPlayer(clientId);
             SendRespawnRequestForPlayerWrapper(clientId);
         }
 
-        [Rpc(SendTo.Server)]
-        private void SubtractLifeForPlayerRpc(ulong clientId)
+        private void SubtractLifeForPlayer(ulong clientId)
         {
-            _playersLifeCount[clientId] -= 1;
+            if (_playersLifeCount[clientId] - 1 >= 0)
+            {
+                _playersLifeCount[clientId] -= 1;
+            }
             SendLifeCountDataRpc(_playersLifeCount[clientId], RpcTarget.Single(clientId, RpcTargetUse.Temp));
             CheckForVictoryConditions();
             Debug.Log($"Player {clientId} lost Life! {_playersLifeCount[clientId]} is left");

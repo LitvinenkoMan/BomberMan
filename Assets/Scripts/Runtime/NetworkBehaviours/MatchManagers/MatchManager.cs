@@ -121,6 +121,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
             if (NetworkManager.Singleton.ConnectedClients[clientID].PlayerObject
                 .TryGetComponent(out DeathResultHandler deathResultHandler))
             {
+                Debug.Log($"Player {clientID} Subscribed for Respawn request from MM");
                 deathResultHandler.OnPlayerDeathAction += SendRespawnRequestForPlayerWrapper;
             }
         }
@@ -130,7 +131,6 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         protected virtual async Task SendRespawnRequestForPlayer(ulong clientID)
         {
             await PlayerSpawner.Instance.SpawnPlayer(clientID, 3);         // TODO Set this Time to variable
-            RegisterPlayerForEvents(clientID);
         }
 
         protected virtual void SubscribeToRespawnEvents()

@@ -19,17 +19,22 @@ namespace Runtime.MonoBehaviours
 
         [Space(20)]
         public UnityEvent OnPlayerDeathUnityEvent;
-        public Action<ulong> OnPlayerDeathAction;
+        public event Action<ulong> OnPlayerDeathAction;
 
 
         public void OnZeroHealthResponse()
         {
+            RiseDeathEventsRpc();
             EnableViewerMode();
-            
+        }
+
+        [Rpc(SendTo.Everyone)]
+        private void RiseDeathEventsRpc() 
+        {
             OnPlayerDeathUnityEvent?.Invoke();
             OnPlayerDeathAction?.Invoke(NetworkObject.OwnerClientId);
         }
-        
+
         [Rpc(SendTo.Server)]
         public void OnZeroHealthResponseRpc()
         {
