@@ -69685,7 +69685,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 0
-  orthographic size: 100
+  orthographic size: 5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -69709,8 +69709,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1823688464}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.47185796, y: -0.000000015170428, z: 0.000000008118968, w: 0.8816746}
-  m_LocalPosition: {x: 2.52, y: 16.023, z: -3.71}
+  m_LocalRotation: {x: 0.47185796, y: -0.000000015170427, z: 0.000000008118967, w: 0.8816746}
+  m_LocalPosition: {x: 561.5075, y: 129.47104, z: -10.825}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -76231,7 +76231,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2025377718}
-  - component: {fileID: 2025377717}
+  - component: {fileID: 2025377719}
   m_Layer: 0
   m_Name: PlayerCameraController
   m_TagString: Untagged
@@ -76239,20 +76239,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2025377717
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2025377716}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7caff4d9998ce0a43a4eb0b3b2827b63, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  CameraExample: {fileID: 8884432705468536314, guid: 9668e2850a18e354ebfdb9130c74cbef,
-    type: 3}
 --- !u!4 &2025377718
 Transform:
   m_ObjectHideFlags: 0
@@ -76268,6 +76254,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2025377719
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2025377716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83351f419d428bc468d5ed76a0e02520, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CameraExample: {fileID: 8884432705468536314, guid: 9668e2850a18e354ebfdb9130c74cbef,
+    type: 3}
 --- !u!1 &2027627332
 GameObject:
   m_ObjectHideFlags: 0

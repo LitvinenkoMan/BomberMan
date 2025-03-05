@@ -88,7 +88,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
             ulong winnerId = 999;
             foreach (var player in _playersLifeCount)
             {
-                if (player.Value < 0)
+                if (player.Value == 0)
                 {
                     defeatedPlayers += 1;
                 }
@@ -137,6 +137,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
             {
                 _playersLifeCount[clientId] -= 1;
             }
+            
             SendLifeCountDataRpc(_playersLifeCount[clientId], RpcTarget.Single(clientId, RpcTargetUse.Temp));
             CheckForVictoryConditions();
             Debug.Log($"Player {clientId} lost Life! {_playersLifeCount[clientId]} is left");

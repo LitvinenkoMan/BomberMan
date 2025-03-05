@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Cinemachine;
 using Interfaces;
 using Runtime.NetworkBehaviours;
@@ -7,7 +8,7 @@ using UnityEngine;
 
 namespace Runtime.MonoBehaviours
 {
-    public class PlayerCameraController : MonoBehaviour, IPlayerViewCamera
+    public class PlayerCameraController : MonoBehaviour, ICameraModeController
     {
         [SerializeField] 
         private GameObject CameraExample;
@@ -16,8 +17,11 @@ namespace Runtime.MonoBehaviours
         private GameObject _instantiatedCamera;
         private ICameraViewer _cameraViewer;
 
+        private List<Transform> playersTransform;
+
         private void OnEnable()
         {
+            playersTransform = new List<Transform>();
             PlayerSpawner.Instance.OnPlayerSpawned += FollowSpawnedPlayer;
             CheckForCameraInstance();
             CheckForInstancedPlayer();
@@ -26,6 +30,16 @@ namespace Runtime.MonoBehaviours
         private void OnDisable()
         {
             PlayerSpawner.Instance.OnPlayerSpawned -= FollowSpawnedPlayer;
+        }
+
+        private void CatchPlayersGameObject()
+        {
+            playersTransform.Clear();
+            var playersObj = FindObjectsByType<BomberParamsProvider>(FindObjectsSortMode.None);
+            foreach (var obj in playersObj)
+            {
+                playersTransform.Add(obj.transform);
+            }
         }
         
         public void SwitchToGameplayMode()
@@ -38,9 +52,9 @@ namespace Runtime.MonoBehaviours
         public void SwitchToViewerMode()
         {
             _cameraViewer.ClearTargetsList();
-            foreach (var client in NetworkManager.Singleton.ConnectedClients)
+            foreach (var playerTransform in playersTransform)
             {
-                _cameraViewer.AddToViewTarget(client.Value.PlayerObject.transform);
+                _cameraViewer.AddToViewTarget(playerTransform);
             }
         }
 
@@ -76,6 +90,7 @@ namespace Runtime.MonoBehaviours
             {
                 handler.OnPlayerDeathAction += OnPlayerDeathResponce;
             }
+            CatchPlayersGameObject();
         }
 
         private void OnPlayerDeathResponce(ulong obj)

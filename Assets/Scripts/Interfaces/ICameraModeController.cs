@@ -1,6 +1,6 @@
 namespace Interfaces
 {
-    interface IPlayerViewCamera
+    interface ICameraModeController
     {
         public void SwitchToGameplayMode();
         public void SwitchToViewerMode();
