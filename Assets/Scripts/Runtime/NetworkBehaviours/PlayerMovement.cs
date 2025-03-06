@@ -7,7 +7,7 @@ namespace NetworkBehaviours
 {
     [RequireComponent(typeof(CharacterController))]
     [RequireComponent(typeof(NetworkObject))]
-    public class PlayerMovement : NetworkBehaviour
+    public class PlayerMovement : NetworkBehaviour, InputActions.IPlayerMapActions
     {
         [SerializeField, Tooltip("Used to take main player values (speed, amount of bombs, health and ex.)")]
         private BaseBomberParameters BomberParameters;
@@ -21,8 +21,7 @@ namespace NetworkBehaviours
 
         
         private CharacterController _controller;
-        private PlayerMainControls _controls;
-        private InputAction MoveAction;
+        private InputActions _input;
 
         private Vector3 _moveDirection;
         private float _velocity;
@@ -32,40 +31,31 @@ namespace NetworkBehaviours
 
         void Start()
         {
-
             canMove = true;
         }
 
         public override void OnNetworkSpawn()
         {
-            if (_controls == null)
+            if (_input == null)
             {
-                _controls = new PlayerMainControls();
+                _input = new InputActions();
             }
+            _input.PlayerMap.AddCallbacks(this);
+            _input.Enable();
 
             if (!_controller)
             {
                 _controller = GetComponent<CharacterController>();
             }
             _velocity = 0;
-            _controls.PlayerMainActionMaps.Enable();
-            
-            MoveAction = _controls.PlayerMainActionMaps.Move;
 
             _controller.enabled = true;
         }
 
         private void FixedUpdate()
         {
-            if (!canMove) return;
-            
             if (IsOwner)
             {
-                if (MoveAction.IsInProgress())
-                {
-                    ApplyMovement();
-                }
-
                 if (IsGravityOn)
                 {
                     ApplyGravity();
@@ -78,13 +68,6 @@ namespace NetworkBehaviours
         private void MoveController()
         {
             _controller.Move(_moveDirection);
-            _moveDirection = Vector3.zero;
-        }
-
-        private void ApplyMovement()
-        {
-            Vector2 inputValue = MoveAction.ReadValue<Vector2>();
-            _moveDirection += new Vector3(inputValue.x, 0, inputValue.y) * BomberParameters.SpeedMultiplier / CONSTANTSPEEDDEVIDER;
         }
         
         private void ApplyGravity()
@@ -106,6 +89,23 @@ namespace NetworkBehaviours
         public void SetAbilityToMoveClientRpc(bool canIt)
         {
             SetAbilityToMove(canIt);
+        }
+
+        public void OnMove(InputAction.CallbackContext context)
+        {
+            Vector2 inputValue = context.ReadValue<Vector2>();
+            _moveDirection = new Vector3(inputValue.x, 0, inputValue.y) * BomberParameters.SpeedMultiplier /
+                              CONSTANTSPEEDDEVIDER;
+        }
+
+        public void OnPlaceBomb(InputAction.CallbackContext context)
+        {
+            //not needed
+        }
+
+        public void OnQuit(InputAction.CallbackContext context)
+        {
+            //not needed
         }
     }
 }

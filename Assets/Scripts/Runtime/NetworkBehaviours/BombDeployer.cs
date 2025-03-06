@@ -12,7 +12,7 @@ using UnityEngine.Serialization;
 namespace Runtime.NetworkBehaviours
 {
     [RequireComponent(typeof(ObjectPoolQueue))]
-    public class BombDeployer : NetworkBehaviour
+    public class BombDeployer : NetworkBehaviour, InputActions.IPlayerMapActions
     {
         [FormerlySerializedAs("PlayerParams")] [SerializeField]
         private BaseBomberParameters bomberParams;
@@ -23,19 +23,17 @@ namespace Runtime.NetworkBehaviours
         private bool CanPlaceBombs;
 
         // Input
-        private PlayerMainControls _controls;
-        private InputAction PlaceBombAction;
+        private InputActions _input;
 
         private void OnEnable()
         {
             Initialize();
-            PlaceBombAction.performed += DeployBombAction;
             CanPlaceBombs = false;
         }
 
         private void OnDisable()
         {
-            PlaceBombAction.performed -= DeployBombAction;
+            
         }
 
         public void SetAbilityToDeployBombs(bool canIt)
@@ -51,20 +49,20 @@ namespace Runtime.NetworkBehaviours
 
         private void Initialize()
         {
-            if (_controls == null)
+            if (_input == null)
             {
-                _controls = new PlayerMainControls();
+                _input = new InputActions();
             }
-            _controls.PlayerMainActionMaps.Enable();
+            _input.PlayerMap.AddCallbacks(this);
+            _input.Enable();
             
-            PlaceBombAction = _controls.PlayerMainActionMaps.PlaceBomb;
             if (!BombsPool)
             {
                 BombsPool = GetComponent<ObjectPoolQueue>();
             }
         }
         
-        private void DeployBombAction(InputAction.CallbackContext context)
+        private void DeployBombAction()
         {
             if (!CanPlaceBombs) return;
             
@@ -72,12 +70,10 @@ namespace Runtime.NetworkBehaviours
             
             if (IsServer)
             {
-                Debug.Log("Deploying from Server");
                 DeployBomb(bomberParams.BombsAtTime, bomberParams.BombsCountdown, bomberParams.BombsDamage, bomberParams.BombsSpreading);
             }
             else
             {
-                Debug.Log("Deploying from Client");
                 DeployBombRpc(bomberParams.BombsAtTime, bomberParams.BombsCountdown, bomberParams.BombsDamage, bomberParams.BombsSpreading);
             }
         }
@@ -104,7 +100,6 @@ namespace Runtime.NetworkBehaviours
         [Rpc(SendTo.Server)]
         private void DeployBombRpc(int bombsAtTime, float timeToExplode, int bombDamage, int bombSpread)
         {
-            Debug.Log("Sended ask to deploy bomb to server");
             DeployBomb(bombsAtTime, timeToExplode, bombDamage, bombSpread);
         }
 
@@ -129,6 +124,21 @@ namespace Runtime.NetworkBehaviours
                 explodedBomb.Reset();
                 explodedBomb.NetworkObject.Despawn(false);
             }
+        }
+
+        public void OnMove(InputAction.CallbackContext context)
+        {
+            //not needed throw new System.NotImplementedException();
+        }
+
+        public void OnPlaceBomb(InputAction.CallbackContext context)
+        {
+            DeployBombAction();
+        }
+
+        public void OnQuit(InputAction.CallbackContext context)
+        {
+            //not needed throw new System.NotImplementedException();
         }
     }
 }

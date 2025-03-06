@@ -23,7 +23,7 @@ namespace Runtime.MonoBehaviours.UI
         private UnityEvent OnQuitWhileInMainPanelEvent;
 
 
-        private PlayerMainControls input;
+        private InputActions _input;
         private Stack<RectTransform> PanelsStack;
 
         private InputAction QuitAction;
@@ -31,21 +31,21 @@ namespace Runtime.MonoBehaviours.UI
         private void Awake()
         {
             PanelsStack = new Stack<RectTransform>(8);
-            input = new PlayerMainControls();
+            _input = new InputActions();
             
-            QuitAction = input.PlayerMainActionMaps.Quit;
+            QuitAction = _input.PlayerMap.Quit;
         }
 
         private void OnEnable()
         {
-            input.PlayerMainActionMaps.Enable();
+            _input.Enable();
             QuitAction.performed += RemovePanelWrapper;
         }
 
         private void OnDisable()
         {
-            input.PlayerMainActionMaps.Disable();
             QuitAction.performed -= RemovePanelWrapper;
+            _input.Disable();
         }
 
         // privat 

@@ -1,8 +1,8 @@
 {
-    "name": "PlayerControls",
+    "name": "InputActions",
     "maps": [
         {
-            "name": "PlayerMainActionMaps",
+            "name": "PlayerMap",
             "id": "9ea23ea9-fc35-4af2-941d-859e8d12133f",
             "actions": [
                 {
