@@ -67,18 +67,15 @@ namespace Runtime.NetworkBehaviours
 
         public async Task SpawnPlayer(ulong clientId, float spawnDelay)
         {
-            Debug.LogWarning("Spawning Player");
             await Task.Delay((int)(spawnDelay * 1000));
             
             GameObject player = Instantiate(Player, Vector3.zero, new Quaternion(0, 0, 0, 0));
             
-            Debug.LogWarning("Checking if player have its spawn");
             if (!CheckIfPlayerHaveSpawnPlace(clientId))
             {
                 await AssociateRandomSpawnPlaceForClient(clientId);
             }
             
-            player.name = $"Player {clientId}";
             _associatedPositions.ForEach(x =>
                 {
                     if (x.clientId == clientId)
@@ -90,7 +87,6 @@ namespace Runtime.NetworkBehaviours
             
             player.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
             player.GetComponent<BomberParamsProvider>().ResetLocalValuesClientRpc();  
-            Debug.LogWarning($"Spawned P{clientId}");
 
             SendPlayerSpawnEventRpc(clientId);
         }
@@ -102,7 +98,6 @@ namespace Runtime.NetworkBehaviours
             if (!_associatedPositions[chosenNumber].isTaken)
             {
                 
-                Debug.LogWarning($"assigning new spawn for player: {_currentLevelDataHolder.SpawnPlaces[chosenNumber].name} for P{clientID}");
                 var spawnPlace = _associatedPositions[chosenNumber];
                 spawnPlace.clientId = clientID;                         //TODO: is it okey to do like this?
                 spawnPlace.isTaken = true;                         
@@ -129,8 +124,6 @@ namespace Runtime.NetworkBehaviours
             {
                 if (_associatedPositions[i].clientId == clientId)
                 {
-                    Debug.Log($"Removed Player from spawn with position: {_associatedPositions[i].position}");
-                    
                     var spawnPos = _associatedPositions[i];
                     spawnPos.clientId = ulong.MaxValue;
                     spawnPos.isTaken = false;

@@ -121,7 +121,6 @@ namespace Runtime.NetworkBehaviours.MatchManagers
             if (NetworkManager.Singleton.ConnectedClients[clientID].PlayerObject
                 .TryGetComponent(out DeathResultHandler deathResultHandler))
             {
-                Debug.Log($"Player {clientID} Subscribed for Respawn request from MM");
                 deathResultHandler.OnPlayerDeathAction += SendRespawnRequestForPlayerWrapper;
             }
         }

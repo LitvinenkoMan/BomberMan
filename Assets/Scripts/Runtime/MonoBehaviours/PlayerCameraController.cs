@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using Cinemachine;
 using Interfaces;
 using Runtime.NetworkBehaviours;
 using Unity.Netcode;
@@ -60,21 +58,17 @@ namespace Runtime.MonoBehaviours
 
         private void CheckForInstancedPlayer()
         {
-            Debug.Log($"Searching for PlayerObject to follow");
             NetworkObject playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
             if (playerObject)
             {
-                Debug.Log($"Got One");
                 FollowSpawnedPlayer(NetworkManager.Singleton.LocalClient.ClientId);
             }
         }
 
         private void CheckForCameraInstance()
         {
-            Debug.Log($"Checking if camera exist");
             if (_instantiatedCamera == null)
             {
-                Debug.Log($"Instantiating camera");
                 _instantiatedCamera = Instantiate(CameraExample, Vector3.zero, new Quaternion(0, 0, 0, 0));
                 _cameraViewer = _instantiatedCamera.GetComponent<ICameraViewer>();
             }
@@ -82,7 +76,6 @@ namespace Runtime.MonoBehaviours
 
         private void FollowSpawnedPlayer(ulong clientId)
         {
-            Debug.Log($"Started to follow local player");
             NetworkObject playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
             SwitchToGameplayMode();
 

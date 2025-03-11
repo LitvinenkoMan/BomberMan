@@ -133,7 +133,10 @@ namespace Runtime.NetworkBehaviours
 
         public void OnPlaceBomb(InputAction.CallbackContext context)
         {
-            DeployBombAction();
+            if (context.performed)
+            {
+                DeployBombAction();
+            }
         }
 
         public void OnQuit(InputAction.CallbackContext context)

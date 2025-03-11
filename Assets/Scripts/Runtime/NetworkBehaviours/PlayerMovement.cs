@@ -1,3 +1,4 @@
+using Runtime.MonoBehaviours;
 using ScriptableObjects;
 using Unity.Netcode;
 using UnityEngine;
@@ -11,6 +12,8 @@ namespace NetworkBehaviours
     {
         [SerializeField, Tooltip("Used to take main player values (speed, amount of bombs, health and ex.)")]
         private BaseBomberParameters BomberParameters;
+        [SerializeField, Tooltip("Used for Animations")]
+        private PawnAnimationHandler PawnAnimation;
         
         [SerializeField] 
         private float GravityAcceleration = -9.8f;
@@ -50,6 +53,7 @@ namespace NetworkBehaviours
             _velocity = 0;
 
             _controller.enabled = true;
+            _moveDirection = Vector3.zero;
         }
 
         private void FixedUpdate()
@@ -67,6 +71,12 @@ namespace NetworkBehaviours
 
         private void MoveController()
         {
+            if (_moveDirection.x != 0 || _moveDirection.z != 0)
+            {
+                PawnAnimation.PlayMoveAnimation();
+            }
+            else PawnAnimation.PlayIdleAnimation();
+            
             _controller.Move(_moveDirection);
         }
         
@@ -96,6 +106,10 @@ namespace NetworkBehaviours
             Vector2 inputValue = context.ReadValue<Vector2>();
             _moveDirection = new Vector3(inputValue.x, 0, inputValue.y) * BomberParameters.SpeedMultiplier /
                               CONSTANTSPEEDDEVIDER;
+            if (context.performed)
+            {
+                transform.rotation = Quaternion.LookRotation(new Vector3(_moveDirection.x, 0, _moveDirection.z));       //TODO: Move this Out from Movement script, this is not SOLID (Snake)
+            }
         }
 
         public void OnPlaceBomb(InputAction.CallbackContext context)

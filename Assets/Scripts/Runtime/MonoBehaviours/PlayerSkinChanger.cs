@@ -10,11 +10,11 @@ namespace Runtime.MonoBehaviours
         [SerializeField]
         private HealthComponent _healthComponent;
 
-        private MeshRenderer _renderer;
+        private Renderer _renderer;
 
         private void Awake()
         {
-            _renderer = Visuals.GetComponent<MeshRenderer>();
+            _renderer = Visuals.GetComponent<Renderer>();
         }
 
         private void OnEnable()
@@ -26,7 +26,6 @@ namespace Runtime.MonoBehaviours
         {
             _healthComponent.OnGetImmune -= ApplyGhostEffect;
         }
-        
         
         private void ApplyGhostEffect(float time)
         {

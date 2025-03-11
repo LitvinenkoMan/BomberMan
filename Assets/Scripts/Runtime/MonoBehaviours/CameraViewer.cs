@@ -12,7 +12,6 @@ namespace Runtime.MonoBehaviours
         public void AddToViewTarget(Transform targetTransform)
         {
             targetGroup.AddMember(targetTransform, 1, 0);
-            Debug.Log($"Added {targetTransform} as target");
         }
 
         public void RemoveFromViewTarget(Transform targetTransform)
@@ -26,8 +25,6 @@ namespace Runtime.MonoBehaviours
             {
                 targetGroup.RemoveMember(targetGroupMTarget.target);
             }
-            
-            Debug.Log($"Cleared list");
         }
     }
 }
