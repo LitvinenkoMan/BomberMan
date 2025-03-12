@@ -9,12 +9,12 @@ namespace Runtime.MonoBehaviours
         private GameObject Visuals;
         [SerializeField]
         private HealthComponent _healthComponent;
-
-        private Renderer _renderer;
+        [SerializeField]
+        private Renderer visualsRenderer;
 
         private void Awake()
         {
-            _renderer = Visuals.GetComponent<Renderer>();
+            visualsRenderer = Visuals.GetComponent<Renderer>();
         }
 
         private void OnEnable()
@@ -29,16 +29,16 @@ namespace Runtime.MonoBehaviours
         
         private void ApplyGhostEffect(float time)
         {
-            var mainColor = _renderer.material.color;
+            var mainColor = visualsRenderer.material.color;
             StartCoroutine(ReturnBackBaseColor(time, mainColor));
             mainColor = new Color(mainColor.r, mainColor.g, mainColor.b, 0.5f);
-            _renderer.material.color = mainColor;
+            visualsRenderer.material.color = mainColor;
         }
 
         private IEnumerator ReturnBackBaseColor(float time, Color baseColor)
         {
             yield return new WaitForSeconds(time);
-            _renderer.material.color = baseColor;
+            visualsRenderer.material.color = baseColor;
             yield return null;
         }
     }

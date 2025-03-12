@@ -1,11 +1,14 @@
 using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Runtime.MonoBehaviours
 {
     public class PawnAnimationHandler : MonoBehaviour
     {
+        [SerializeField] 
+        private CharacterController Controller;
         [SerializeField] 
         private Animator PawnAnimator;
         [SerializeField]
@@ -15,10 +18,15 @@ namespace Runtime.MonoBehaviours
         private static readonly int MoveValue = Animator.StringToHash("MoveValue");
         private static readonly int Dead = Animator.StringToHash("Dead");
 
-
         private void Update()
         {
-            
+            var direction = Controller.velocity;
+            direction = direction.normalized;
+            if (direction.x != 0 || direction.z != 0)
+            {
+                PlayMoveAnimation();
+            }
+            else PlayIdleAnimation();
         }
 
         public void PlayMoveAnimation()
@@ -34,7 +42,6 @@ namespace Runtime.MonoBehaviours
         
         public void PlayDeathAnimation(bool isDead)
         {
-            
             PawnAnimator.SetBool(Dead, isDead);
         }
 
@@ -42,10 +49,10 @@ namespace Runtime.MonoBehaviours
         {
             var startValue = PawnAnimator.GetFloat(MoveValue);
             
+            if (startValue == endValue) return;
+            
             while (true)
             {
-                if (startValue == endValue) return;
-                
                 if (startValue > endValue)
                 {
                     startValue -= Time.deltaTime / timeInSec;
@@ -53,9 +60,9 @@ namespace Runtime.MonoBehaviours
                 else startValue += Time.deltaTime / timeInSec;
                 
                 PawnAnimator.SetFloat(MoveValue, startValue);
+                if (startValue == endValue) return;
                 await UniTask.WaitForEndOfFrame();
             }
         }
-        
     }
 }
