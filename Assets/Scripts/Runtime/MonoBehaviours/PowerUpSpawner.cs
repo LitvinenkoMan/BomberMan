@@ -40,10 +40,8 @@ namespace Runtime.MonoBehaviours
             EnableSpawning();
             if (!IsServer)
             {
-                Debug.Log("Exiting from creating Power ups Queue");
                 return;
             }  
-            Debug.Log("Creating Queue");
             CreatePowerUpsQueue();
         }
 

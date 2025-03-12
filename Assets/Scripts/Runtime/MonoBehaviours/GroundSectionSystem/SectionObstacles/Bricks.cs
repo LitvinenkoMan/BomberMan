@@ -20,7 +20,6 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             // }
             CanReceiveDamage = true;
             CanPlayerStepOnIt = false;
-            Debug.Log($"Brick {name} Initialized");
         }
 
         private void OnEnable()

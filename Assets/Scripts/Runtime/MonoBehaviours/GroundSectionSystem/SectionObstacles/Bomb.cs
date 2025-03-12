@@ -195,10 +195,8 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             {
                 if (colliders[i].gameObject.TryGetComponent(out HealthComponent health) ) //TODO: recode this check, looks bad
                 {
-                    Debug.LogWarning($"Fiend Health component on {health.gameObject.name}");
                     if (health.gameObject.TryGetComponent(out BomberParamsProvider bomberParamsProvider) && bomberParamsProvider.NetworkObject.IsOwner)
                     {
-                        Debug.LogWarning($"Damaged player {bomberParamsProvider.name}");
                         health.SetHealth(bomberParamsProvider.GetBomberParams().ActorHealth - damage);
                     }
                 }

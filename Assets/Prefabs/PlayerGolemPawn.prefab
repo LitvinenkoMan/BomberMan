@@ -86,6 +86,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2021193808197260962}
   - component: {fileID: 3192485037731634668}
+  - component: {fileID: 8152593400877766404}
+  - component: {fileID: 5560595334319445906}
   - component: {fileID: 7043332111894801736}
   - component: {fileID: 9181407408975216252}
   - component: {fileID: 6133191061836779383}
@@ -95,8 +97,8 @@ GameObject:
   - component: {fileID: 7731251428465038235}
   - component: {fileID: 1898818222369800095}
   - component: {fileID: 4479951942615403597}
-  - component: {fileID: 5560595334319445906}
   - component: {fileID: 2698855256694393988}
+  - component: {fileID: 8787606411089374933}
   m_Layer: 0
   m_Name: PlayerGolemPawn
   m_TagString: Untagged
@@ -148,6 +150,60 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.75, z: 0}
+--- !u!136 &8152593400877766404
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4821896025292580154}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.4
+  m_Height: 1.5
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.76, z: 0}
+--- !u!114 &5560595334319445906
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4821896025292580154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: a8f9f87aec7ef374daf69655ab4b7909,
+    type: 3}
+  m_NotificationBehavior: 3
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: PlayerControllScheme
+  m_DefaultActionMap: PlayerMap
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!114 &7043332111894801736
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -229,7 +285,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BomberParameters: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
-  PawnAnimation: {fileID: 2698855256694393988}
   GravityAcceleration: -9.8
   IsGravityOn: 1
   GravityMultiplyer: 0.001
@@ -322,39 +377,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b28e3397a646f564ba7c0af65c837adf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Visuals: {fileID: 4821896025292580154}
+  Visuals: {fileID: 5630106756533224544}
   _healthComponent: {fileID: 7137738926094273680}
---- !u!114 &5560595334319445906
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4821896025292580154}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: a8f9f87aec7ef374daf69655ab4b7909,
-    type: 3}
-  m_NotificationBehavior: 3
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents: []
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: PlayerControllScheme
-  m_DefaultActionMap: PlayerMap
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
+  visualsRenderer: {fileID: 0}
 --- !u!114 &2698855256694393988
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -367,8 +392,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fcb62a4a5b34264e9e4ceadb9eb9f34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Controller: {fileID: 3192485037731634668}
   PawnAnimator: {fileID: 1407889712315434144}
   TransitionTime: 0.3
+--- !u!114 &8787606411089374933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4821896025292580154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 045b81d566b06c844945e6fc30394a16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterController: {fileID: 3192485037731634668}
+  VisualsTransform: {fileID: 5001802568364515034}
+  RotationTime: 0.25
 --- !u!1 &5012474147548761335
 GameObject:
   m_ObjectHideFlags: 0
@@ -554,7 +595,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6145124489188603407}
   m_Layer: 0
-  m_Name: Golem
+  m_Name: PlayerLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -663,6 +704,12 @@ Animator:
 --- !u!4 &5001802568364515034 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 73a79822e5f60464396c0eaf57702880,
+    type: 3}
+  m_PrefabInstance: {fileID: 4819768121852016945}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5630106756533224544 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 73a79822e5f60464396c0eaf57702880,
     type: 3}
   m_PrefabInstance: {fileID: 4819768121852016945}
   m_PrefabAsset: {fileID: 0}
