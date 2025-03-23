@@ -3,6 +3,7 @@
 
 
 using System.Collections.Generic;
+using System.Timers;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -80,7 +81,7 @@ namespace Runtime.MonoBehaviours.UI
                 var panel = PanelsStack.Pop();
                 panel.gameObject.SetActive(false);
 
-                if (HideMainPanel && PanelsStack.Count == 0)        //There we check if all panels are closed and if MainPanel was hiden, then we will enable it if so
+                if (HideMainPanel && PanelsStack.Count == 0)        //There we check if all panels are closed and if MainPanel was hiden, then we will enable it
                 {
                     MainPanel.gameObject.SetActive(true);
                 }
