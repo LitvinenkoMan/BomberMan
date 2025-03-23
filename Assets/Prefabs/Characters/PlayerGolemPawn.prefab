@@ -359,7 +359,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7faf6940d9a446840a31cc70ee26ecae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  visuals: {fileID: 0}
+  visuals: {fileID: 5630106756533224544}
   playerMovement: {fileID: 4454664985879038347}
   bombDeployer: {fileID: 1320740036372020134}
   OnPlayerDeathUnityEvent:
@@ -379,7 +379,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Visuals: {fileID: 5630106756533224544}
   _healthComponent: {fileID: 7137738926094273680}
-  visualsRenderer: {fileID: 0}
+  visualsRenderer: {fileID: 4809652922734438482}
 --- !u!114 &2698855256694393988
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -693,11 +693,21 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 73a79822e5f60464396c0eaf57702880,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4154767941061913200}
   m_SourcePrefab: {fileID: 100100000, guid: 73a79822e5f60464396c0eaf57702880, type: 3}
 --- !u!95 &1407889712315434144 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 73a79822e5f60464396c0eaf57702880,
+    type: 3}
+  m_PrefabInstance: {fileID: 4819768121852016945}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &4809652922734438482 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 25913615693173091, guid: 73a79822e5f60464396c0eaf57702880,
     type: 3}
   m_PrefabInstance: {fileID: 4819768121852016945}
   m_PrefabAsset: {fileID: 0}
@@ -713,3 +723,17 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 4819768121852016945}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4154767941061913200
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5630106756533224544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TransitionStateInfoList: []
+  m_Animator: {fileID: 1407889712315434144}

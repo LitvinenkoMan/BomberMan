@@ -44,6 +44,9 @@ namespace Runtime.NetworkBehaviours.MatchManagers
                     PlayerSpawner.Instance.SpawnClientRpc(client.Key);
                     AddPlayerToLifeCounter(client.Key);
                 }
+                
+                //TODO: Add section for bots
+                
             }
 
             JoinCodeText.text = RelayManager.Instance.JoinCode;

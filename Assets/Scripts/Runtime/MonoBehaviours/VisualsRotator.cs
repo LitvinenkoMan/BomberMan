@@ -1,13 +1,10 @@
-using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace Runtime.MonoBehaviours
 {
-    public class VisualsRotator : MonoBehaviour, InputActions.IPlayerMapActions
+    public class VisualsRotator : MonoBehaviour
     {
         [SerializeField] 
         private CharacterController characterController;
@@ -18,17 +15,10 @@ namespace Runtime.MonoBehaviours
 
         
         private CancellationTokenSource _cts;
-        private InputActions _input;
         private Quaternion _endRotation;
         private Quaternion _startRotation;
         private float timer = 0;
 
-        private void OnEnable()
-        {
-            _input = new InputActions();
-            _input.PlayerMap.AddCallbacks(this);
-            _input.Enable();
-        }
 
         private void Update()
         {
@@ -80,21 +70,6 @@ namespace Runtime.MonoBehaviours
                 await UniTask.WaitForEndOfFrame();
                 if (currentRotation == endRotation) return;
             }
-        }
-
-        public void OnMove(InputAction.CallbackContext context)
-        {
-            
-        }
-
-        public void OnPlaceBomb(InputAction.CallbackContext context)
-        {
-            //Not Needed
-        }
-
-        public void OnQuit(InputAction.CallbackContext context)
-        {
-            //Not Needed
         }
     }
 }

@@ -25,13 +25,13 @@ namespace NetworkBehaviours
 
         private Vector3 _moveDirection;
         private float _velocity;
-        private bool canMove;
+        private bool _canMove;
 
         private const float CONSTANTSPEEDDEVIDER = 1.25f;
 
         void Start()
         {
-            canMove = true;
+            _canMove = true;
         }
 
         public override void OnNetworkSpawn()
@@ -83,7 +83,7 @@ namespace NetworkBehaviours
 
         public void SetAbilityToMove(bool canIt)
         {
-            canMove = canIt;
+            _canMove = canIt;
         }
 
         [ClientRpc]

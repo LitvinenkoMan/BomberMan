@@ -6,25 +6,18 @@ namespace Runtime.MonoBehaviours
     public class PlayerSkinChanger : MonoBehaviour
     {
         [SerializeField]
-        private GameObject Visuals;
+        private HealthComponent healthComponent;
         [SerializeField]
-        private HealthComponent _healthComponent;
-        [SerializeField]
-        private Renderer visualsRenderer;
-
-        private void Awake()
-        {
-            visualsRenderer = Visuals.GetComponent<Renderer>();
-        }
+        private SkinnedMeshRenderer visualsRenderer;
 
         private void OnEnable()
         {
-            _healthComponent.OnGetImmune += ApplyGhostEffect;
+            healthComponent.OnGetImmune += ApplyGhostEffect;
         }
 
         private void OnDisable()
         {
-            _healthComponent.OnGetImmune -= ApplyGhostEffect;
+            healthComponent.OnGetImmune -= ApplyGhostEffect;
         }
         
         private void ApplyGhostEffect(float time)
