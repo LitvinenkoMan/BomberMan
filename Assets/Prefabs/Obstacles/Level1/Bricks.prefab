@@ -92,7 +92,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ObstacleHealthComponent: {fileID: 7824594161072046893}
-  Visuals: {fileID: 0}
+  Visuals: {fileID: 8629476180602649643}
 --- !u!114 &7824594161072046893
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -214,6 +214,12 @@ PrefabInstance:
 --- !u!4 &6319059737735999844 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5198125434422716958, guid: 507c8a1e30ab7d74b8e8e05a0917f060,
+    type: 3}
+  m_PrefabInstance: {fileID: 2275088366377261946}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8629476180602649643 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7516703547791615825, guid: 507c8a1e30ab7d74b8e8e05a0917f060,
     type: 3}
   m_PrefabInstance: {fileID: 2275088366377261946}
   m_PrefabAsset: {fileID: 0}
