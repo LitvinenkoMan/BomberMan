@@ -41,10 +41,6 @@ namespace Runtime.MonoBehaviours
         private void OnEnable()
         {
             _isImmune = false;
-            if (baseParams)
-            {
-                //baseParams.
-            }
         }
 
         private void OnDisable()

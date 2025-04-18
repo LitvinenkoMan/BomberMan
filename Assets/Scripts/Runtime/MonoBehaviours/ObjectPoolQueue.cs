@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MonoBehaviours
+namespace Runtime.MonoBehaviours
 {
     public class ObjectPoolQueue : MonoBehaviour
     {

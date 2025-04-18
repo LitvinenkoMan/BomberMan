@@ -43,9 +43,9 @@ namespace Runtime.MonoBehaviours
         private void EnableViewerMode()
         {
             NetworkObject.Despawn();
-            playerMovement.enabled = false;
-            bombDeployer.enabled = false;
-            visuals.SetActive(false);
+            playerMovement.enabled = false;         // this should be in movement
+            bombDeployer.enabled = false;           // this should be in bomb deployer
+            visuals.SetActive(false);               // this also should be not here
         }
     }
 }

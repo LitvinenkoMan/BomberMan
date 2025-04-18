@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8789691550055022042}
   - component: {fileID: 6393183761067734736}
   m_Layer: 0
-  m_Name: Concrete
+  m_Name: Concrete_Lv1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

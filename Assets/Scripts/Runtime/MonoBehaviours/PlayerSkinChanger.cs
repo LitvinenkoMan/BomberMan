@@ -12,12 +12,12 @@ namespace Runtime.MonoBehaviours
 
         private void OnEnable()
         {
-            healthComponent.OnGetImmune += ApplyGhostEffect;
+            //healthComponent.OnGetImmune += ApplyGhostEffect;
         }
 
         private void OnDisable()
         {
-            healthComponent.OnGetImmune -= ApplyGhostEffect;
+            //healthComponent.OnGetImmune -= ApplyGhostEffect;
         }
         
         private void ApplyGhostEffect(float time)
