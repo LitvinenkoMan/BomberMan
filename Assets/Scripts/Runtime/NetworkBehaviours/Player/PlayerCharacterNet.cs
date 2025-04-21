@@ -14,6 +14,7 @@ namespace Runtime.NetworkBehaviours.Player
         public IHealth Health { get; private set; }
         public IImmune Immune { get; private set; }
         public IBombDeployer BombDeployer { get; private set; }
+        public IMovable CharacterMovement { get; private set; }
 
         private InputActions _input;
 
@@ -26,10 +27,8 @@ namespace Runtime.NetworkBehaviours.Player
         {
             if (TryGetComponent(out IImmune immune)) Immune = immune;
             if (TryGetComponent(out IBombDeployer bombDeployer)) BombDeployer = bombDeployer;
-            if (TryGetComponent(out IHealth health)) 
-            {
-                Health = health;
-            }
+            if (TryGetComponent(out IMovable playerMovement)) CharacterMovement = playerMovement;
+            if (TryGetComponent(out IHealth health)) Health = health;
 
             if (IsOwner)
             {
@@ -62,9 +61,14 @@ namespace Runtime.NetworkBehaviours.Player
             BombDeployer.DeployBomb(bomberParams.BombsAtTime, bomberParams.BombsCountdown, bomberParams.BombsDamage, bomberParams.BombsSpreading);
         }
 
-        public void SetMoveAbility()
+        public void SetMoveAbility(bool canMove)
         {
-            
+            CharacterMovement.SetAbilityToMove(canMove);
+        }
+
+        public void SetBombDeployAbility(bool canDeploy)
+        {
+            BombDeployer.SetAbilityToDeployBombs(canDeploy);
         }
 
         private void StartDeathSequence()
@@ -74,7 +78,10 @@ namespace Runtime.NetworkBehaviours.Player
 
         public void OnMove(InputAction.CallbackContext context)
         {
-            //throw new NotImplementedException();
+            var input = context.ReadValue<Vector2>();
+            var moveDirection = new Vector3(input.x, 0, input.y);
+            
+            CharacterMovement.Move(moveDirection * bomberParams.SpeedMultiplier);
         }
 
         public void OnPlaceBomb(InputAction.CallbackContext context)

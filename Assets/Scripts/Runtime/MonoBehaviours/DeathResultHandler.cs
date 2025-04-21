@@ -3,6 +3,7 @@ using Runtime.NetworkBehaviours;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace Runtime.MonoBehaviours
 {
@@ -10,8 +11,8 @@ namespace Runtime.MonoBehaviours
     {
         [SerializeField]
         private GameObject visuals;
-        [SerializeField]
-        private PlayerMovement playerMovement;
+        [FormerlySerializedAs("playerMovement")] [SerializeField]
+        private PlayerMovementNet playerMovementNet;
         [SerializeField]
         private BombDeployer bombDeployer;
 
@@ -42,7 +43,7 @@ namespace Runtime.MonoBehaviours
         private void EnableViewerMode()
         {
             NetworkObject.Despawn();
-            playerMovement.enabled = false;         // this should be in movement
+            playerMovementNet.enabled = false;         // this should be in movement
             bombDeployer.enabled = false;           // this should be in bomb deployer
             visuals.SetActive(false);               // this also should be not here
         }

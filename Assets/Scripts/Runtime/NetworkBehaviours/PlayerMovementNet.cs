@@ -1,17 +1,16 @@
+using Interfaces;
 using ScriptableObjects;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.PlayerLoop;
 
 namespace Runtime.NetworkBehaviours
 {
     [RequireComponent(typeof(CharacterController))]
     [RequireComponent(typeof(NetworkObject))]
-    public class PlayerMovement : NetworkBehaviour, InputActions.IPlayerMapActions
+    public class PlayerMovementNet : NetworkBehaviour, IMovable
     {
-        [SerializeField, Tooltip("Used to take main player values (speed, amount of bombs, health and ex.)")]
-        private BaseBomberParameters BomberParameters;
-        
         [SerializeField] 
         private float GravityAcceleration = -9.8f;
         [SerializeField]
@@ -21,7 +20,7 @@ namespace Runtime.NetworkBehaviours
 
         
         private CharacterController _controller;
-        private InputActions _input;
+        // private InputActions _input;
 
         private Vector3 _moveDirection;
         private float _velocity;
@@ -31,18 +30,11 @@ namespace Runtime.NetworkBehaviours
 
         void Start()
         {
-            _canMove = true;
+            Initialize();
         }
 
         public override void OnNetworkSpawn()
         {
-            if (_input == null)
-            {
-                _input = new InputActions();
-            }
-            _input.PlayerMap.AddCallbacks(this);
-            _input.Enable();
-
             if (!_controller)
             {
                 _controller = GetComponent<CharacterController>();
@@ -66,6 +58,21 @@ namespace Runtime.NetworkBehaviours
             }
         }
 
+        public void Initialize()
+        {
+            _canMove = true;
+        }
+
+        public void Move(Vector3 direction)
+        {
+            _moveDirection = direction / CONSTANTSPEEDDEVIDER;
+        }
+
+        public void SetAbilityToMove(bool canIt)
+        {
+            _canMove = canIt;
+        }
+
         private void MoveController()
         {
             _controller.Move(_moveDirection);
@@ -81,36 +88,10 @@ namespace Runtime.NetworkBehaviours
             else _velocity = 0;
         }
 
-        public void SetAbilityToMove(bool canIt)
-        {
-            _canMove = canIt;
-        }
-
         [ClientRpc]
         public void SetAbilityToMoveClientRpc(bool canIt)
         {
             SetAbilityToMove(canIt);
-        }
-
-        public void OnMove(InputAction.CallbackContext context)
-        {
-            Vector2 inputValue = context.ReadValue<Vector2>();
-            _moveDirection = new Vector3(inputValue.x, 0, inputValue.y) * BomberParameters.SpeedMultiplier /
-                              CONSTANTSPEEDDEVIDER;
-            // if (context.performed)
-            // {
-            //     transform.rotation = Quaternion.LookRotation(new Vector3(_moveDirection.x, 0, _moveDirection.z));       //TODO: Move this Out from Movement script, this is not SOLID (Snake)
-            // }
-        }
-
-        public void OnPlaceBomb(InputAction.CallbackContext context)
-        {
-            //not needed
-        }
-
-        public void OnQuit(InputAction.CallbackContext context)
-        {
-            //not needed
         }
     }
 }
