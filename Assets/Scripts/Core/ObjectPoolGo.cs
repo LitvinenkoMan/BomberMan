@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Interfaces;
 using UnityEngine;
@@ -15,6 +16,11 @@ namespace Core
         private bool useReparenting;
         
         private Queue<GameObject> _queue;
+
+        private void Start()
+        {
+            Initialize();
+        }
 
         public void Initialize()
         {
@@ -42,6 +48,11 @@ namespace Core
             item.SetActive(false);
         }
 
+        /// <summary>
+        /// Will give an Object from pool
+        /// </summary>
+        /// <param name="makeActive"></param>
+        /// <returns></returns>
         public GameObject GetFromPool(bool makeActive)
         {
             if (_queue.Count > 0)
@@ -54,6 +65,9 @@ namespace Core
             return InstantiateNewMember(makeActive);
         }
 
+        /// <summary>
+        /// Destroys all object in pool
+        /// </summary>
         public void Clear()
         {
             while (_queue.Count > 0)

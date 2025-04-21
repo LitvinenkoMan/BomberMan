@@ -90,16 +90,17 @@ GameObject:
   - component: {fileID: 5560595334319445906}
   - component: {fileID: 7043332111894801736}
   - component: {fileID: 9181407408975216252}
-  - component: {fileID: 6133191061836779383}
+  - component: {fileID: 4069421721509544861}
+  - component: {fileID: 3533742488125631471}
+  - component: {fileID: 2468723079306178931}
+  - component: {fileID: 7876189251710233369}
+  - component: {fileID: 8949525128573402941}
   - component: {fileID: 4454664985879038347}
-  - component: {fileID: 1320740036372020134}
   - component: {fileID: 7731251428465038235}
   - component: {fileID: 1898818222369800095}
   - component: {fileID: 4479951942615403597}
   - component: {fileID: 2698855256694393988}
   - component: {fileID: 8787606411089374933}
-  - component: {fileID: 2468723079306178931}
-  - component: {fileID: 7876189251710233369}
   m_Layer: 0
   m_Name: PlayerGolemPawnRemastered
   m_TagString: Untagged
@@ -257,7 +258,7 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &6133191061836779383
+--- !u!114 &4069421721509544861
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -266,13 +267,64 @@ MonoBehaviour:
   m_GameObject: {fileID: 4821896025292580154}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d90f97cc89543a44887580b884b9ed47, type: 3}
+  m_Script: {fileID: 11500000, guid: 6f152a6b512f991469561ebb6ca59e46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectExample: {fileID: 6260933269128134215, guid: a19dc95892433e948a0a89d9befe479e,
+  bomberParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
+--- !u!114 &3533742488125631471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4821896025292580154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92e19823fa9c77046b15d1b22ab67a52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2468723079306178931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4821896025292580154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1588474d7fc209d44aa8ccf243025549, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
+--- !u!114 &7876189251710233369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4821896025292580154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 932da2a46ede6504f83b31c4dc0e4734, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startImmunityTime: 3
+--- !u!114 &8949525128573402941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4821896025292580154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b3f17dd52e6ca945af2ce1dafe899eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectExample: {fileID: 6260933269128134215, guid: a19dc95892433e948a0a89d9befe479e,
     type: 3}
-  StartingCount: 10
-  UseReparenting: 0
+  startingCount: 10
+  useReparenting: 0
 --- !u!114 &4454664985879038347
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -289,20 +341,6 @@ MonoBehaviour:
   GravityAcceleration: -9.8
   IsGravityOn: 1
   GravityMultiplyer: 0.001
---- !u!114 &1320740036372020134
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4821896025292580154}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 747db11059caa1b46ae18c92f93e5c04, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bomberParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
-  BombsPool: {fileID: 6133191061836779383}
 --- !u!114 &7731251428465038235
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -331,7 +369,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   visuals: {fileID: 5630106756533224544}
   playerMovement: {fileID: 4454664985879038347}
-  bombDeployer: {fileID: 1320740036372020134}
+  bombDeployer: {fileID: 0}
   OnPlayerDeathUnityEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -379,32 +417,6 @@ MonoBehaviour:
   characterController: {fileID: 3192485037731634668}
   VisualsTransform: {fileID: 5001802568364515034}
   RotationTime: 0.25
---- !u!114 &2468723079306178931
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4821896025292580154}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1588474d7fc209d44aa8ccf243025549, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  baseParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
---- !u!114 &7876189251710233369
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4821896025292580154}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 932da2a46ede6504f83b31c4dc0e4734, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  startImmunityTime: 3
 --- !u!1 &5012474147548761335
 GameObject:
   m_ObjectHideFlags: 0

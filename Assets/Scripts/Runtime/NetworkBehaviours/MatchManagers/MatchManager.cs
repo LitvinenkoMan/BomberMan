@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Interfaces;
 using MonoBehaviours.Network;
 using Runtime.MonoBehaviours;
 using TMPro;
@@ -91,6 +92,11 @@ namespace Runtime.NetworkBehaviours.MatchManagers
             if (newClientObject.TryGetComponent(out BombDeployer bombDeployer))
             {
                 bombDeployer.SetAbilityToDeployBombsClientRpc(canUse);
+            }
+
+            if (newClientObject.TryGetComponent(out IBombDeployer deployer))
+            {
+                deployer.SetAbilityToDeployBombs(canUse);
             }
             //
             // if (newClientObject.TryGetComponent(out PlayerMovement playerMovement))

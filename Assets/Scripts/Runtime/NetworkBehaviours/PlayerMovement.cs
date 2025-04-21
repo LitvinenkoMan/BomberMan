@@ -3,7 +3,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace NetworkBehaviours
+namespace Runtime.NetworkBehaviours
 {
     [RequireComponent(typeof(CharacterController))]
     [RequireComponent(typeof(NetworkObject))]
