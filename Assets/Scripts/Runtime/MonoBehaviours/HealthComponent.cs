@@ -8,6 +8,8 @@ namespace Runtime.MonoBehaviours
 {
     public class HealthComponent : MonoBehaviour
     {
+        public int HealthPoints { get => _nonBaseActorHealth; private set => _nonBaseActorHealth = value; }
+        
         [SerializeField, Tooltip("If not set Component will use Starting Health instead, this field not necessary")]
         private ActorBaseParams baseParams;
         [SerializeField, Tooltip("If this GameObject should be Immune after being damaged, set this to true")]
@@ -18,8 +20,6 @@ namespace Runtime.MonoBehaviours
         private byte StartingHealth;
 
         private int _nonBaseActorHealth;
-        public int HealthPoints { get => _nonBaseActorHealth; private set => _nonBaseActorHealth = value; }
-
         private bool _isImmune;
         
         [Space(20)]
@@ -41,10 +41,6 @@ namespace Runtime.MonoBehaviours
         private void OnEnable()
         {
             _isImmune = false;
-            if (baseParams)
-            {
-                //baseParams.
-            }
         }
 
         private void OnDisable()

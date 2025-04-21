@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Runtime.MonoBehaviours
 {
-    public class PlayerCameraController : MonoBehaviour, ICameraModeController
+    public class PlayerCameraModeController : MonoBehaviour, ICameraModeController
     {
         [SerializeField] 
         private GameObject CameraExample;

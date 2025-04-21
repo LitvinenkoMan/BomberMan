@@ -1,10 +1,9 @@
 using System.Collections;
-using MonoBehaviours;
 using MonoBehaviours.GroundSectionSystem;
 using MonoBehaviours.GroundSectionSystem.SectionObstacles;
+using Runtime.MonoBehaviours;
 using ScriptableObjects;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
@@ -19,8 +18,8 @@ namespace Runtime.NetworkBehaviours
         [SerializeField]
         private ObjectPoolQueue BombsPool;
 
-        private int currentPlacedBombs;
-        private bool CanPlaceBombs;
+        private int _currentPlacedBombs;
+        private bool _canPlaceBombs;
 
         // Input
         private InputActions _input;
@@ -28,17 +27,12 @@ namespace Runtime.NetworkBehaviours
         private void OnEnable()
         {
             Initialize();
-            CanPlaceBombs = false;
-        }
-
-        private void OnDisable()
-        {
-            
+            _canPlaceBombs = false;
         }
 
         public void SetAbilityToDeployBombs(bool canIt)
         {
-            CanPlaceBombs = canIt;
+            _canPlaceBombs = canIt;
         }
 
         [ClientRpc]
@@ -47,7 +41,7 @@ namespace Runtime.NetworkBehaviours
             SetAbilityToDeployBombs(canIt);
         }
 
-        private void Initialize()
+        public void Initialize()
         {
             if (_input == null)
             {
@@ -64,7 +58,7 @@ namespace Runtime.NetworkBehaviours
         
         private void DeployBombAction()
         {
-            if (!CanPlaceBombs) return;
+            if (!_canPlaceBombs) return;
             
             if (!IsOwner) return;
             
@@ -81,7 +75,7 @@ namespace Runtime.NetworkBehaviours
         private void DeployBomb(int bombsAtTime, float timeToExplode, int bombDamage, int bombSpread)
         {
             var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
-            if (section && !section.PlacedObstacle && currentPlacedBombs < bombsAtTime)
+            if (section && !section.PlacedObstacle && _currentPlacedBombs < bombsAtTime)
             {
                 var bomb = BombsPool.GetFromPool(true).GetComponent<Bomb>();
                 bomb.SetNewPosition(section.ObstaclePlacementPosition);
@@ -93,7 +87,7 @@ namespace Runtime.NetworkBehaviours
                 {
                     bomb.NetworkObject.Spawn();
                 }
-                currentPlacedBombs++;
+                _currentPlacedBombs++;
             }
         }
 
@@ -105,7 +99,7 @@ namespace Runtime.NetworkBehaviours
 
         private void SubtractAmountOfCurrentBombs(Bomb explodedBomb)
         {
-            currentPlacedBombs--;
+            _currentPlacedBombs--;
             explodedBomb.onExplode -= SubtractAmountOfCurrentBombs;
             StartCoroutine(ReturnBombBackToPoolRoutine(explodedBomb));
         }
@@ -128,7 +122,7 @@ namespace Runtime.NetworkBehaviours
 
         public void OnMove(InputAction.CallbackContext context)
         {
-            //not needed throw new System.NotImplementedException();
+            //not needed 
         }
 
         public void OnPlaceBomb(InputAction.CallbackContext context)
@@ -141,7 +135,7 @@ namespace Runtime.NetworkBehaviours
 
         public void OnQuit(InputAction.CallbackContext context)
         {
-            //not needed throw new System.NotImplementedException();
+            //not needed 
         }
     }
 }

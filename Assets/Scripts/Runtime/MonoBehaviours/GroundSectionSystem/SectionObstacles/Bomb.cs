@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Interfaces;
 using Runtime.MonoBehaviours;
 using Runtime.MonoBehaviours.GroundSectionSystem;
 using ScriptableObjects;
@@ -193,13 +194,20 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
             for (int i = 0; i < colliders.Length; i++)
             {
-                if (colliders[i].gameObject.TryGetComponent(out HealthComponent health) ) //TODO: recode this check, looks bad
+                if (colliders[i].gameObject.TryGetComponent(out IHealth health1))
                 {
-                    if (health.gameObject.TryGetComponent(out BomberParamsProvider bomberParamsProvider) && bomberParamsProvider.NetworkObject.IsOwner)
-                    {
-                        health.SetHealth(bomberParamsProvider.GetBomberParams().ActorHealth - damage);
-                    }
+                    health1.AddHealth(-damage);
+                    Debug.Log($"Damaged Player");
                 }
+                
+                
+                // if (colliders[i].gameObject.TryGetComponent(out HealthComponent health) ) //TODO: recode this check, looks bad
+                // {
+                //     if (health.gameObject.TryGetComponent(out BomberParamsProvider bomberParamsProvider) && bomberParamsProvider.NetworkObject.IsOwner)
+                //     {
+                //         health.SetHealth(bomberParamsProvider.GetBomberParams().ActorHealth - damage);
+                //     }
+                // }
             }
         }
 

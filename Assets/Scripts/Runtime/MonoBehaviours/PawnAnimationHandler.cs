@@ -1,7 +1,5 @@
-using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace Runtime.MonoBehaviours
 {
@@ -36,7 +34,6 @@ namespace Runtime.MonoBehaviours
 
         public void PlayIdleAnimation()
         {
-
             PlayMoveAnimation(0, TransitionTime);
         }
         
