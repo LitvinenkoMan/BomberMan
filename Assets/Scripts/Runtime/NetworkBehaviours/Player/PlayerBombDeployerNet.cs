@@ -19,6 +19,11 @@ namespace Runtime.NetworkBehaviours.Player
             Initialize();
         }
 
+        public override void OnNetworkDespawn()
+        {
+            //ClearPoolRpc();
+        }
+
         public void Initialize()
         {
             _bombsPool = GetComponent<IObjectPool<GameObject>>();
@@ -37,7 +42,7 @@ namespace Runtime.NetworkBehaviours.Player
             DeployBombRpc(bombsAtTime, timeToExplode, bombDamage, bombSpread);
         }
 
-        [Rpc(SendTo.Server)]
+        [Rpc(SendTo.ClientsAndHost)]
         private void DeployBombRpc(int bombsAtTime, float timeToExplode, int bombDamage, int bombSpread)
         {
             var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
@@ -80,6 +85,12 @@ namespace Runtime.NetworkBehaviours.Player
                 explodedBomb.Reset();
                 explodedBomb.NetworkObject.Despawn(false);
             }
+        }
+
+        [Rpc(SendTo.Server)]
+        private void ClearPoolRpc()
+        {
+           _bombsPool.Clear();
         }
 
         [ClientRpc]

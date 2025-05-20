@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using Core.ScriptableObjects;
+using Interfaces;
 using Runtime.MonoBehaviours;
 using Runtime.MonoBehaviours.GroundSectionSystem;
 using ScriptableObjects;
@@ -27,7 +29,7 @@ namespace MonoBehaviours.GroundSectionSystem
 
         public virtual void Initialize()
         {
-            ObstacleHealthComponent.SetHealth(1);
+            ObstacleHealthComponent.Initialize(1);
             CanReceiveDamage = true;
             CanPlayerStepOnIt = true;
             _isTaken = false;
@@ -60,16 +62,13 @@ namespace MonoBehaviours.GroundSectionSystem
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.gameObject.TryGetComponent(out BomberParamsProvider provider) && !_isTaken && provider.IsOwner)
+            if (other.gameObject.TryGetComponent(out ICharacterUpgradable characterUpgrader))
             {
-                ApplyPowerUp(provider.GetBomberParams());
+                ApplyPowerUp(characterUpgrader);
             }
         }
 
-        protected virtual void ApplyPowerUp(BaseBomberParameters Params)
-        {
-            // NetworkObject.Despawn();
-        }
+        protected virtual void ApplyPowerUp(ICharacterUpgradable characterUpgrader) { }
 
         protected virtual void RemovePowerUpFromGroundSection()
         {

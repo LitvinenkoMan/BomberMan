@@ -87,7 +87,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             _isExploded = false;
             _bombCollider.isTrigger = true;
             BombVisuals.SetActive(true);
-            ObstacleHealthComponent.SetHealth(1);
+            ObstacleHealthComponent.Initialize(1);
         }
 
         public void Ignite(float timeToExplode, int bombDamage, int bombSpread)
@@ -184,7 +184,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         {
             if (obstacle.CanReceiveDamage)
             {
-                obstacle.ObstacleHealthComponent.SetHealth(obstacle.ObstacleHealthComponent.HealthPoints - _bombDamage);
+                obstacle.ObstacleHealthComponent.SubtractHealth(_bombDamage);
             }
         }
 

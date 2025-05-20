@@ -1,4 +1,4 @@
-using System;
+using Core.ScriptableObjects;
 using Interfaces;
 using ScriptableObjects;
 using Unity.Netcode;
@@ -53,6 +53,7 @@ namespace Runtime.NetworkBehaviours.Player
 
         public void ActivateSpecial()
         {
+            //TODO: Should to add specials
             //throw new System.NotImplementedException();
         }
 
@@ -73,7 +74,8 @@ namespace Runtime.NetworkBehaviours.Player
 
         private void StartDeathSequence()
         {
-            
+            SetMoveAbility(false);
+            SetBombDeployAbility(false);
         }
 
         public void OnMove(InputAction.CallbackContext context)

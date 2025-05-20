@@ -1,4 +1,5 @@
 using System;
+using Interfaces;
 using MonoBehaviours.GroundSectionSystem;
 using Unity.Netcode;
 using UnityEngine;
@@ -8,7 +9,7 @@ namespace Runtime.MonoBehaviours.GroundSectionSystem
     [RequireComponent(typeof(HealthComponent))]
     public class Obstacle : NetworkBehaviour, INetworkSerializable
     {
-        public HealthComponent ObstacleHealthComponent;
+        public IHealth ObstacleHealthComponent;
         public bool CanReceiveDamage { get; protected set; }
         public bool CanPlayerStepOnIt { get; protected set; }
 
@@ -20,7 +21,7 @@ namespace Runtime.MonoBehaviours.GroundSectionSystem
 
         private void Start()
         {
-            ObstacleHealthComponent = GetComponent<HealthComponent>();
+            ObstacleHealthComponent = GetComponent<IHealth>();
         }
 
         public void SetAbilityToReceiveDamage(bool state)

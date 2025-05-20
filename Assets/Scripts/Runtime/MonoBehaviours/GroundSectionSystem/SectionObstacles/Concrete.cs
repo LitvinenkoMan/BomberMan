@@ -8,7 +8,7 @@ namespace MonoBehaviours.GroundSectionSystem
     {
         private void Start()
         {
-            ObstacleHealthComponent.SetHealth(255);
+            ObstacleHealthComponent.AddHealth(255);
             CanReceiveDamage = false;
             CanPlayerStepOnIt = false;
         }

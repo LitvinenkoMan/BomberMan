@@ -43,7 +43,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         {
             Visuals.SetActive(true);
             _collider.isTrigger = false;
-            ObstacleHealthComponent.SetHealth(1);
+            ObstacleHealthComponent.AddHealth(1);
         }
 
         private void OnHealthRunOutResponce()

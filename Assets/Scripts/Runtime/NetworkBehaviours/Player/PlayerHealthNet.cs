@@ -16,13 +16,10 @@ namespace Runtime.NetworkBehaviours.Player
 
         public override void OnNetworkSpawn()
         {
-            Initialize();
+            Initialize(0);
         }
 
-        public void Initialize()
-        {
-            
-        }
+        public void Initialize(float initialValue) { }
 
         public void AddHealth(int healthToAdd)
         {

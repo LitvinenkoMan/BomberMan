@@ -1,9 +1,8 @@
 using System;
-using Core.ScriptableObjects;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace ScriptableObjects
+namespace Core.ScriptableObjects
 {
     [CreateAssetMenu]
     public class BaseBomberParameters : ActorBaseParams, INetworkSerializable
@@ -27,11 +26,11 @@ namespace ScriptableObjects
         [SerializeField]
         private float _speedMultiplier;
         [SerializeField]
+        private float _bombsCountdown;
+        [SerializeField]
         private int _bombsAtTime;
         [SerializeField]
         private int _bombsSpreading;
-        [SerializeField]
-        private int _bombsCountdown;
         [SerializeField]
         private int _bombsDamage;
 
@@ -40,11 +39,18 @@ namespace ScriptableObjects
         public Action<int> OnDamageChangedEvent;
         public Action<int> OnBombsPerTimeChangedEvent;
         public Action<int> OnSpreadingChangedEvent;
+        public Action<float> OnBombsCountdownChangedEvent;
         
         public float SpeedMultiplier 
         {
             get => _speedMultiplier;
             protected set => _speedMultiplier = value;
+        }
+        
+        public float BombsCountdown
+        {
+            get => _bombsCountdown;
+            protected set => _bombsCountdown = value;
         }
         
         public int BombsAtTime 
@@ -57,12 +63,6 @@ namespace ScriptableObjects
         {
             get => _bombsSpreading;
             protected set => _bombsSpreading = value;
-        }
-        
-        public int BombsCountdown
-        {
-            get => _bombsCountdown;
-            protected set => _bombsCountdown = value;
         }
         
         public int BombsDamage
@@ -99,7 +99,11 @@ namespace ScriptableObjects
             OnSpreadingChangedEvent?.Invoke(BombsSpreading);
         }
 
-        public void SetBombsCountdown(int newValue) => BombsCountdown = newValue;
+        public void SetBombsCountdown(float newValue)
+        {
+            BombsCountdown = newValue;
+            OnBombsCountdownChangedEvent?.Invoke(newValue);
+        }
 
         public void SetBombsDamage(int newValue)
         {
