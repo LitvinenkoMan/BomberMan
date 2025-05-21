@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using Core.ScriptableObjects;
+using Interfaces;
 using UnityEngine;
 using UnityEngine.Events;
 

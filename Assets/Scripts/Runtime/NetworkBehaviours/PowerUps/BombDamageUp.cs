@@ -1,7 +1,7 @@
 using Interfaces;
 using UnityEngine;
 
-namespace MonoBehaviours.GroundSectionSystem.PowerUps
+namespace Runtime.NetworkBehaviours.PowerUps
 {
     public class BombDamageUp : PowerUp
     {

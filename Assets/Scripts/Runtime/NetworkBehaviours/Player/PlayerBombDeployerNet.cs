@@ -42,7 +42,7 @@ namespace Runtime.NetworkBehaviours.Player
             DeployBombRpc(bombsAtTime, timeToExplode, bombDamage, bombSpread);
         }
 
-        [Rpc(SendTo.ClientsAndHost)]
+        [Rpc(SendTo.Server)]
         private void DeployBombRpc(int bombsAtTime, float timeToExplode, int bombDamage, int bombSpread)
         {
             var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);

@@ -1,9 +1,7 @@
 using System;
 using System.Collections;
 using Interfaces;
-using Runtime.MonoBehaviours;
 using Runtime.MonoBehaviours.GroundSectionSystem;
-using ScriptableObjects;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -39,9 +37,8 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         private void Start()
         {
-            CanReceiveDamage = true;
-            CanPlayerStepOnIt = false;
             _bombCollider = GetComponent<Collider>();
+            ObstacleHealthCmp.Initialize(1);
         }
 
         private void OnEnable()
@@ -52,12 +49,12 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             // }
             //_timer = _timeToExplode;
 
-            ObstacleHealthComponent.OnHealthRunOut += OnHealthRunOutExplode;
+            ObstacleHealthCmp.OnHealthRunOut += OnHealthRunOutExplode;
         }
 
         private void OnDisable()
         {
-            ObstacleHealthComponent.OnHealthRunOut -= OnHealthRunOutExplode;
+            ObstacleHealthCmp.OnHealthRunOut -= OnHealthRunOutExplode;
         }
 
         private void Update()
@@ -87,7 +84,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             _isExploded = false;
             _bombCollider.isTrigger = true;
             BombVisuals.SetActive(true);
-            ObstacleHealthComponent.Initialize(1);
+            ObstacleHealthCmp.Initialize(1);
         }
 
         public void Ignite(float timeToExplode, int bombDamage, int bombSpread)
@@ -182,9 +179,9 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         private void DamageObstacle(Obstacle obstacle)
         {
-            if (obstacle.CanReceiveDamage)
+            if (obstacle.ObstacleHealthCmp.CanReceiveDamage)
             {
-                obstacle.ObstacleHealthComponent.SubtractHealth(_bombDamage);
+                obstacle.ObstacleHealthCmp.SubtractHealth(_bombDamage);
             }
         }
 
@@ -197,7 +194,6 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
                 if (colliders[i].gameObject.TryGetComponent(out IHealth health1))
                 {
                     health1.AddHealth(-damage);
-                    Debug.Log($"Damaged Player");
                 }
                 
                 

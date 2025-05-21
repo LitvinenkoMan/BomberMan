@@ -36,6 +36,7 @@ namespace Runtime.NetworkBehaviours.Player
                 _input.PlayerMap.AddCallbacks(this);
                 _input.Enable();
             }
+            bomberParams.ResetValues();
         }
 
         public void Damage(int damageAmount)

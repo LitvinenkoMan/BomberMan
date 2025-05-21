@@ -6,8 +6,6 @@ namespace Runtime.MonoBehaviours
     public class PlayerSkinChanger : MonoBehaviour
     {
         [SerializeField]
-        private HealthComponent healthComponent;
-        [SerializeField]
         private SkinnedMeshRenderer visualsRenderer;
 
         private void OnEnable()

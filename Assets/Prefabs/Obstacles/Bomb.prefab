@@ -183,7 +183,6 @@ GameObject:
   - component: {fileID: 8445551862046939434}
   - component: {fileID: 1587419071089442802}
   - component: {fileID: 4733436572388899212}
-  - component: {fileID: 654695661294613331}
   - component: {fileID: 5356054130129563679}
   m_Layer: 0
   m_Name: Bomb
@@ -241,29 +240,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a446c142d989bc43bdd64f6749010b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObstacleHealthComponent: {fileID: 654695661294613331}
   IgniteOnStart: 0
-  bomberParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
   BombVisuals: {fileID: 609344817609076943}
---- !u!114 &654695661294613331
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6260933269128134215}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a2e4521c0d71624381b03f9d69c0b80, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  baseParams: {fileID: 0}
-  ImmuneAfterGettingDamaged: 0
-  ImmunityTime: 0
-  StartingHealth: 1
-  OnHealthRunOutUnityEvent:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!65 &5356054130129563679
 BoxCollider:
   m_ObjectHideFlags: 0

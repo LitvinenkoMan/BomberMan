@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MonoBehaviours.GroundSectionSystem;
-using Runtime.MonoBehaviours;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Android;
 using Random = UnityEngine.Random;
 
 namespace Runtime.NetworkBehaviours
@@ -86,7 +84,7 @@ namespace Runtime.NetworkBehaviours
             );
             
             player.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
-            player.GetComponent<BomberParamsProvider>().ResetLocalValuesClientRpc();  
+            //player.GetComponent<ICharacter>().Initialize();  
 
             SendPlayerSpawnEventRpc(clientId);
         }

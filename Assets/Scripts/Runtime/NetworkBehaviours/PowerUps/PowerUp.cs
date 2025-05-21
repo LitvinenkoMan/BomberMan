@@ -1,14 +1,11 @@
-using System;
 using System.Collections;
-using Core.ScriptableObjects;
 using Interfaces;
-using Runtime.MonoBehaviours;
+using MonoBehaviours.GroundSectionSystem;
 using Runtime.MonoBehaviours.GroundSectionSystem;
-using ScriptableObjects;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace MonoBehaviours.GroundSectionSystem
+namespace Runtime.NetworkBehaviours.PowerUps
 {
     public class PowerUp : Obstacle
     {
@@ -29,8 +26,8 @@ namespace MonoBehaviours.GroundSectionSystem
 
         public virtual void Initialize()
         {
-            ObstacleHealthComponent.Initialize(1);
-            CanReceiveDamage = true;
+            ObstacleHealthCmp.Initialize(1);
+            ObstacleHealthCmp.SetAbilityToReceiveDamage(true);
             CanPlayerStepOnIt = true;
             _isTaken = false;
             gameObject.SetActive(true);
@@ -42,27 +39,27 @@ namespace MonoBehaviours.GroundSectionSystem
             {
                 StartCoroutine(CountLifeTime());
             }
-            ObstacleHealthComponent.OnHealthRunOut += RemovePowerUpFromGroundSection;
         }
 
         private void OnDisable()
         {
-            ObstacleHealthComponent.OnHealthRunOut -= RemovePowerUpFromGroundSection;
+            
         }
 
         public override void OnNetworkSpawn()
         {
-            
+            ObstacleHealthCmp.OnHealthRunOut += RemovePowerUpFromGroundSection;
         }
 
         public override void OnNetworkDespawn()
         {
-           Destroy(gameObject);
+            ObstacleHealthCmp.OnHealthRunOut -= RemovePowerUpFromGroundSection;
+            Destroy(gameObject);
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.gameObject.TryGetComponent(out ICharacterUpgradable characterUpgrader))
+            if (other.gameObject.TryGetComponent(out ICharacterUpgradable characterUpgrader) && IsOwner)
             {
                 ApplyPowerUp(characterUpgrader);
             }

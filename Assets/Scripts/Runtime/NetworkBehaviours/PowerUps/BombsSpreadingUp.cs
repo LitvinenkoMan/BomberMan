@@ -1,9 +1,7 @@
-using Core.ScriptableObjects;
 using Interfaces;
-using ScriptableObjects;
 using UnityEngine;
 
-namespace MonoBehaviours.GroundSectionSystem.PowerUps
+namespace Runtime.NetworkBehaviours.PowerUps
 {
     public class BombsSpreadingUp : PowerUp
     {
