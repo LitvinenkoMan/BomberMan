@@ -38,7 +38,7 @@ namespace Runtime.NetworkBehaviours.Player
 
             OnHealthChangedRpc(healthToAdd);
 
-            if (healthToAdd <= 0)
+            if (baseParams.ActorHealth <= 0)
             {
                 OnHealthRunOutRpc();
             }

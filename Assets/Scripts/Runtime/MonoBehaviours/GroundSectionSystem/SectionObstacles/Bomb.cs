@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 using Interfaces;
 using Runtime.MonoBehaviours.GroundSectionSystem;
 using Unity.Netcode;
@@ -185,13 +186,13 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         private void TryDamageActorsOrPlayer(Vector3 position, int damage)
         {
-            Collider[] colliders = Physics.OverlapBox(position, new Vector3(0.5f, 0.5f, 0.5f));
+            Collider[] colliders = Physics.OverlapBox(position, new Vector3(0.49f, 0.49f, 0.49f));
 
             for (int i = 0; i < colliders.Length; i++)
             {
-                if (colliders[i].gameObject.TryGetComponent(out IHealth health1))
+                if (colliders[i].gameObject.TryGetComponent(out ICharacter health1))
                 {
-                    health1.AddHealth(-damage);
+                    health1.Damage(damage);
                 }
             }
         }
