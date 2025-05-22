@@ -21,8 +21,6 @@ namespace Runtime.MonoBehaviours.GroundSectionSystem
         public void Initialize(float initialValue)
         {
             _health = (int)initialValue;
-            
-            CanReceiveDamage = false;
         }
 
         public void AddHealth(int healthToAdd)
@@ -33,6 +31,8 @@ namespace Runtime.MonoBehaviours.GroundSectionSystem
 
         public void SubtractHealth(int healthToSubtract)
         {
+            if (!CanReceiveDamage) return;
+            
             _health -= healthToSubtract;
             OnHealthChanged?.Invoke(_health);
             if (_health <= 0)

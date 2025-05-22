@@ -39,6 +39,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         {
             _bombCollider = GetComponent<Collider>();
             ObstacleHealthCmp.Initialize(1);
+            ObstacleHealthCmp.SetAbilityToReceiveDamage(true);
         }
 
         private void OnEnable()
@@ -179,10 +180,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         private void DamageObstacle(Obstacle obstacle)
         {
-            if (obstacle.ObstacleHealthCmp.CanReceiveDamage)
-            {
-                obstacle.ObstacleHealthCmp.SubtractHealth(_bombDamage);
-            }
+            obstacle.ObstacleHealthCmp.SubtractHealth(_bombDamage);
         }
 
         private void TryDamageActorsOrPlayer(Vector3 position, int damage)
@@ -195,15 +193,6 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
                 {
                     health1.AddHealth(-damage);
                 }
-                
-                
-                // if (colliders[i].gameObject.TryGetComponent(out HealthComponent health) ) //TODO: recode this check, looks bad
-                // {
-                //     if (health.gameObject.TryGetComponent(out BomberParamsProvider bomberParamsProvider) && bomberParamsProvider.NetworkObject.IsOwner)
-                //     {
-                //         health.SetHealth(bomberParamsProvider.GetBomberParams().ActorHealth - damage);
-                //     }
-                // }
             }
         }
 
