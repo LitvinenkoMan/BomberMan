@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Linq;
 using Interfaces;
 using Runtime.MonoBehaviours.GroundSectionSystem;
 using Unity.Netcode;
@@ -87,6 +86,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             _bombCollider.isTrigger = true;
             BombVisuals.SetActive(true);
             ObstacleHealthCmp.Initialize(1);
+            ObstacleHealthCmp.SetAbilityToReceiveDamage(true);
         }
 
         public void Ignite(float timeToExplode, int bombDamage, int bombSpread)

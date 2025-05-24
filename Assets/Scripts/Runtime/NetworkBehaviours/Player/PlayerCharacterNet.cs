@@ -1,6 +1,7 @@
+using System;
 using Core.ScriptableObjects;
 using Interfaces;
-using ScriptableObjects;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -11,6 +12,11 @@ namespace Runtime.NetworkBehaviours.Player
     {
         [SerializeField]
         private BaseBomberParameters bomberParams;
+        [SerializeField]
+        private TMP_Text playerName;
+        [SerializeField]
+        private GameObject playerVisuals;
+        
         public IHealth Health { get; private set; }
         public IImmune Immune { get; private set; }
         public IBombDeployer BombDeployer { get; private set; }
@@ -18,25 +24,41 @@ namespace Runtime.NetworkBehaviours.Player
 
         private InputActions _input;
 
+        public event Action<ulong> OnPlayerDeath;
+
+        private void Awake()
+        {
+            CollectRefs();
+        }
+
+        private void OnEnable()
+        {
+            Health.OnHealthRunOut += StartDeathSequence;
+        }
+
+        private void OnDisable()
+        {
+            Health.OnHealthRunOut -= StartDeathSequence;
+        }
+
         public override void OnNetworkSpawn()
         {
             Initialize();
+            name = $"P{GetComponent<NetworkObject>().OwnerClientId}";
+            playerName.text = name;
         }
 
         public void Initialize()
         {
-            if (TryGetComponent(out IImmune immune)) Immune = immune;
-            if (TryGetComponent(out IBombDeployer bombDeployer)) BombDeployer = bombDeployer;
-            if (TryGetComponent(out IMovable playerMovement)) CharacterMovement = playerMovement;
-            if (TryGetComponent(out IHealth health)) Health = health;
-
             if (IsOwner)
             {
                 _input ??= new InputActions();
                 _input.PlayerMap.AddCallbacks(this);
                 _input.Enable();
+                bomberParams.ResetValues();
+                playerVisuals.SetActive(true);
+                playerName.enabled = true;
             }
-            bomberParams.ResetValues();
         }
 
         public void Damage(int damageAmount)
@@ -75,8 +97,17 @@ namespace Runtime.NetworkBehaviours.Player
 
         private void StartDeathSequence()
         {
-            SetMoveAbility(false);
-            SetBombDeployAbility(false);
+            if (IsOwner)
+            { 
+                playerVisuals.SetActive(false);
+                SetMoveAbility(false);
+                SetBombDeployAbility(false);      
+                playerName.enabled = false;
+            }
+            gameObject.SetActive(false);
+
+            OnPlayerDeath?.Invoke(OwnerClientId);
+            //UnspawnPlayerRpc();
         }
 
         public void OnMove(InputAction.CallbackContext context)
@@ -99,5 +130,19 @@ namespace Runtime.NetworkBehaviours.Player
         {
             //throw new NotImplementedException();
         }
+
+        private void CollectRefs()
+        {
+            if (TryGetComponent(out IImmune immune)) Immune = immune;
+            if (TryGetComponent(out IBombDeployer bombDeployer)) BombDeployer = bombDeployer;
+            if (TryGetComponent(out IMovable playerMovement)) CharacterMovement = playerMovement;
+            if (TryGetComponent(out IHealth health)) Health = health;
+        }
+        
+        [Rpc(SendTo.Server)]
+		private void UnspawnPlayerRpc()
+		{
+            NetworkObject.Despawn(true);
+		}
     }
 }

@@ -80,14 +80,14 @@ namespace Runtime.MonoBehaviours
             NetworkObject playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
             SwitchToGameplayMode();
 
-            if (playerObject.gameObject.TryGetComponent(out DeathResultHandler handler))
+            if (playerObject.gameObject.TryGetComponent(out IHealth health))
             {
-                handler.OnPlayerDeathAction += OnPlayerDeathResponce;
+                health.OnHealthRunOut += OnPlayerDeathResponce;
             }
             CatchPlayersGameObject();
         }
 
-        private void OnPlayerDeathResponce(ulong obj)
+        private void OnPlayerDeathResponce()
         {
             SwitchToViewerMode();
         }

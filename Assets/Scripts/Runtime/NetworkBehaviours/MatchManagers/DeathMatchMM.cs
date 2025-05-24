@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using MonoBehaviours.Network;
-using Runtime.MonoBehaviours;
-using TMPro;
+using Runtime.NetworkBehaviours.Player;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Runtime.NetworkBehaviours.MatchManagers
 {
@@ -70,10 +67,10 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         protected override void RegisterPlayerForEvents(ulong clientID)
         {
             if (NetworkManager.Singleton.ConnectedClients[clientID].PlayerObject
-                .TryGetComponent(out DeathResultHandler deathResultHandler))
+                .TryGetComponent(out PlayerCharacterNet playerCharacter))
             {
                 Debug.Log($"Player {clientID} Subscribed for Respawn request from DMM");
-                deathResultHandler.OnPlayerDeathAction += RequestRespawnRpc;
+                playerCharacter.OnPlayerDeath += RequestRespawnRpc;             //TODO: I should to solve it, but how...
             }
         }
 
@@ -130,6 +127,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         private void RequestRespawnRpc(ulong clientId)
         {
             Debug.Log($"Player {clientId} Requested for respawn");
+            
             SubtractLifeForPlayer(clientId);
             SendRespawnRequestForPlayerWrapper(clientId);
         }

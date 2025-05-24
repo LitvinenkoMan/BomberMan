@@ -8,7 +8,6 @@ namespace Core.ScriptableObjects
         [SerializeField]
         protected int _actorHealth;
         
-        
         public Action<int> OnHealthChangedEvent;
         
         public int ActorHealth

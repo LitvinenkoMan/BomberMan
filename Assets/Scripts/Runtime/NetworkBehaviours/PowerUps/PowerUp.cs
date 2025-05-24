@@ -59,7 +59,7 @@ namespace Runtime.NetworkBehaviours.PowerUps
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.gameObject.TryGetComponent(out ICharacterUpgradable characterUpgrader) && IsOwner)
+            if (other.gameObject.TryGetComponent(out ICharacterUpgradable characterUpgrader))
             {
                 ApplyPowerUp(characterUpgrader);
             }
@@ -69,8 +69,6 @@ namespace Runtime.NetworkBehaviours.PowerUps
 
         protected virtual void RemovePowerUpFromGroundSection()
         {
-            GroundSection startSection = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
-            startSection.RemoveObstacle();
 
             if (!IsServer)
             {
@@ -78,6 +76,8 @@ namespace Runtime.NetworkBehaviours.PowerUps
             }
             else
             {
+                GroundSection startSection = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
+                startSection.RemoveObstacle();
                 NetworkObject.Despawn();
             }
         }
@@ -106,7 +106,6 @@ namespace Runtime.NetworkBehaviours.PowerUps
             serializer.SerializeValue(ref LifeTime);
             serializer.SerializeValue(ref TimedEffect);
             serializer.SerializeValue(ref EffectTime);
-            
             serializer.SerializeValue(ref _isTaken);
         }
     }

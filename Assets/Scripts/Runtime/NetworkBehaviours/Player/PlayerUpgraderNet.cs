@@ -8,33 +8,52 @@ namespace Runtime.NetworkBehaviours.Player
     public class PlayerUpgraderNet : NetworkBehaviour, ICharacterUpgradable
     {
         [SerializeField] private BaseBomberParameters playerParams;
-        
-        
+
+        private IHealth _playerHealthComponent;
+
+        public override void OnNetworkSpawn()
+        {
+            _playerHealthComponent = GetComponent<IHealth>();
+        }
+
         public void IncreaseHealth(float increaseAmount)
         {
-            playerParams.SetActorHealth(playerParams.ActorHealth + (int)increaseAmount);
+            if (IsOwner)
+            {
+                _playerHealthComponent.AddHealth((int)increaseAmount);
+            }
         }
 
         public void IncreaseBombsPerTime(float increaseAmount)
         {
-            playerParams.SetBombsAtTime(playerParams.BombsAtTime + (int)increaseAmount);
+            if (IsOwner)
+            {
+                playerParams.SetBombsAtTime(playerParams.BombsAtTime + (int)increaseAmount);
+            }
         }
 
         public void IncreaseBombsDamage(float increaseAmount)
         {
-            playerParams.SetBombsDamage(playerParams.BombsDamage + (int)increaseAmount);
+            if (IsOwner)
+            {
+                playerParams.SetBombsDamage(playerParams.BombsDamage + (int)increaseAmount);
+            }
         }
 
         public void IncreaseMovementSpeed(float increaseAmount)
         {
-            playerParams.SetSpeedMultiplier(playerParams.SpeedMultiplier + increaseAmount);
-
+            if (IsOwner)
+            {
+                playerParams.SetSpeedMultiplier(playerParams.SpeedMultiplier + increaseAmount);
+            }
         }
 
         public void IncreaseBombsSpreading(float increaseAmount)
         {
-            playerParams.SetBombsSpreading(playerParams.BombsSpreading + (int)increaseAmount);
-
+            if (IsOwner)
+            {
+                playerParams.SetBombsSpreading(playerParams.BombsSpreading + (int)increaseAmount);
+            }
         }
 
         public void Reset()
