@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Interfaces;
 using Runtime.NetworkBehaviours;
+using Runtime.NetworkBehaviours.Player;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -33,7 +34,7 @@ namespace Runtime.MonoBehaviours
         private void CatchPlayersGameObject()
         {
             playersTransform.Clear();
-            var playersObj = FindObjectsByType<BomberParamsProvider>(FindObjectsSortMode.None);
+            var playersObj = FindObjectsByType<CharacterController>(FindObjectsSortMode.None); // Every bot or player will have it (i thinmk so..)
             foreach (var obj in playersObj)
             {
                 playersTransform.Add(obj.transform);
@@ -79,14 +80,14 @@ namespace Runtime.MonoBehaviours
             NetworkObject playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
             SwitchToGameplayMode();
 
-            if (playerObject.gameObject.TryGetComponent(out DeathResultHandler handler))
+            if (playerObject.gameObject.TryGetComponent(out IHealth health))
             {
-                handler.OnPlayerDeathAction += OnPlayerDeathResponce;
+                health.OnHealthRunOut += OnPlayerDeathResponce;
             }
             CatchPlayersGameObject();
         }
 
-        private void OnPlayerDeathResponce(ulong obj)
+        private void OnPlayerDeathResponce()
         {
             SwitchToViewerMode();
         }

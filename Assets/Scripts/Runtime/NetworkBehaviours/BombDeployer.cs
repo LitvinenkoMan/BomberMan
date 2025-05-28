@@ -1,4 +1,5 @@
 using System.Collections;
+using Core.ScriptableObjects;
 using MonoBehaviours.GroundSectionSystem;
 using MonoBehaviours.GroundSectionSystem.SectionObstacles;
 using Runtime.MonoBehaviours;

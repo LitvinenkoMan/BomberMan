@@ -5,40 +5,31 @@ using UnityEngine;
 
 namespace Runtime.MonoBehaviours.GroundSectionSystem
 {
-    [RequireComponent(typeof(HealthComponent))]
     public class Obstacle : NetworkBehaviour, INetworkSerializable
     {
-        public HealthComponent ObstacleHealthComponent;
-        public bool CanReceiveDamage { get; protected set; }
+        public ObstacleHealthComponent ObstacleHealthCmp { get; private set;  }
         public bool CanPlayerStepOnIt { get; protected set; }
+        
+        protected event Action<bool> OnAbilityToPlayerCanStepOnItChanged;
 
-        protected Action<bool> OnAbilityToReciveDamageChanged;
-        protected Action<bool> OnAbilityToPlayerCanStepOnItChanged;
-
-
-        private Vector3 _position;
-
-        private void Start()
+        private void Awake()
         {
-            ObstacleHealthComponent = GetComponent<HealthComponent>();
+            ObstacleHealthCmp = gameObject.AddComponent<ObstacleHealthComponent>();
         }
 
-        public void SetAbilityToReceiveDamage(bool state)
+        public override void OnNetworkSpawn()
         {
-            CanReceiveDamage = state;
-            OnAbilityToReciveDamageChanged?.Invoke(CanReceiveDamage);
+            //ObstacleHealthCmp.OnHealthRunOut += DespawnObstacleRpc;
         }
 
-        public void SetAbilityToPlayerCanStepOnIt(bool state)
+        public override void OnNetworkDespawn()
         {
-            CanPlayerStepOnIt = state;
-            OnAbilityToPlayerCanStepOnItChanged?.Invoke(CanPlayerStepOnIt);
+            //ObstacleHealthCmp.OnHealthRunOut -= DespawnObstacleRpc;
         }
 
         public virtual void SetNewPosition(Vector3 position)
         {
             transform.position = position;
-            _position = position;
         }
 
         public void AutoPlaceToNearestSection()
@@ -47,9 +38,21 @@ namespace Runtime.MonoBehaviours.GroundSectionSystem
             section.AddObstacle(this);
         }
 
+        public void SetAbilityToPlayerCanStepOnIt(bool state)
+        {
+            CanPlayerStepOnIt = state;
+            OnAbilityToPlayerCanStepOnItChanged?.Invoke(CanPlayerStepOnIt);
+        }
+
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
-            serializer.SerializeValue(ref _position);
+            
+        }
+
+        [Rpc(SendTo.Server)]
+        private void DespawnObstacleRpc()
+        {
+            NetworkObject.Despawn();        //TODO: This Only works if player entered not in the middle of the session
         }
     }
 }

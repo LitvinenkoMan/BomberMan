@@ -8,7 +8,7 @@ namespace Interfaces
         
         public event Action OnHealthRunOut;
 
-        public void Initialize();
+        public void Initialize(float initialValue);
         public void AddHealth(int healthToAdd);
         public void SubtractHealth(int healthToSubtract);
         public int GetHealth();

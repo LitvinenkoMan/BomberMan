@@ -1,20 +1,19 @@
-using ScriptableObjects;
+using Interfaces;
 using UnityEngine;
 
-namespace MonoBehaviours.GroundSectionSystem.PowerUps
+namespace Runtime.NetworkBehaviours.PowerUps
 {
     public class BombDamageUp : PowerUp
     {
         [Header("Power up settings")]
         [SerializeField] private byte BombsDamageIncreaseValue = 1; 
 
-        protected override void ApplyPowerUp(BaseBomberParameters Params)
+        protected override void ApplyPowerUp(ICharacterUpgradable characterUpgrader)
         {
             Visuals.SetActive(false);
             _isTaken = true;
-            Params.SetBombsDamage(Params.BombsDamage + BombsDamageIncreaseValue);  
+            characterUpgrader.IncreaseBombsDamage(1);  
             RemovePowerUpFromGroundSection();
-            base.ApplyPowerUp(Params);
         }
     }
 }

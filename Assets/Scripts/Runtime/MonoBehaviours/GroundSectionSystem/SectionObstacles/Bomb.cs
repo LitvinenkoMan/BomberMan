@@ -1,9 +1,7 @@
 using System;
 using System.Collections;
 using Interfaces;
-using Runtime.MonoBehaviours;
 using Runtime.MonoBehaviours.GroundSectionSystem;
-using ScriptableObjects;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -39,9 +37,9 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         private void Start()
         {
-            CanReceiveDamage = true;
-            CanPlayerStepOnIt = false;
             _bombCollider = GetComponent<Collider>();
+            ObstacleHealthCmp.Initialize(1);
+            ObstacleHealthCmp.SetAbilityToReceiveDamage(true);
         }
 
         private void OnEnable()
@@ -52,12 +50,12 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             // }
             //_timer = _timeToExplode;
 
-            ObstacleHealthComponent.OnHealthRunOut += OnHealthRunOutExplode;
+            ObstacleHealthCmp.OnHealthRunOut += OnHealthRunOutExplode;
         }
 
         private void OnDisable()
         {
-            ObstacleHealthComponent.OnHealthRunOut -= OnHealthRunOutExplode;
+            ObstacleHealthCmp.OnHealthRunOut -= OnHealthRunOutExplode;
         }
 
         private void Update()
@@ -87,7 +85,8 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             _isExploded = false;
             _bombCollider.isTrigger = true;
             BombVisuals.SetActive(true);
-            ObstacleHealthComponent.SetHealth(1);
+            ObstacleHealthCmp.Initialize(1);
+            ObstacleHealthCmp.SetAbilityToReceiveDamage(true);
         }
 
         public void Ignite(float timeToExplode, int bombDamage, int bombSpread)
@@ -182,32 +181,19 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         private void DamageObstacle(Obstacle obstacle)
         {
-            if (obstacle.CanReceiveDamage)
-            {
-                obstacle.ObstacleHealthComponent.SetHealth(obstacle.ObstacleHealthComponent.HealthPoints - _bombDamage);
-            }
+            obstacle.ObstacleHealthCmp.SubtractHealth(_bombDamage);
         }
 
         private void TryDamageActorsOrPlayer(Vector3 position, int damage)
         {
-            Collider[] colliders = Physics.OverlapBox(position, new Vector3(0.5f, 0.5f, 0.5f));
+            Collider[] colliders = Physics.OverlapBox(position, new Vector3(0.49f, 0.49f, 0.49f));
 
             for (int i = 0; i < colliders.Length; i++)
             {
-                if (colliders[i].gameObject.TryGetComponent(out IHealth health1))
+                if (colliders[i].gameObject.TryGetComponent(out ICharacter health1))
                 {
-                    health1.AddHealth(-damage);
-                    Debug.Log($"Damaged Player");
+                    health1.Damage(damage);
                 }
-                
-                
-                // if (colliders[i].gameObject.TryGetComponent(out HealthComponent health) ) //TODO: recode this check, looks bad
-                // {
-                //     if (health.gameObject.TryGetComponent(out BomberParamsProvider bomberParamsProvider) && bomberParamsProvider.NetworkObject.IsOwner)
-                //     {
-                //         health.SetHealth(bomberParamsProvider.GetBomberParams().ActorHealth - damage);
-                //     }
-                // }
             }
         }
 

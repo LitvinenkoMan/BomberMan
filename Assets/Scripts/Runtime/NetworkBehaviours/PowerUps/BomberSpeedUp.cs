@@ -1,20 +1,21 @@
-using ScriptableObjects;
+using Core.ScriptableObjects;
+using Interfaces;
+using MonoBehaviours.GroundSectionSystem;
 using UnityEngine;
 
-namespace MonoBehaviours.GroundSectionSystem.PowerUps
+namespace Runtime.NetworkBehaviours.PowerUps
 {
     public class BomberSpeedUp : PowerUp
     {
         [Header("Power up settings")]
         [SerializeField] private float SpeedIncreaseValue = 0.1f; 
         
-        protected override void ApplyPowerUp(BaseBomberParameters Params)
+        protected override void ApplyPowerUp(ICharacterUpgradable characterUpgrader)
         {
             Visuals.SetActive(false);
             _isTaken = true;
-            Params.SetSpeedMultiplier(Params.SpeedMultiplier + SpeedIncreaseValue);  
+            characterUpgrader.IncreaseMovementSpeed(SpeedIncreaseValue);
             RemovePowerUpFromGroundSection();
-            base.ApplyPowerUp(Params);
         }
     }
 }

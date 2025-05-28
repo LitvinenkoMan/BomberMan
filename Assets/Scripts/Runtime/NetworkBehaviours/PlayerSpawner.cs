@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MonoBehaviours.GroundSectionSystem;
-using Runtime.MonoBehaviours;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Android;
 using Random = UnityEngine.Random;
 
 namespace Runtime.NetworkBehaviours
@@ -69,7 +67,13 @@ namespace Runtime.NetworkBehaviours
         {
             await Task.Delay((int)(spawnDelay * 1000));
             
-            GameObject player = Instantiate(Player, Vector3.zero, new Quaternion(0, 0, 0, 0));
+            var playerNetObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
+            if (playerNetObject != null)
+            {
+                playerNetObject.Despawn(true);
+            }
+
+            GameObject player = Instantiate(Player, Vector3.zero, new Quaternion(0, 0, 0, 0));                  //TODO: I could somehow reuse already existing object instead of Reinstantiate it
             
             if (!CheckIfPlayerHaveSpawnPlace(clientId))
             {
@@ -86,7 +90,7 @@ namespace Runtime.NetworkBehaviours
             );
             
             player.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
-            player.GetComponent<BomberParamsProvider>().ResetLocalValuesClientRpc();  
+            //player.GetComponent<ICharacter>().Initialize();  
 
             SendPlayerSpawnEventRpc(clientId);
         }
@@ -97,7 +101,6 @@ namespace Runtime.NetworkBehaviours
 
             if (!_associatedPositions[chosenNumber].isTaken)
             {
-                
                 var spawnPlace = _associatedPositions[chosenNumber];
                 spawnPlace.clientId = clientID;                         //TODO: is it okey to do like this?
                 spawnPlace.isTaken = true;                         

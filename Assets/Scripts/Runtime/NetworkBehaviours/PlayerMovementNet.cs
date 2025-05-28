@@ -20,7 +20,6 @@ namespace Runtime.NetworkBehaviours
 
         
         private CharacterController _controller;
-        // private InputActions _input;
 
         private Vector3 _moveDirection;
         private float _velocity;

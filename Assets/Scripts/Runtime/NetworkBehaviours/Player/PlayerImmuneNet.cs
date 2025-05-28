@@ -14,19 +14,25 @@ namespace Runtime.NetworkBehaviours.Player
         
         public event Action<float> OnGetImmune;
 
-        private IEnumerator _immunity;
+        private IEnumerator _immunityCoroutine;
         private float _immunityTime;
+
+        public override void OnNetworkSpawn()
+        {
+            Initialize();
+        }
+
         public void Initialize()
         {
             IsImmune = false;
-            _immunity = Immunity();
+            _immunityCoroutine = Immunity();
             _immunityTime = startImmunityTime;
         }
 
         public void ActivateImmunity()
         {
             IsImmune = true;
-            StartCoroutine(_immunity);
+            StartCoroutine(_immunityCoroutine);
             OnGetImmuneRpc(_immunityTime);
         }
 
@@ -45,7 +51,7 @@ namespace Runtime.NetworkBehaviours.Player
         {
             yield return new WaitForSeconds(_immunityTime);
             IsImmune = false;
-            _immunity = Immunity();
+            _immunityCoroutine = Immunity();
             yield return null;
         }
     }

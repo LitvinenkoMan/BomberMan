@@ -5,7 +5,7 @@ namespace Interfaces
         public IHealth Health { get; }
         public IImmune Immune { get; }
         public IBombDeployer BombDeployer { get; }
-        public IMovable CharacterMovement { get;}
+        public IMovable CharacterMovement { get; }
 
         public void Initialize();
 
@@ -20,5 +20,7 @@ namespace Interfaces
         public void SetMoveAbility(bool canMove);
 
         public void SetBombDeployAbility(bool canDeploy);
+
+        public void Reset();
     }
 }

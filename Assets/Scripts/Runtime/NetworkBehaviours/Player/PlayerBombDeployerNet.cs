@@ -19,6 +19,11 @@ namespace Runtime.NetworkBehaviours.Player
             Initialize();
         }
 
+        public override void OnNetworkDespawn()
+        {
+            ClearPoolRpc();
+        }
+
         public void Initialize()
         {
             _bombsPool = GetComponent<IObjectPool<GameObject>>();
@@ -80,6 +85,13 @@ namespace Runtime.NetworkBehaviours.Player
                 explodedBomb.Reset();
                 explodedBomb.NetworkObject.Despawn(false);
             }
+        }
+
+        [Rpc(SendTo.Server)]
+        private void ClearPoolRpc()
+        {
+            Debug.Log("ClearPoolRpc from server side");
+           //_bombsPool.Clear();
         }
 
         [ClientRpc]

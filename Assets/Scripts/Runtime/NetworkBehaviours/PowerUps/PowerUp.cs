@@ -1,12 +1,11 @@
-using System;
 using System.Collections;
-using Runtime.MonoBehaviours;
+using Interfaces;
+using MonoBehaviours.GroundSectionSystem;
 using Runtime.MonoBehaviours.GroundSectionSystem;
-using ScriptableObjects;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace MonoBehaviours.GroundSectionSystem
+namespace Runtime.NetworkBehaviours.PowerUps
 {
     public class PowerUp : Obstacle
     {
@@ -27,8 +26,8 @@ namespace MonoBehaviours.GroundSectionSystem
 
         public virtual void Initialize()
         {
-            ObstacleHealthComponent.SetHealth(1);
-            CanReceiveDamage = true;
+            ObstacleHealthCmp.Initialize(1);
+            ObstacleHealthCmp.SetAbilityToReceiveDamage(true);
             CanPlayerStepOnIt = true;
             _isTaken = false;
             gameObject.SetActive(true);
@@ -40,41 +39,36 @@ namespace MonoBehaviours.GroundSectionSystem
             {
                 StartCoroutine(CountLifeTime());
             }
-            ObstacleHealthComponent.OnHealthRunOut += RemovePowerUpFromGroundSection;
         }
 
         private void OnDisable()
         {
-            ObstacleHealthComponent.OnHealthRunOut -= RemovePowerUpFromGroundSection;
+            
         }
 
         public override void OnNetworkSpawn()
         {
-            
+            ObstacleHealthCmp.OnHealthRunOut += RemovePowerUpFromGroundSection;
         }
 
         public override void OnNetworkDespawn()
         {
-           Destroy(gameObject);
+            ObstacleHealthCmp.OnHealthRunOut -= RemovePowerUpFromGroundSection;
+            Destroy(gameObject);
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.gameObject.TryGetComponent(out BomberParamsProvider provider) && !_isTaken && provider.IsOwner)
+            if (other.gameObject.TryGetComponent(out ICharacterUpgradable characterUpgrader))
             {
-                ApplyPowerUp(provider.GetBomberParams());
+                ApplyPowerUp(characterUpgrader);
             }
         }
 
-        protected virtual void ApplyPowerUp(BaseBomberParameters Params)
-        {
-            // NetworkObject.Despawn();
-        }
+        protected virtual void ApplyPowerUp(ICharacterUpgradable characterUpgrader) { }
 
         protected virtual void RemovePowerUpFromGroundSection()
         {
-            GroundSection startSection = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
-            startSection.RemoveObstacle();
 
             if (!IsServer)
             {
@@ -82,6 +76,8 @@ namespace MonoBehaviours.GroundSectionSystem
             }
             else
             {
+                GroundSection startSection = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
+                startSection.RemoveObstacle();
                 NetworkObject.Despawn();
             }
         }
@@ -110,7 +106,6 @@ namespace MonoBehaviours.GroundSectionSystem
             serializer.SerializeValue(ref LifeTime);
             serializer.SerializeValue(ref TimedEffect);
             serializer.SerializeValue(ref EffectTime);
-            
             serializer.SerializeValue(ref _isTaken);
         }
     }
