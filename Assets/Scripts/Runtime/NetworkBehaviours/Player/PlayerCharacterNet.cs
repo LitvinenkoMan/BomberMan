@@ -55,7 +55,7 @@ namespace Runtime.NetworkBehaviours.Player
                 _input ??= new InputActions();
                 _input.PlayerMap.AddCallbacks(this);
                 _input.Enable();
-                bomberParams.ResetValues();
+                //bomberParams.ResetValues();
                 playerVisuals.SetActive(true);
                 playerName.enabled = true;
             }
@@ -93,6 +93,11 @@ namespace Runtime.NetworkBehaviours.Player
         public void SetBombDeployAbility(bool canDeploy)
         {
             BombDeployer.SetAbilityToDeployBombs(canDeploy);
+        }
+
+        public void Reset()
+        {
+            ResetPlayerRpc(RpcTarget.Single(NetworkObject.OwnerClientId, RpcTargetUse.Temp));
         }
 
         private void StartDeathSequence()
@@ -144,5 +149,11 @@ namespace Runtime.NetworkBehaviours.Player
 		{
             NetworkObject.Despawn(true);
 		}
+
+        [Rpc(SendTo.SpecifiedInParams)]
+        private void ResetPlayerRpc(RpcParams rpcParams)
+        {
+            Health.Initialize(3);
+        }
     }
 }

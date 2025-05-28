@@ -69,9 +69,9 @@ namespace Core
         /// </summary>
         public void Clear()
         {
-            while (_queue.Count > 0)
+            while (_queue.Count > 1)
             {
-                Destroy(_queue.Peek());
+                Destroy(_queue.Dequeue());
             }
         }
 

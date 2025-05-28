@@ -20,5 +20,7 @@ namespace Interfaces
         public void SetMoveAbility(bool canMove);
 
         public void SetBombDeployAbility(bool canDeploy);
+
+        public void Reset();
     }
 }

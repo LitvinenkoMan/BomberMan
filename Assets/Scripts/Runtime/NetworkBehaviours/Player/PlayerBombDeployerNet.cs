@@ -21,7 +21,7 @@ namespace Runtime.NetworkBehaviours.Player
 
         public override void OnNetworkDespawn()
         {
-            //ClearPoolRpc();
+            ClearPoolRpc();
         }
 
         public void Initialize()
@@ -90,7 +90,8 @@ namespace Runtime.NetworkBehaviours.Player
         [Rpc(SendTo.Server)]
         private void ClearPoolRpc()
         {
-           _bombsPool.Clear();
+            Debug.Log("ClearPoolRpc from server side");
+           //_bombsPool.Clear();
         }
 
         [ClientRpc]

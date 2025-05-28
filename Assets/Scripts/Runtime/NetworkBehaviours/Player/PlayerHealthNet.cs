@@ -14,21 +14,41 @@ namespace Runtime.NetworkBehaviours.Player
         public event Action<int> OnHealthChanged;
         public event Action OnHealthRunOut;
 
-        public override void OnNetworkSpawn()
+        public void Initialize(float initialValue)
         {
-            Initialize(0);
+            baseParams.SetActorHealth((int)initialValue);
         }
-
-        public void Initialize(float initialValue) { }
 
         public void AddHealth(int healthToAdd)
         {
-            AddHealthRpc(healthToAdd, RpcTarget.Single(OwnerClientId, RpcTargetUse.Temp));
+            if (IsOwner)
+            {
+                baseParams.SetActorHealth(baseParams.ActorHealth + healthToAdd);
+
+                OnHealthChangedRpc(healthToAdd);
+
+                if (baseParams.ActorHealth <= 0)
+                {
+                    OnHealthRunOutRpc();
+                }
+            }
+            //AddHealthRpc(healthToAdd, RpcTarget.Single(OwnerClientId, RpcTargetUse.Temp));
         }
 
         public void SubtractHealth(int healthToSubtract)
         {
-            AddHealthRpc(-healthToSubtract, RpcTarget.Single(OwnerClientId, RpcTargetUse.Temp));
+            if (IsOwner)
+            {
+                baseParams.SetActorHealth(baseParams.ActorHealth - healthToSubtract);
+
+                OnHealthChangedRpc(baseParams.ActorHealth);
+
+                if (baseParams.ActorHealth <= 0)
+                {
+                    OnHealthRunOutRpc();
+                }
+            }
+            //AddHealthRpc(-healthToSubtract, RpcTarget.Single(OwnerClientId, RpcTargetUse.Temp));
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
@@ -36,7 +56,7 @@ namespace Runtime.NetworkBehaviours.Player
         {
             baseParams.SetActorHealth(baseParams.ActorHealth + healthToAdd);
 
-            OnHealthChangedRpc(healthToAdd);
+            OnHealthChangedRpc(baseParams.ActorHealth);
 
             if (baseParams.ActorHealth <= 0)
             {
