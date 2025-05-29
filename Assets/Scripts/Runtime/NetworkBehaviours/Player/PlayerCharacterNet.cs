@@ -66,7 +66,10 @@ namespace Runtime.NetworkBehaviours.Player
             if (Immune.IsImmune) return;
 
             Health.SubtractHealth(damageAmount);
-            Immune.ActivateImmunity();
+            if (Health.GetHealth() > 0)
+            {
+                Immune.ActivateImmunity();
+            }
         }
 
         public void Heal(int healAmount)

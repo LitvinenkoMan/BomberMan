@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Timers;
 using Interfaces;
 using Runtime.NetworkBehaviours;
 using Runtime.NetworkBehaviours.Player;
@@ -9,8 +10,7 @@ namespace Runtime.MonoBehaviours
 {
     public class PlayerCameraModeController : MonoBehaviour, ICameraModeController
     {
-        [SerializeField] 
-        private GameObject CameraExample;
+        [SerializeField] private GameObject CameraExample;
 
 
         private GameObject _instantiatedCamera;
@@ -33,14 +33,23 @@ namespace Runtime.MonoBehaviours
 
         private void CatchPlayersGameObject()
         {
+            string str = "Collecting Players: ";
             playersTransform.Clear();
-            var playersObj = FindObjectsByType<CharacterController>(FindObjectsSortMode.None); // Every bot or player will have it (i thinmk so..)
+            var playersObj =
+                FindObjectsByType<CharacterController>(FindObjectsSortMode
+                    .None); // Every bot or player will have it (i thinmk so..)
             foreach (var obj in playersObj)
             {
-                playersTransform.Add(obj.transform);
+                str += $"{obj.transform.name} ";
+                if (obj.gameObject.activeInHierarchy)
+                {
+                    playersTransform.Add(obj.transform);
+                }
             }
+
+            Debug.Log(str);
         }
-        
+
         public void SwitchToGameplayMode()
         {
             NetworkObject playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
@@ -50,11 +59,15 @@ namespace Runtime.MonoBehaviours
 
         public void SwitchToViewerMode()
         {
+            string str = "Switching to player viewer mode";
             _cameraViewer.ClearTargetsList();
             foreach (var playerTransform in playersTransform)
             {
+                str += $"\nwatching {playerTransform.gameObject.name},";
                 _cameraViewer.AddToViewTarget(playerTransform);
             }
+
+            Debug.Log(str);
         }
 
         private void CheckForInstancedPlayer()
@@ -77,14 +90,29 @@ namespace Runtime.MonoBehaviours
 
         private void FollowSpawnedPlayer(ulong clientId)
         {
+            Debug.Log($"Player P{clientId} is spawned");
             NetworkObject playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
-            SwitchToGameplayMode();
-
-            if (playerObject.gameObject.TryGetComponent(out IHealth health))
-            {
-                health.OnHealthRunOut += OnPlayerDeathResponce;
-            }
             CatchPlayersGameObject();
+
+            if (clientId == NetworkManager.Singleton.LocalClient.ClientId)
+            {
+                if (playerObject && playerObject.gameObject.activeInHierarchy)
+                {
+                    if (playerObject.gameObject.TryGetComponent(out ICharacter character))
+                    {
+                        character.Health.OnHealthRunOut += OnPlayerDeathResponce;
+                        SwitchToGameplayMode();
+                        Debug.Log("Watching player");
+                    }
+                }
+            }
+            else
+            {
+                if (playerObject && playerObject.gameObject.activeInHierarchy) return;
+
+                SwitchToViewerMode();
+                Debug.Log("PLayer Is dead, watching others players");
+            }
         }
 
         private void OnPlayerDeathResponce()

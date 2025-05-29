@@ -26,11 +26,6 @@ namespace Runtime.NetworkBehaviours.Player
                 baseParams.SetActorHealth(baseParams.ActorHealth + healthToAdd);
 
                 OnHealthChangedRpc(healthToAdd);
-
-                if (baseParams.ActorHealth <= 0)
-                {
-                    OnHealthRunOutRpc();
-                }
             }
             //AddHealthRpc(healthToAdd, RpcTarget.Single(OwnerClientId, RpcTargetUse.Temp));
         }
