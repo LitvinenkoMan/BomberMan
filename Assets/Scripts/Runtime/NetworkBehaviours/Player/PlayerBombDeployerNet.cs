@@ -42,10 +42,7 @@ namespace Runtime.NetworkBehaviours.Player
         {
             _bombsPool = GetComponent<IObjectPool<GameObject>>();
             _dropedBombs = new Queue<Bomb>();
-            if (IsOwner)
-            {
-                _bombsPool.Initialize();
-            }
+            _bombsPool.Initialize();
         }
 
         public void SetAbilityToDeployBombs(bool canIt)
@@ -110,7 +107,7 @@ namespace Runtime.NetworkBehaviours.Player
 
         private IEnumerator ReturnBombBackToPoolRoutine(Bomb bomb)
         {
-            //yield return new WaitForSeconds(2.1f);                      // I pushing bombs to return explosion effects back to ObjectPool, since I do that,
+            //yield return new WaitForSeconds(2.1f);                      // I'm pushing bombs to return explosion effects back to ObjectPool, since I do that,
             ReturnBombToPoolRpc(bomb);                 // I need to wait until coroutine will return them back, and after that I will return bomb
             yield return null;
         }
@@ -135,4 +132,8 @@ namespace Runtime.NetworkBehaviours.Player
 
         [ClientRpc]
         private void SetAbilityToDeployBombsClientRpc(bool canIt)
-        
+        {
+            _canDeployBombs = canIt;
+        }
+    }
+}
