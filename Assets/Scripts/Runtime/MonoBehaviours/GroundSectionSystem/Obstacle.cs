@@ -17,16 +17,6 @@ namespace Runtime.MonoBehaviours.GroundSectionSystem
             ObstacleHealthCmp = gameObject.AddComponent<ObstacleHealthComponent>();
         }
 
-        public override void OnNetworkSpawn()
-        {
-            //ObstacleHealthCmp.OnHealthRunOut += DespawnObstacleRpc;
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            //ObstacleHealthCmp.OnHealthRunOut -= DespawnObstacleRpc;
-        }
-
         public virtual void SetNewPosition(Vector3 position)
         {
             transform.position = position;
@@ -35,6 +25,7 @@ namespace Runtime.MonoBehaviours.GroundSectionSystem
         public void AutoPlaceToNearestSection()
         {
             var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
+            SetNewPosition(section.ObstaclePlacementPosition);
             section.AddObstacle(this);
         }
 
@@ -47,12 +38,6 @@ namespace Runtime.MonoBehaviours.GroundSectionSystem
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             
-        }
-
-        [Rpc(SendTo.Server)]
-        private void DespawnObstacleRpc()
-        {
-            NetworkObject.Despawn();        //TODO: This Only works if player entered not in the middle of the session
         }
     }
 }

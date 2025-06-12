@@ -48,6 +48,11 @@ namespace Runtime.NetworkBehaviours.Player
             playerName.text = name;
         }
 
+        public override void OnNetworkDespawn()
+        {
+            
+        }
+
         public void Initialize()
         {
             if (IsOwner)

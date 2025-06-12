@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1790023055
+  GlobalObjectIdHash: 2261022560
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -67,5 +67,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Player: {fileID: 4821896025292580154, guid: 3af001a1887e5d849a22fe15cc95b7ed, type: 3}
-  Camera: {fileID: 8884432705468536314, guid: 9668e2850a18e354ebfdb9130c74cbef, type: 3}
-  SpawnOnStart: 0

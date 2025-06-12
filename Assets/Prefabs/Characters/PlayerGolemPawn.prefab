@@ -216,7 +216,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1057055354
+  GlobalObjectIdHash: 688270617
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -284,7 +284,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b7459a0392b9f44c9d26ed4bd09e633, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BomberParameters: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
   GravityAcceleration: -9.8
   IsGravityOn: 1
   GravityMultiplyer: 0.001
@@ -346,7 +345,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerName: {fileID: 2931790567708399911}
-  BomberParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
+  BaseBomberParams: {fileID: 0}
 --- !u!114 &1898818222369800095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -360,7 +359,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   visuals: {fileID: 5630106756533224544}
-  playerMovement: {fileID: 4454664985879038347}
+  playerMovementNet: {fileID: 4454664985879038347}
   bombDeployer: {fileID: 1320740036372020134}
   OnPlayerDeathUnityEvent:
     m_PersistentCalls:
@@ -377,8 +376,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b28e3397a646f564ba7c0af65c837adf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Visuals: {fileID: 5630106756533224544}
-  _healthComponent: {fileID: 7137738926094273680}
   visualsRenderer: {fileID: 4809652922734438482}
 --- !u!114 &2698855256694393988
 MonoBehaviour:

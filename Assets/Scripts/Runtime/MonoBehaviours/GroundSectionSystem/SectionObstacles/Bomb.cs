@@ -16,22 +16,22 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         private GameObject BombVisuals;
         
         private Collider _bombCollider;
-        //private float _explosionSpeed = 1;
         private float _timer; 
         private bool _isTimerOn;
         private bool _isExploded;
-
         private int _bombSpread;
         private float _timeToExplode;
         private int _bombDamage;
         
-
         public new void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref IgniteOnStart);
             serializer.SerializeValue(ref _timer);
             serializer.SerializeValue(ref _isTimerOn);
             serializer.SerializeValue(ref _isExploded);
+            serializer.SerializeValue(ref _bombSpread);
+            serializer.SerializeValue(ref _timeToExplode);
+            serializer.SerializeValue(ref _bombDamage);
             //bomberParams.NetworkSerialize(serializer);
         }
 
@@ -40,16 +40,12 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             _bombCollider = GetComponent<Collider>();
             ObstacleHealthCmp.Initialize(1);
             ObstacleHealthCmp.SetAbilityToReceiveDamage(true);
+            AutoPlaceToNearestSection();
         }
 
+        
         private void OnEnable()
         {
-            // if (IgniteOnStart)
-            // {
-            //     Ignite(3, 1, );              TODO: Change Ignite on start logic
-            // }
-            //_timer = _timeToExplode;
-
             ObstacleHealthCmp.OnHealthRunOut += OnHealthRunOutExplode;
         }
 
@@ -176,7 +172,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         {
             GameObject expl = GroundSectionsUtils.Instance.ExplosionsPool.GetFromPool(true);
             expl.transform.position = explPosition;
-            StartCoroutine(ReturnExplosionToPool(expl));
+            GroundSectionsUtils.Instance.StartCoroutine(ReturnExplosionToPool(expl));
         }
 
         private void DamageObstacle(Obstacle obstacle)

@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using System.Timers;
 using Interfaces;
 using Runtime.NetworkBehaviours;
-using Runtime.NetworkBehaviours.Player;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -33,21 +31,16 @@ namespace Runtime.MonoBehaviours
 
         private void CatchPlayersGameObject()
         {
-            string str = "Collecting Players: ";
             playersTransform.Clear();
             var playersObj =
-                FindObjectsByType<CharacterController>(FindObjectsSortMode
-                    .None); // Every bot or player will have it (i thinmk so..)
+                FindObjectsByType<CharacterController>(FindObjectsSortMode.None); // Every bot or player will have it (i thinmk so..)
             foreach (var obj in playersObj)
             {
-                str += $"{obj.transform.name} ";
                 if (obj.gameObject.activeInHierarchy)
                 {
                     playersTransform.Add(obj.transform);
                 }
             }
-
-            Debug.Log(str);
         }
 
         public void SwitchToGameplayMode()
@@ -59,15 +52,11 @@ namespace Runtime.MonoBehaviours
 
         public void SwitchToViewerMode()
         {
-            string str = "Switching to player viewer mode";
             _cameraViewer.ClearTargetsList();
             foreach (var playerTransform in playersTransform)
             {
-                str += $"\nwatching {playerTransform.gameObject.name},";
                 _cameraViewer.AddToViewTarget(playerTransform);
             }
-
-            Debug.Log(str);
         }
 
         private void CheckForInstancedPlayer()
@@ -90,7 +79,6 @@ namespace Runtime.MonoBehaviours
 
         private void FollowSpawnedPlayer(ulong clientId)
         {
-            Debug.Log($"Player P{clientId} is spawned");
             NetworkObject playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
             CatchPlayersGameObject();
 
@@ -102,7 +90,6 @@ namespace Runtime.MonoBehaviours
                     {
                         character.Health.OnHealthRunOut += OnPlayerDeathResponce;
                         SwitchToGameplayMode();
-                        Debug.Log("Watching player");
                     }
                 }
             }
@@ -111,7 +98,6 @@ namespace Runtime.MonoBehaviours
                 if (playerObject && playerObject.gameObject.activeInHierarchy) return;
 
                 SwitchToViewerMode();
-                Debug.Log("PLayer Is dead, watching others players");
             }
         }
 

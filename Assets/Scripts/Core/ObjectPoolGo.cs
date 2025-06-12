@@ -16,11 +16,6 @@ namespace Core
         
         private Queue<GameObject> _queue;
 
-        private void Start()
-        {
-            Initialize();
-        }
-
         public void Initialize()
         {
             _queue = new Queue<GameObject>(startingCount);

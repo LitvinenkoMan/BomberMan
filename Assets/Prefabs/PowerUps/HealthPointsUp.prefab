@@ -73,6 +73,9 @@ MonoBehaviour:
   ImmuneAfterGettingDamaged: 0
   ImmunityTime: 0
   StartingHealth: 1
+  OnHealthRunOutUnityEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &8217781826248771389
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -85,7 +88,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1835572460
+  GlobalObjectIdHash: 2613246993
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -106,7 +109,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d4586d7024a23c4793ec4566ab29a25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObstacleHealthComponent: {fileID: 3883283356936834176}
   TimedPowerUp: 0
   LifeTime: 0
   TimedEffect: 0
