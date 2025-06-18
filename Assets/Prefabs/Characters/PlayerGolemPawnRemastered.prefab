@@ -97,10 +97,9 @@ GameObject:
   - component: {fileID: -7152030252571559338}
   - component: {fileID: 4454664985879038347}
   - component: {fileID: 805387573508716289}
-  - component: {fileID: 8949525128573402941}
+  - component: {fileID: 3254159188030098918}
   - component: {fileID: 5506503297875142062}
-  - component: {fileID: 2698855256694393988}
-  - component: {fileID: 8787606411089374933}
+  - component: {fileID: 8949525128573402941}
   m_Layer: 0
   m_Name: PlayerGolemPawnRemastered
   m_TagString: Untagged
@@ -218,7 +217,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2418553533
+  GlobalObjectIdHash: 793571855
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -351,6 +350,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
+--- !u!114 &3254159188030098918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4821896025292580154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5904034c43738f4db7dc5da37bcd758, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PawnAnimator: {fileID: 1407889712315434144}
+  transitionSmoothness: 12.5
+--- !u!114 &5506503297875142062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4821896025292580154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31c1ac6c55fa0ee40a2f10703c3021e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  visuals: {fileID: 5630106756533224544}
 --- !u!114 &8949525128573402941
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -367,49 +393,6 @@ MonoBehaviour:
     type: 3}
   startingCount: 10
   useReparenting: 0
---- !u!114 &5506503297875142062
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4821896025292580154}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31c1ac6c55fa0ee40a2f10703c3021e8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  visuals: {fileID: 5630106756533224544}
---- !u!114 &2698855256694393988
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4821896025292580154}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6fcb62a4a5b34264e9e4ceadb9eb9f34, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Controller: {fileID: 3192485037731634668}
-  PawnAnimator: {fileID: 1407889712315434144}
-  TransitionTime: 0.3
---- !u!114 &8787606411089374933
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4821896025292580154}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 045b81d566b06c844945e6fc30394a16, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  characterController: {fileID: 3192485037731634668}
-  VisualsTransform: {fileID: 5001802568364515034}
-  RotationTime: 0.25
 --- !u!1 &5012474147548761335
 GameObject:
   m_ObjectHideFlags: 0

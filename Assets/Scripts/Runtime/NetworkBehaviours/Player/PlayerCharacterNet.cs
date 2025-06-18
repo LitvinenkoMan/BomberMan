@@ -21,8 +21,10 @@ namespace Runtime.NetworkBehaviours.Player
         public IImmune Immune { get; private set; }
         public IBombDeployer BombDeployer { get; private set; }
         public IMovable CharacterMovement { get; private set; }
+        public ICharacterAnimator CharacterAnimator { get; private set; }
 
         private InputActions _input;
+        private CharacterController _characterController;
 
         public event Action<ulong> OnPlayerDeath;
 
@@ -64,6 +66,7 @@ namespace Runtime.NetworkBehaviours.Player
                 playerVisuals.SetActive(true);
                 playerName.enabled = true;
             }
+            CharacterAnimator.Initialize();
         }
 
         public void Damage(int damageAmount)
@@ -85,7 +88,6 @@ namespace Runtime.NetworkBehaviours.Player
         public void ActivateSpecial()
         {
             //TODO: Should to add specials
-            //throw new System.NotImplementedException();
         }
 
         public void DeployBomb()
@@ -112,12 +114,15 @@ namespace Runtime.NetworkBehaviours.Player
         {
             if (IsOwner)
             { 
-                playerVisuals.SetActive(false);
+                //playerVisuals.SetActive(false);
                 SetMoveAbility(false);
                 SetBombDeployAbility(false);      
-                playerName.enabled = false;
+                    //playerName.enabled = false;
+                _input.PlayerMap.RemoveCallbacks(this);
             }
-            gameObject.SetActive(false);
+            //gameObject.SetActive(false);
+            _characterController.enabled = false;
+            CharacterAnimator.PlayDeathAnimation();
 
             OnPlayerDeath?.Invoke(OwnerClientId);
             //UnspawnPlayerRpc();
@@ -129,6 +134,14 @@ namespace Runtime.NetworkBehaviours.Player
             var moveDirection = new Vector3(input.x, 0, input.y);
             
             CharacterMovement.Move(moveDirection * bomberParams.SpeedMultiplier);
+            if (input != Vector2.zero)
+            {
+                CharacterAnimator.PlayWalkAnimation();
+            }
+            else
+            {
+                CharacterAnimator.PlayIdleAnimation();
+            }
         }
 
         public void OnPlaceBomb(InputAction.CallbackContext context)
@@ -150,6 +163,8 @@ namespace Runtime.NetworkBehaviours.Player
             if (TryGetComponent(out IBombDeployer bombDeployer)) BombDeployer = bombDeployer;
             if (TryGetComponent(out IMovable playerMovement)) CharacterMovement = playerMovement;
             if (TryGetComponent(out IHealth health)) Health = health;
+            if (TryGetComponent(out ICharacterAnimator characterAnimator)) CharacterAnimator = characterAnimator;
+            if (TryGetComponent(out CharacterController characterController)) _characterController = characterController;
         }
         
         [Rpc(SendTo.Server)]
@@ -162,6 +177,7 @@ namespace Runtime.NetworkBehaviours.Player
         private void ResetPlayerRpc(RpcParams rpcParams)
         {
             Health.Initialize(3);
+            _characterController.enabled = true;
         }
     }
 }

@@ -6,6 +6,7 @@ namespace Interfaces
         public IImmune Immune { get; }
         public IBombDeployer BombDeployer { get; }
         public IMovable CharacterMovement { get; }
+        public ICharacterAnimator CharacterAnimator { get; }
 
         public void Initialize();
 

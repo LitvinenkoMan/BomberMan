@@ -36,7 +36,7 @@ namespace Runtime.MonoBehaviours
                 FindObjectsByType<CharacterController>(FindObjectsSortMode.None); // Every bot or player will have it (i thinmk so..)
             foreach (var obj in playersObj)
             {
-                if (obj.gameObject.activeInHierarchy)
+                if (obj.enabled)
                 {
                     playersTransform.Add(obj.transform);
                 }

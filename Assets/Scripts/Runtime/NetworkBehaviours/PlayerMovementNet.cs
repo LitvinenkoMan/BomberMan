@@ -74,7 +74,8 @@ namespace Runtime.NetworkBehaviours
 
         private void MoveController()
         {
-            _controller.Move(_moveDirection);
+            if (_controller.enabled)  
+                _controller.Move(_moveDirection);
         }
         
         private void ApplyGravity()

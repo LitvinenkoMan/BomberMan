@@ -186,9 +186,9 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
             for (int i = 0; i < colliders.Length; i++)
             {
-                if (colliders[i].gameObject.TryGetComponent(out ICharacter health1))
+                if (colliders[i].gameObject.TryGetComponent(out ICharacter character))
                 {
-                    health1.Damage(damage);
+                    character.Damage(damage);
                 }
             }
         }

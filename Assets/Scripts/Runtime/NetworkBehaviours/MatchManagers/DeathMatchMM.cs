@@ -86,7 +86,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         private void CheckForVictoryConditions()
         {
             byte defeatedPlayers = 0;
-            ulong winnerId = 999;
+            ulong winnerId = ulong.MaxValue;
             foreach (var player in _playersLifeCount)
             {
                 if (player.Value == 0)
