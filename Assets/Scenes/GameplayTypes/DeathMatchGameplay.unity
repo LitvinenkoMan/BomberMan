@@ -808,7 +808,8 @@ MonoBehaviour:
   EndMatchUnityEvent:
     m_PersistentCalls:
       m_Calls: []
-  InitialPlayersLifeCount: 2
+  bomberParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
+  InitialPlayersLifeCount: 3
 --- !u!1 &441923708
 GameObject:
   m_ObjectHideFlags: 0

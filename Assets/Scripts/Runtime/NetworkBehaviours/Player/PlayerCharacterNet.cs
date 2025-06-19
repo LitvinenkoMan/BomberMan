@@ -73,9 +73,9 @@ namespace Runtime.NetworkBehaviours.Player
         {
             if (Immune.IsImmune) return;
 
-            Health.SubtractHealth(damageAmount);
             if (Health.GetHealth() > 0)
-            {
+            { 
+                Health.SubtractHealth(damageAmount);
                 Immune.ActivateImmunity();
             }
         }
@@ -119,6 +119,7 @@ namespace Runtime.NetworkBehaviours.Player
                 SetBombDeployAbility(false);      
                     //playerName.enabled = false;
                 _input.PlayerMap.RemoveCallbacks(this);
+                _input.Disable();
             }
             //gameObject.SetActive(false);
             _characterController.enabled = false;

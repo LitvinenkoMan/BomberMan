@@ -29,20 +29,23 @@ namespace Runtime.NetworkBehaviours.Player
             if (IsOwner)
             {
                 _bombsPool.Clear();
-                DestroyPlacedBombs();
+                //DestroyPlacedBombs();
             }
         }
 
         private void OnDisable()
         {
-            DestroyPlacedBombs();
+            //DestroyPlacedBombs();
         }
 
         public void Initialize()
         {
-            _bombsPool = GetComponent<IObjectPool<GameObject>>();
-            _dropedBombs = new Queue<Bomb>();
-            _bombsPool.Initialize();
+            if (IsServer)
+            {
+                _bombsPool = GetComponent<IObjectPool<GameObject>>();
+                _bombsPool.Initialize();
+            }
+            //_dropedBombs = new Queue<Bomb>();
         }
 
         public void SetAbilityToDeployBombs(bool canIt)
@@ -60,19 +63,36 @@ namespace Runtime.NetworkBehaviours.Player
         [Rpc(SendTo.Server)]
         private void DeployBombRpc(int bombsAtTime, float timeToExplode, int bombDamage, int bombSpread)
         {
+            // var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
+            // if (section && !section.PlacedObstacle && _currentPlacedBombs < bombsAtTime)
+            // {
+            //     var bomb = _bombsPool.GetFromPool(true).GetComponent<Bomb>();
+            //     bomb.SetNewPosition(section.ObstaclePlacementPosition);
+            //     bomb.transform.SetParent(null);
+            //     section.AddObstacle(bomb);
+            //     bomb.onExplode += SubtractAmountOfCurrentBombs;
+            //     bomb.onExplode += RemoveBombFromDropedList;
+            //         
+            //     bomb.Ignite(timeToExplode, bombDamage, bombSpread);
+            //     
+            //     if (!bomb.NetworkObject.IsSpawned)
+            //     {
+            //         bomb.NetworkObject.Spawn();
+            //     }
+            //
+            //     _currentPlacedBombs++;
+            //     _dropedBombs.Enqueue(bomb);
+            // }
+            
             var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
             if (section && !section.PlacedObstacle && _currentPlacedBombs < bombsAtTime)
             {
                 var bomb = _bombsPool.GetFromPool(true).GetComponent<Bomb>();
                 bomb.SetNewPosition(section.ObstaclePlacementPosition);
                 bomb.transform.SetParent(null);
-                section.AddObstacle(bomb);
-                _dropedBombs.Enqueue(bomb);
                 bomb.onExplode += SubtractAmountOfCurrentBombs;
-                bomb.onExplode += RemoveBombFromDropedList;
-                    
+                section.AddObstacle(bomb);
                 bomb.Ignite(timeToExplode, bombDamage, bombSpread);
-                
                 if (!bomb.NetworkObject.IsSpawned)
                 {
                     bomb.NetworkObject.Spawn();
@@ -127,7 +147,7 @@ namespace Runtime.NetworkBehaviours.Player
         private void ClearPoolRpc()
         {
             Debug.Log("ClearPoolRpc from server side");
-           //_bombsPool.Clear();
+            _bombsPool.Clear();
         }
 
         [ClientRpc]

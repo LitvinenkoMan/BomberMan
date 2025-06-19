@@ -32,13 +32,13 @@ namespace Runtime.NetworkBehaviours.Player
         public void ActivateImmunity()
         {
             IsImmune = true;
-            StartCoroutine(_immunityCoroutine);
             OnGetImmuneRpc(_immunityTime);
         }
 
         [Rpc(SendTo.Everyone)]
         private void OnGetImmuneRpc(float time)
         {
+            StartCoroutine(_immunityCoroutine);
             OnGetImmune?.Invoke(time);
         }
 

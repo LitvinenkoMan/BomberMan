@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Core.ScriptableObjects;
 using Interfaces;
 using MonoBehaviours.Network;
 using Runtime.NetworkBehaviours.Player;
@@ -14,6 +15,8 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         [Header("Death Match Params")]
         [Space(10)]
 
+        [SerializeField]
+        private BaseBomberParameters bomberParams;
         [SerializeField]
         private byte InitialPlayersLifeCount = 3;
         
@@ -46,6 +49,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
                 //TODO: Add section for bots
                 
             }
+            bomberParams.ResetValues();
 
             JoinCodeText.text = RelayManager.Instance.JoinCode;
             
