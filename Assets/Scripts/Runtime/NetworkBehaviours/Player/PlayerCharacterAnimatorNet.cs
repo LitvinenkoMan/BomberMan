@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace Runtime.NetworkBehaviours.Player
 {
-    public class PlayerCharacterAnimator : NetworkBehaviour, ICharacterAnimator
+    public class PlayerCharacterAnimatorNet : NetworkBehaviour, ICharacterAnimator
     {
         [SerializeField] 
-        private Animator PawnAnimator;
+        private Animator pawnAnimator;
         [SerializeField]
         private float transitionSmoothness = 1;
 
@@ -24,14 +24,14 @@ namespace Runtime.NetworkBehaviours.Player
             if (_currentSpeedValue == _endSpeedValue) return;
             _currentSpeedValue = Mathf.Lerp(_currentSpeedValue, _endSpeedValue, Time.deltaTime * transitionSmoothness);
             
-            PawnAnimator.SetFloat(MoveValue, _currentSpeedValue);
+            pawnAnimator.SetFloat(MoveValue, _currentSpeedValue);
         }
 
         public void Initialize()
         {
             _currentSpeedValue = 0;
             _endSpeedValue = 0;
-            PawnAnimator.SetBool(Dead, false);
+            pawnAnimator.SetBool(Dead, false);
         }
 
         public void PlayWalkAnimation()
@@ -49,6 +49,16 @@ namespace Runtime.NetworkBehaviours.Player
             PlayIdleAnimationRpc();
         }
 
+        public void PlayHitAnimation()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void PlayKickedAnimation()
+        {
+            throw new System.NotImplementedException();
+        }
+
         [Rpc(SendTo.Everyone)]
         private void PlayWalkAnimationRpc()
         {
@@ -64,7 +74,7 @@ namespace Runtime.NetworkBehaviours.Player
         [Rpc(SendTo.Everyone)]
         private void PlayDeathAnimationRpc()
         {
-            PawnAnimator.SetBool(Dead, true);
+            pawnAnimator.SetBool(Dead, true);
         }
     }
 }

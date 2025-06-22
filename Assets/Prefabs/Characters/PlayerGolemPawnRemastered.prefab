@@ -94,10 +94,10 @@ GameObject:
   - component: {fileID: 3533742488125631471}
   - component: {fileID: 2468723079306178931}
   - component: {fileID: 7876189251710233369}
-  - component: {fileID: -7152030252571559338}
   - component: {fileID: 4454664985879038347}
   - component: {fileID: 805387573508716289}
   - component: {fileID: 3254159188030098918}
+  - component: {fileID: -7152030252571559338}
   - component: {fileID: 5506503297875142062}
   - component: {fileID: 8949525128573402941}
   m_Layer: 0
@@ -217,7 +217,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 793571855
+  GlobalObjectIdHash: 2418553533
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -310,18 +310,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startImmunityTime: 3
---- !u!114 &-7152030252571559338
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4821896025292580154}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b0c5001dc61b124438110526bffe5182, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &4454664985879038347
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -362,8 +350,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5904034c43738f4db7dc5da37bcd758, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PawnAnimator: {fileID: 1407889712315434144}
+  pawnAnimator: {fileID: 1407889712315434144}
   transitionSmoothness: 12.5
+--- !u!114 &-7152030252571559338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4821896025292580154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0c5001dc61b124438110526bffe5182, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &5506503297875142062
 MonoBehaviour:
   m_ObjectHideFlags: 0

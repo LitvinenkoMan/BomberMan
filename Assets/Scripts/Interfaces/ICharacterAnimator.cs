@@ -6,5 +6,7 @@ namespace Interfaces
         public void PlayWalkAnimation();
         public void PlayDeathAnimation();
         public void PlayIdleAnimation();
+        public void PlayHitAnimation();
+        public void PlayKickedAnimation();
     }
 }
