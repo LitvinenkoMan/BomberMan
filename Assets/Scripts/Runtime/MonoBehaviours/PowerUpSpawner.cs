@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using MonoBehaviours;
 using MonoBehaviours.GroundSectionSystem;
+using Runtime.NetworkBehaviours.PowerUps;
 using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -40,10 +41,8 @@ namespace Runtime.MonoBehaviours
             EnableSpawning();
             if (!IsServer)
             {
-                Debug.Log("Exiting from creating Power ups Queue");
                 return;
             }  
-            Debug.Log("Creating Queue");
             CreatePowerUpsQueue();
         }
 

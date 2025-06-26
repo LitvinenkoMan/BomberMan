@@ -20,7 +20,8 @@ namespace Runtime.NetworkBehaviours
         [SerializeField]
         private TMP_InputField RoomPassword;
 
-        private LevelData _levelDataToLoad;
+        [SerializeField]
+        private GeneralGameData GameData;
 
         
         [Space(20)]
@@ -49,7 +50,7 @@ namespace Runtime.NetworkBehaviours
         {
             OnHostLaunched?.Invoke();
             
-            Allocation allocation = await RelayManager.Instance.CreateRelay(_levelDataToLoad.MaxAmountOfPlayers);
+            Allocation allocation = await RelayManager.Instance.CreateRelay(GameData.LastSelectedLevelData.MaxAmountOfPlayers);
             
             if (allocation != null)
             {
@@ -70,12 +71,6 @@ namespace Runtime.NetworkBehaviours
         {
             //PlayerSpawner.Instance.SpawnPlayer();
             OnHostStarted?.Invoke();
-        }
-        
-
-        public void SetNewLevelForLoading(LevelData levelData)
-        {
-            _levelDataToLoad = levelData;
         }
     }
 }

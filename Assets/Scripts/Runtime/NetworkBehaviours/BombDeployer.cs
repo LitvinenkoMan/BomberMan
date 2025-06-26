@@ -1,10 +1,10 @@
 using System.Collections;
-using MonoBehaviours;
+using Core.ScriptableObjects;
 using MonoBehaviours.GroundSectionSystem;
 using MonoBehaviours.GroundSectionSystem.SectionObstacles;
+using Runtime.MonoBehaviours;
 using ScriptableObjects;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
@@ -12,35 +12,28 @@ using UnityEngine.Serialization;
 namespace Runtime.NetworkBehaviours
 {
     [RequireComponent(typeof(ObjectPoolQueue))]
-    public class BombDeployer : NetworkBehaviour
+    public class BombDeployer : NetworkBehaviour, InputActions.IPlayerMapActions
     {
         [FormerlySerializedAs("PlayerParams")] [SerializeField]
         private BaseBomberParameters bomberParams;
         [SerializeField]
         private ObjectPoolQueue BombsPool;
 
-        private int currentPlacedBombs;
-        private bool CanPlaceBombs;
+        private int _currentPlacedBombs;
+        private bool _canPlaceBombs;
 
         // Input
-        private PlayerMainControls _controls;
-        private InputAction PlaceBombAction;
+        private InputActions _input;
 
         private void OnEnable()
         {
             Initialize();
-            PlaceBombAction.performed += DeployBombAction;
-            CanPlaceBombs = true;
-        }
-
-        private void OnDisable()
-        {
-            PlaceBombAction.performed -= DeployBombAction;
+            _canPlaceBombs = false;
         }
 
         public void SetAbilityToDeployBombs(bool canIt)
         {
-            CanPlaceBombs = canIt;
+            _canPlaceBombs = canIt;
         }
 
         [ClientRpc]
@@ -49,35 +42,33 @@ namespace Runtime.NetworkBehaviours
             SetAbilityToDeployBombs(canIt);
         }
 
-        private void Initialize()
+        public void Initialize()
         {
-            if (_controls == null)
+            if (_input == null)
             {
-                _controls = new PlayerMainControls();
+                _input = new InputActions();
             }
-            _controls.PlayerMainActionMaps.Enable();
+            _input.PlayerMap.AddCallbacks(this);
+            _input.Enable();
             
-            PlaceBombAction = _controls.PlayerMainActionMaps.PlaceBomb;
             if (!BombsPool)
             {
                 BombsPool = GetComponent<ObjectPoolQueue>();
             }
         }
         
-        private void DeployBombAction(InputAction.CallbackContext context)
+        private void DeployBombAction()
         {
-            if (!CanPlaceBombs) return;
+            if (!_canPlaceBombs) return;
             
             if (!IsOwner) return;
             
             if (IsServer)
             {
-                Debug.Log("Deploying from Server");
                 DeployBomb(bomberParams.BombsAtTime, bomberParams.BombsCountdown, bomberParams.BombsDamage, bomberParams.BombsSpreading);
             }
             else
             {
-                Debug.Log("Deploying from Client");
                 DeployBombRpc(bomberParams.BombsAtTime, bomberParams.BombsCountdown, bomberParams.BombsDamage, bomberParams.BombsSpreading);
             }
         }
@@ -85,7 +76,7 @@ namespace Runtime.NetworkBehaviours
         private void DeployBomb(int bombsAtTime, float timeToExplode, int bombDamage, int bombSpread)
         {
             var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
-            if (section && !section.PlacedObstacle && currentPlacedBombs < bombsAtTime)
+            if (section && !section.PlacedObstacle && _currentPlacedBombs < bombsAtTime)
             {
                 var bomb = BombsPool.GetFromPool(true).GetComponent<Bomb>();
                 bomb.SetNewPosition(section.ObstaclePlacementPosition);
@@ -97,20 +88,19 @@ namespace Runtime.NetworkBehaviours
                 {
                     bomb.NetworkObject.Spawn();
                 }
-                currentPlacedBombs++;
+                _currentPlacedBombs++;
             }
         }
 
         [Rpc(SendTo.Server)]
         private void DeployBombRpc(int bombsAtTime, float timeToExplode, int bombDamage, int bombSpread)
         {
-            Debug.Log("Sended ask to deploy bomb to server");
             DeployBomb(bombsAtTime, timeToExplode, bombDamage, bombSpread);
         }
 
         private void SubtractAmountOfCurrentBombs(Bomb explodedBomb)
         {
-            currentPlacedBombs--;
+            _currentPlacedBombs--;
             explodedBomb.onExplode -= SubtractAmountOfCurrentBombs;
             StartCoroutine(ReturnBombBackToPoolRoutine(explodedBomb));
         }
@@ -129,6 +119,24 @@ namespace Runtime.NetworkBehaviours
                 explodedBomb.Reset();
                 explodedBomb.NetworkObject.Despawn(false);
             }
+        }
+
+        public void OnMove(InputAction.CallbackContext context)
+        {
+            //not needed 
+        }
+
+        public void OnPlaceBomb(InputAction.CallbackContext context)
+        {
+            if (context.performed)
+            {
+                DeployBombAction();
+            }
+        }
+
+        public void OnQuit(InputAction.CallbackContext context)
+        {
+            //not needed 
         }
     }
 }

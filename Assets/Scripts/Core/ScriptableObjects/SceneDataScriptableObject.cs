@@ -8,12 +8,7 @@ namespace ScriptableObjects
     { 
         [SerializeField]
         private string _sceneName;
-        
-        public string SceneName { get; private set; }
 
-        public void Initialize()
-        {
-            SceneName = _sceneName;
-        }
+        public string SceneName => _sceneName;
     }
 }

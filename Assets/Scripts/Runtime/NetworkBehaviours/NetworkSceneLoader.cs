@@ -30,7 +30,6 @@ namespace MonoBehaviours.Network
 
         void Start()
         {
-            SceneData.Initialize();
             if (LoadOnStart)
             {
                 LoadScene();
@@ -87,6 +86,11 @@ namespace MonoBehaviours.Network
         private void SceneLoaded(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
         {
             OnScenLoaded?.Invoke(sceneName);
+        }
+
+        public void SetSceneData(SceneDataScriptableObject data)
+        {
+            SceneData = data;
         }
     }
 }

@@ -3,6 +3,7 @@
 
 
 using System.Collections.Generic;
+using System.Timers;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -23,7 +24,7 @@ namespace Runtime.MonoBehaviours.UI
         private UnityEvent OnQuitWhileInMainPanelEvent;
 
 
-        private PlayerMainControls input;
+        private InputActions _input;
         private Stack<RectTransform> PanelsStack;
 
         private InputAction QuitAction;
@@ -31,21 +32,21 @@ namespace Runtime.MonoBehaviours.UI
         private void Awake()
         {
             PanelsStack = new Stack<RectTransform>(8);
-            input = new PlayerMainControls();
+            _input = new InputActions();
             
-            QuitAction = input.PlayerMainActionMaps.Quit;
+            QuitAction = _input.PlayerMap.Quit;
         }
 
         private void OnEnable()
         {
-            input.PlayerMainActionMaps.Enable();
+            _input.Enable();
             QuitAction.performed += RemovePanelWrapper;
         }
 
         private void OnDisable()
         {
-            input.PlayerMainActionMaps.Disable();
             QuitAction.performed -= RemovePanelWrapper;
+            _input.Disable();
         }
 
         // privat 
@@ -80,7 +81,7 @@ namespace Runtime.MonoBehaviours.UI
                 var panel = PanelsStack.Pop();
                 panel.gameObject.SetActive(false);
 
-                if (HideMainPanel && PanelsStack.Count == 0)        //There we check if all panels are closed and if MainPanel was hiden, then we will enable it if so
+                if (HideMainPanel && PanelsStack.Count == 0)        //There we check if all panels are closed and if MainPanel was hiden, then we will enable it
                 {
                     MainPanel.gameObject.SetActive(true);
                 }

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Interfaces
 {
-    interface IBomb
+    public interface IBomb
     {
         public void PlaceBomb(Vector3 newPos);
         public void Ignite();

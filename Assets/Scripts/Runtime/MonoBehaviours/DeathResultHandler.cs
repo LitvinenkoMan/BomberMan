@@ -1,5 +1,4 @@
 using System;
-using NetworkBehaviours;
 using Runtime.NetworkBehaviours;
 using Unity.Netcode;
 using UnityEngine;
@@ -12,24 +11,29 @@ namespace Runtime.MonoBehaviours
     {
         [SerializeField]
         private GameObject visuals;
-        [SerializeField]
-        private PlayerMovement playerMovement;
+        [FormerlySerializedAs("playerMovement")] [SerializeField]
+        private PlayerMovementNet playerMovementNet;
         [SerializeField]
         private BombDeployer bombDeployer;
 
         [Space(20)]
         public UnityEvent OnPlayerDeathUnityEvent;
-        public Action<ulong> OnPlayerDeathAction;
+        public event Action<ulong> OnPlayerDeathAction;
 
 
         public void OnZeroHealthResponse()
         {
+            RiseDeathEventsRpc();
             EnableViewerMode();
-            
+        }
+
+        [Rpc(SendTo.Everyone)]
+        private void RiseDeathEventsRpc() 
+        {
             OnPlayerDeathUnityEvent?.Invoke();
             OnPlayerDeathAction?.Invoke(NetworkObject.OwnerClientId);
         }
-        
+
         [Rpc(SendTo.Server)]
         public void OnZeroHealthResponseRpc()
         {
@@ -39,9 +43,9 @@ namespace Runtime.MonoBehaviours
         private void EnableViewerMode()
         {
             NetworkObject.Despawn();
-            playerMovement.enabled = false;
-            bombDeployer.enabled = false;
-            visuals.SetActive(false);
+            playerMovementNet.enabled = false;         // this should be in movement
+            bombDeployer.enabled = false;           // this should be in bomb deployer
+            visuals.SetActive(false);               // this also should be not here
         }
     }
 }

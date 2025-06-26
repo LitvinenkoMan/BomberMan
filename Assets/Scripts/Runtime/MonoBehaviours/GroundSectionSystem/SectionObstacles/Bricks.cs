@@ -4,47 +4,39 @@ using UnityEngine;
 
 namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 {
-    [RequireComponent(typeof(Collider))]
     public class Bricks : Obstacle
     {
-        [SerializeField] private GameObject Visuals;
+        [SerializeField] private GameObject visuals;
 
         private Collider _collider;
 
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            Initialize();
+            NetworkManager.OnServerStarted += Initialize;
+            ObstacleHealthCmp.OnHealthRunOut += OnHealthRunOutResponce;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            NetworkManager.OnServerStarted -= Initialize;
+            ObstacleHealthCmp.OnHealthRunOut -= OnHealthRunOutResponce;
+        }
+
         private void Initialize()
         {
-            // if (!NetworkObject.IsSpawned)
-            // {
-            //     NetworkObject.Spawn();
-            //     Debug.Log($"Brick {name} Spawned");
-            // }
-            CanReceiveDamage = true;
-            CanPlayerStepOnIt = false;
-            Debug.Log($"Brick {name} Initialized");
-        }
-
-        private void OnEnable()
-        {
-            NetworkManager.OnServerStarted += Initialize;
-            ObstacleHealthComponent.OnHealthRunOut += OnHealthRunOutResponce;
-        }
-
-        private void OnDisable()
-        {
-            NetworkManager.OnServerStarted -= Initialize;
-            ObstacleHealthComponent.OnHealthRunOut -= OnHealthRunOutResponce;
-        }
-
-        void Start()
-        {
             _collider = GetComponent<Collider>();
+            ObstacleHealthCmp.SetAbilityToReceiveDamage(true);
+            CanPlayerStepOnIt = false;
         }
-
+        
         private void Reset()
         {
-            Visuals.SetActive(true);
+            visuals.SetActive(true);
             _collider.isTrigger = false;
-            ObstacleHealthComponent.SetHealth(1);
+            ObstacleHealthCmp.AddHealth(1);
         }
 
         private void OnHealthRunOutResponce()
@@ -61,7 +53,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         private void BreakBricks()
         {
             GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position).RemoveObstacle();
-            Visuals.SetActive(false);
+            visuals.SetActive(false);
             _collider.isTrigger = true;
         }
     }
