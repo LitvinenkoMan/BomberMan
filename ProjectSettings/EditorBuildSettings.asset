@@ -33,6 +33,8 @@ EditorBuildSettings:
     path: Assets/Samples/Relay/1.0.5/Simple Relay Sample (using UTP)/SimpleRelayUtp.unity
     guid: 3573da1ccba6a412e965f523d689fbd6
   m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: ee7af3bed9ad82d4e9576f69b2dcc839,
+      type: 2}
     com.unity.input.settings: {fileID: 11400000, guid: f0facabcd77f1364f933fd5563e8cffd,
       type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: a8f9f87aec7ef374daf69655ab4b7909,

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee14f3131d8475544bd50668de230951, type: 3}
+  m_Name: GolemData
+  m_EditorClassIdentifier: 
+  _characterName: Golem
+  _visuals: {fileID: 919132149155446097, guid: 73a79822e5f60464396c0eaf57702880, type: 3}
+  _bomb: {fileID: 6260933269128134215, guid: a19dc95892433e948a0a89d9befe479e, type: 3}
+  _animatorController: {fileID: 9100000, guid: cf7b4e10ea14d7741af5e1c89097ea5f, type: 2}
+  _characterHealth: 3
+  _speedMultiplier: 1
+  _bombsCountdown: 3
+  _bombsAtTime: 1
+  _bombsSpreading: 1
+  _bombsDamage: 1
+  _kickForce: 1
