@@ -1,10 +1,9 @@
 using System;
 using System.Collections;
 using Interfaces;
-using Runtime.MonoBehaviours;
 using Runtime.MonoBehaviours.GroundSectionSystem;
-using ScriptableObjects;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
@@ -18,46 +17,42 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         private GameObject BombVisuals;
         
         private Collider _bombCollider;
-        //private float _explosionSpeed = 1;
         private float _timer; 
         private bool _isTimerOn;
         private bool _isExploded;
-
         private int _bombSpread;
         private float _timeToExplode;
         private int _bombDamage;
         
-
         public new void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref IgniteOnStart);
             serializer.SerializeValue(ref _timer);
             serializer.SerializeValue(ref _isTimerOn);
             serializer.SerializeValue(ref _isExploded);
+            serializer.SerializeValue(ref _bombSpread);
+            serializer.SerializeValue(ref _timeToExplode);
+            serializer.SerializeValue(ref _bombDamage);
             //bomberParams.NetworkSerialize(serializer);
         }
 
         private void Start()
         {
-            CanReceiveDamage = true;
-            CanPlayerStepOnIt = false;
             _bombCollider = GetComponent<Collider>();
+            ObstacleHealthCmp.Initialize(1);
+            ObstacleHealthCmp.SetAbilityToReceiveDamage(true);
+            AutoPlaceToNearestSection();
         }
 
+        
         private void OnEnable()
         {
-            // if (IgniteOnStart)
-            // {
-            //     Ignite(3, 1, );              TODO: Change Ignite on start logic
-            // }
-            //_timer = _timeToExplode;
-
-            ObstacleHealthComponent.OnHealthRunOut += OnHealthRunOutExplode;
+            ObstacleHealthCmp.OnHealthRunOut += OnHealthRunOutExplode;
         }
 
         private void OnDisable()
         {
-            ObstacleHealthComponent.OnHealthRunOut -= OnHealthRunOutExplode;
+            ObstacleHealthCmp.OnHealthRunOut -= OnHealthRunOutExplode;
         }
 
         private void Update()
@@ -87,7 +82,8 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             _isExploded = false;
             _bombCollider.isTrigger = true;
             BombVisuals.SetActive(true);
-            ObstacleHealthComponent.SetHealth(1);
+            ObstacleHealthCmp.Initialize(1);
+            ObstacleHealthCmp.SetAbilityToReceiveDamage(true);
         }
 
         public void Ignite(float timeToExplode, int bombDamage, int bombSpread)
@@ -177,37 +173,24 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         {
             GameObject expl = GroundSectionsUtils.Instance.ExplosionsPool.GetFromPool(true);
             expl.transform.position = explPosition;
-            StartCoroutine(ReturnExplosionToPool(expl));
+            GroundSectionsUtils.Instance.StartCoroutine(ReturnExplosionToPool(expl));
         }
 
         private void DamageObstacle(Obstacle obstacle)
         {
-            if (obstacle.CanReceiveDamage)
-            {
-                obstacle.ObstacleHealthComponent.SetHealth(obstacle.ObstacleHealthComponent.HealthPoints - _bombDamage);
-            }
+            obstacle.ObstacleHealthCmp.SubtractHealth(_bombDamage);
         }
 
         private void TryDamageActorsOrPlayer(Vector3 position, int damage)
         {
-            Collider[] colliders = Physics.OverlapBox(position, new Vector3(0.5f, 0.5f, 0.5f));
+            Collider[] colliders = Physics.OverlapBox(position, new Vector3(0.49f, 0.49f, 0.49f));
 
             for (int i = 0; i < colliders.Length; i++)
             {
-                if (colliders[i].gameObject.TryGetComponent(out IHealth health1))
+                if (colliders[i].gameObject.TryGetComponent(out ICharacter character))
                 {
-                    health1.AddHealth(-damage);
-                    Debug.Log($"Damaged Player");
+                    character.Damage(damage);
                 }
-                
-                
-                // if (colliders[i].gameObject.TryGetComponent(out HealthComponent health) ) //TODO: recode this check, looks bad
-                // {
-                //     if (health.gameObject.TryGetComponent(out BomberParamsProvider bomberParamsProvider) && bomberParamsProvider.NetworkObject.IsOwner)
-                //     {
-                //         health.SetHealth(bomberParamsProvider.GetBomberParams().ActorHealth - damage);
-                //     }
-                // }
             }
         }
 

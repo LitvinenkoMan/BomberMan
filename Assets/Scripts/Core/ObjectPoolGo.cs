@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Interfaces;
 using UnityEngine;
@@ -16,11 +15,6 @@ namespace Core
         private bool useReparenting;
         
         private Queue<GameObject> _queue;
-
-        private void Start()
-        {
-            Initialize();
-        }
 
         public void Initialize()
         {
@@ -70,9 +64,9 @@ namespace Core
         /// </summary>
         public void Clear()
         {
-            while (_queue.Count > 0)
+            while (_queue.Count > 1)
             {
-                Destroy(_queue.Peek());
+                Destroy(_queue.Dequeue());
             }
         }
 

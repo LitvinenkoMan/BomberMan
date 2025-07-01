@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 8186339852267050050}
   - component: {fileID: 8945103254827932463}
   - component: {fileID: 8789691550055022042}
-  - component: {fileID: 6393183761067734736}
   m_Layer: 0
   m_Name: Concrete 1
   m_TagString: Untagged
@@ -69,7 +68,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1755631369
+  GlobalObjectIdHash: 1431136179
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -90,26 +89,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8206f6d4f4f2170468b440c0e34a809c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObstacleHealthComponent: {fileID: 6393183761067734736}
---- !u!114 &6393183761067734736
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8541336358320576165}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a2e4521c0d71624381b03f9d69c0b80, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  baseParams: {fileID: 0}
-  ImmuneAfterGettingDamaged: 0
-  ImmunityTime: 0
-  StartingHealth: 1
-  OnHealthRunOutUnityEvent:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1001 &3245389495922063941
 PrefabInstance:
   m_ObjectHideFlags: 0

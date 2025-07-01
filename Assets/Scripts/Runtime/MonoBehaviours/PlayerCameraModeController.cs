@@ -8,8 +8,7 @@ namespace Runtime.MonoBehaviours
 {
     public class PlayerCameraModeController : MonoBehaviour, ICameraModeController
     {
-        [SerializeField] 
-        private GameObject CameraExample;
+        [SerializeField] private GameObject CameraExample;
 
 
         private GameObject _instantiatedCamera;
@@ -33,13 +32,17 @@ namespace Runtime.MonoBehaviours
         private void CatchPlayersGameObject()
         {
             playersTransform.Clear();
-            var playersObj = FindObjectsByType<BomberParamsProvider>(FindObjectsSortMode.None);
+            var playersObj =
+                FindObjectsByType<CharacterController>(FindObjectsSortMode.None); // Every bot or player will have it (i thinmk so..)
             foreach (var obj in playersObj)
             {
-                playersTransform.Add(obj.transform);
+                if (obj.enabled)
+                {
+                    playersTransform.Add(obj.transform);
+                }
             }
         }
-        
+
         public void SwitchToGameplayMode()
         {
             NetworkObject playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
@@ -77,16 +80,28 @@ namespace Runtime.MonoBehaviours
         private void FollowSpawnedPlayer(ulong clientId)
         {
             NetworkObject playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
-            SwitchToGameplayMode();
-
-            if (playerObject.gameObject.TryGetComponent(out DeathResultHandler handler))
-            {
-                handler.OnPlayerDeathAction += OnPlayerDeathResponce;
-            }
             CatchPlayersGameObject();
+
+            if (clientId == NetworkManager.Singleton.LocalClient.ClientId)
+            {
+                if (playerObject && playerObject.gameObject.activeInHierarchy)
+                {
+                    if (playerObject.gameObject.TryGetComponent(out ICharacter character))
+                    {
+                        character.Health.OnHealthRunOut += OnPlayerDeathResponce;
+                        SwitchToGameplayMode();
+                    }
+                }
+            }
+            else
+            {
+                if (playerObject && playerObject.gameObject.activeInHierarchy) return;
+
+                SwitchToViewerMode();
+            }
         }
 
-        private void OnPlayerDeathResponce(ulong obj)
+        private void OnPlayerDeathResponce()
         {
             SwitchToViewerMode();
         }

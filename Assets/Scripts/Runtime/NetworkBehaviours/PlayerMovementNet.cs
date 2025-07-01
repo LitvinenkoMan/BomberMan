@@ -1,9 +1,6 @@
 using Interfaces;
-using ScriptableObjects;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.PlayerLoop;
 
 namespace Runtime.NetworkBehaviours
 {
@@ -20,7 +17,6 @@ namespace Runtime.NetworkBehaviours
 
         
         private CharacterController _controller;
-        // private InputActions _input;
 
         private Vector3 _moveDirection;
         private float _velocity;
@@ -75,7 +71,8 @@ namespace Runtime.NetworkBehaviours
 
         private void MoveController()
         {
-            _controller.Move(_moveDirection);
+            if (_controller.enabled)  
+                _controller.Move(_moveDirection);
         }
         
         private void ApplyGravity()

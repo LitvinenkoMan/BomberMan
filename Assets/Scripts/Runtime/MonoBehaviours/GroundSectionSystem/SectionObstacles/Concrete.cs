@@ -1,16 +1,13 @@
-using System;
-using Runtime.MonoBehaviours.GroundSectionSystem;
-using UnityEngine;
-
-namespace MonoBehaviours.GroundSectionSystem
+namespace Runtime.MonoBehaviours.GroundSectionSystem.SectionObstacles
 {
     public class Concrete : Obstacle
     {
-        private void Start()
+        public override void OnNetworkSpawn()
         {
-            ObstacleHealthComponent.SetHealth(255);
-            CanReceiveDamage = false;
-            CanPlayerStepOnIt = false;
+            base.OnNetworkSpawn();
+            ObstacleHealthCmp.Initialize(255);
+            ObstacleHealthCmp.SetAbilityToReceiveDamage(false);
+            SetAbilityToPlayerCanStepOnIt(false);
         }
     }
 }

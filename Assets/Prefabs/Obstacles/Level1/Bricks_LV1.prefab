@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 426458469771513397}
   - component: {fileID: -4750872074940096956}
   - component: {fileID: 3656118626449184014}
-  - component: {fileID: 7824594161072046893}
   - component: {fileID: 9124078937798254840}
   m_Layer: 0
   m_Name: Bricks_LV1
@@ -70,7 +69,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3106347685
+  GlobalObjectIdHash: 2433771435
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -91,27 +90,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86cea5dad8d57714db2186daa58aa44a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObstacleHealthComponent: {fileID: 7824594161072046893}
-  Visuals: {fileID: 8629476180602649643}
---- !u!114 &7824594161072046893
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4887622304763278231}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a2e4521c0d71624381b03f9d69c0b80, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  baseParams: {fileID: 0}
-  ImmuneAfterGettingDamaged: 0
-  ImmunityTime: 0
-  StartingHealth: 1
-  OnHealthRunOutUnityEvent:
-    m_PersistentCalls:
-      m_Calls: []
+  visuals: {fileID: 8629476180602649643}
 --- !u!114 &9124078937798254840
 MonoBehaviour:
   m_ObjectHideFlags: 0

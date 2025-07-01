@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Core.ScriptableObjects;
+using Interfaces;
 using MonoBehaviours.Network;
-using Runtime.MonoBehaviours;
-using TMPro;
+using Runtime.NetworkBehaviours.Player;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Runtime.NetworkBehaviours.MatchManagers
 {
@@ -17,6 +16,8 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         [Space(10)]
 
         [SerializeField]
+        private BaseBomberParameters bomberParams;
+        [SerializeField]
         private byte InitialPlayersLifeCount = 3;
         
         private Dictionary<ulong, int> _playersLifeCount;
@@ -24,8 +25,8 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         public event Action<int> OnLocalPlayerLifeCountUIUpdate;
         public event Action<int> OnLifeCountInfoReceived;
         public event Action<ulong> OnWinnerAppeared;
-        public event Action OnEnableClientView; // if send with true - is server, else is client
-        public event Action OnEnableServerView; // if send with true - is server, else is client
+        public event Action OnEnableClientView; 
+        public event Action OnEnableServerView; 
         public event Action<bool> OnResetUI; // if send with true - is server, else is client
 
         public override void OnNetworkSpawn()
@@ -48,6 +49,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
                 //TODO: Add section for bots
                 
             }
+            bomberParams.ResetValues();
 
             JoinCodeText.text = RelayManager.Instance.JoinCode;
             
@@ -70,10 +72,10 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         protected override void RegisterPlayerForEvents(ulong clientID)
         {
             if (NetworkManager.Singleton.ConnectedClients[clientID].PlayerObject
-                .TryGetComponent(out DeathResultHandler deathResultHandler))
+                .TryGetComponent(out PlayerCharacterNet playerCharacter))
             {
                 Debug.Log($"Player {clientID} Subscribed for Respawn request from DMM");
-                deathResultHandler.OnPlayerDeathAction += RequestRespawnRpc;
+                playerCharacter.OnPlayerDeath += RequestRespawnRpc;             //TODO: I should to solve it, but how...
             }
         }
 
@@ -88,7 +90,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         private void CheckForVictoryConditions()
         {
             byte defeatedPlayers = 0;
-            ulong winnerId = 999;
+            ulong winnerId = ulong.MaxValue;
             foreach (var player in _playersLifeCount)
             {
                 if (player.Value == 0)
@@ -130,6 +132,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         private void RequestRespawnRpc(ulong clientId)
         {
             Debug.Log($"Player {clientId} Requested for respawn");
+            
             SubtractLifeForPlayer(clientId);
             SendRespawnRequestForPlayerWrapper(clientId);
         }
@@ -158,10 +161,24 @@ namespace Runtime.NetworkBehaviours.MatchManagers
             OnLifeCountInfoReceived?.Invoke(lifeCount);
         }
 
+        private void ResetPlayerParams(ulong clientId)
+        {
+            try
+            {
+                NetworkManager.ConnectedClients[clientId].PlayerObject.TryGetComponent(out ICharacter playerCharacter);
+                playerCharacter.Reset();
+            }
+            catch (NullReferenceException e)
+            {
+                Console.WriteLine($"Player is missing!\n {e}");
+            }
+        }
+
         protected override void SubscribeToRespawnEvents()
         {
             NetworkManager.OnClientConnectedCallback += AddPlayerToLifeCounter;
             NetworkManager.OnClientDisconnectCallback += RemovePlayerFromLifeCounter;
+            PlayerSpawner.Instance.OnPlayerSpawned += ResetPlayerParams;
             base.SubscribeToRespawnEvents();
         }
 
@@ -169,6 +186,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         {
             NetworkManager.OnClientConnectedCallback -= AddPlayerToLifeCounter;
             NetworkManager.OnClientDisconnectCallback -= RemovePlayerFromLifeCounter;
+            PlayerSpawner.Instance.OnPlayerSpawned -= ResetPlayerParams;
             base.UnsubscribeFromRespawnEvents();
         }
     }

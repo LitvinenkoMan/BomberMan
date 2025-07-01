@@ -5,28 +5,28 @@ using UnityEngine;
 
 namespace Runtime.MonoBehaviours.GroundSectionSystem
 {
-    [RequireComponent(typeof(HealthComponent))]
     public class Obstacle : NetworkBehaviour, INetworkSerializable
     {
-        public HealthComponent ObstacleHealthComponent;
-        public bool CanReceiveDamage { get; protected set; }
+        public ObstacleHealthComponent ObstacleHealthCmp { get; private set;  }
         public bool CanPlayerStepOnIt { get; protected set; }
+        
+        protected event Action<bool> OnAbilityToPlayerCanStepOnItChanged;
 
-        protected Action<bool> OnAbilityToReciveDamageChanged;
-        protected Action<bool> OnAbilityToPlayerCanStepOnItChanged;
-
-
-        private Vector3 _position;
-
-        private void Start()
+        private void Awake()
         {
-            ObstacleHealthComponent = GetComponent<HealthComponent>();
+            ObstacleHealthCmp = gameObject.AddComponent<ObstacleHealthComponent>();
         }
 
-        public void SetAbilityToReceiveDamage(bool state)
+        public virtual void SetNewPosition(Vector3 position)
         {
-            CanReceiveDamage = state;
-            OnAbilityToReciveDamageChanged?.Invoke(CanReceiveDamage);
+            transform.position = position;
+        }
+
+        public void AutoPlaceToNearestSection()
+        {
+            var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
+            SetNewPosition(section.ObstaclePlacementPosition);
+            section.AddObstacle(this);
         }
 
         public void SetAbilityToPlayerCanStepOnIt(bool state)
@@ -35,21 +35,9 @@ namespace Runtime.MonoBehaviours.GroundSectionSystem
             OnAbilityToPlayerCanStepOnItChanged?.Invoke(CanPlayerStepOnIt);
         }
 
-        public virtual void SetNewPosition(Vector3 position)
-        {
-            transform.position = position;
-            _position = position;
-        }
-
-        public void AutoPlaceToNearestSection()
-        {
-            var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
-            section.AddObstacle(this);
-        }
-
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
-            serializer.SerializeValue(ref _position);
+            
         }
     }
 }

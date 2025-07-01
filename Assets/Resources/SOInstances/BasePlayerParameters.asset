@@ -19,8 +19,8 @@ MonoBehaviour:
   _startBombsSpreading: 1
   _startBombsCountdown: 3
   _startBombsDamage: 1
-  _speedMultiplier: 3
+  _speedMultiplier: 0.1
+  _bombsCountdown: 3
   _bombsAtTime: 1
   _bombsSpreading: 1
-  _bombsCountdown: 3
   _bombsDamage: 1
