@@ -14,7 +14,7 @@ namespace Core.SaveSystem
         void Start()
         {
             _fileDataReader = new FileDataReader(Application.dataPath, SaveProfileName);
-            LoadGame();    
+            LoadGame();
         }
 
         private void OnApplicationQuit()

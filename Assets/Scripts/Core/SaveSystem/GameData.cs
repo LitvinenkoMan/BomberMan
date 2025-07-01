@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Core.SaveSystem
 {
-    public class GameData : MonoBehaviour
+    public class GameData
     {
         private CharacterData _selectedCharacterData;
         private string _playerNickname;
@@ -11,10 +11,10 @@ namespace Core.SaveSystem
         private int _battlesAmount;
         //TODO: may add some extra data related to player
         
-        // public CharacterData SelectedCharacterData => _selectedCharacterData;
-        // public string PlayerNickname => _playerNickname;
-        // public int WinsAmount => _winsAmount;
-        // public int BattlesAmount => _battlesAmount;
+        public CharacterData SelectedCharacterData => _selectedCharacterData;
+        public string PlayerNickname => _playerNickname;
+        public int WinsAmount => _winsAmount;
+        public int BattlesAmount => _battlesAmount;
         
         public GameData(string playerNickname, int winsAmount, int battlesAmount, CharacterData selectedCharacterData)
         {

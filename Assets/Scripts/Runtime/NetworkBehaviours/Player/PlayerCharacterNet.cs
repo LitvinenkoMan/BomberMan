@@ -1,5 +1,6 @@
 using System;
 using Core.ScriptableObjects;
+using CSharp;
 using Interfaces;
 using TMPro;
 using Unity.Netcode;
@@ -25,6 +26,7 @@ namespace Runtime.NetworkBehaviours.Player
 
         private InputActions _input;
         private CharacterController _characterController;
+        private CharacterRuntime _characterRuntime;
 
         public event Action<ulong> OnPlayerDeath;
 
