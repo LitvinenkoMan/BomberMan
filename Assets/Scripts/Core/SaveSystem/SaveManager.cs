@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Core.SaveSystem
@@ -7,13 +8,25 @@ namespace Core.SaveSystem
         [Header("Name of the save folder")]
         [SerializeField]
         private string SaveProfileName;
+        
+        public static SaveManager Instance;
          
         private GameData _data;
         private FileDataReader _fileDataReader;
-        
+
+        private void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else Destroy(this);
+        }
+
         void Start()
         {
             _fileDataReader = new FileDataReader(Application.dataPath, SaveProfileName);
+            Debug.Log(Application.dataPath);
             LoadGame();
         }
 

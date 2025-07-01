@@ -1,8 +1,10 @@
+using System;
 using Core.ScriptableObjects;
 using UnityEngine;
 
 namespace Core.SaveSystem
 {
+    [Serializable]
     public class GameData
     {
         private CharacterData _selectedCharacterData;
@@ -28,8 +30,16 @@ namespace Core.SaveSystem
         {
             _playerNickname ??= data._playerNickname;
             _selectedCharacterData ??= data._selectedCharacterData;
-            _winsAmount = data._winsAmount;
-            _battlesAmount = data._battlesAmount;
+
+            if (data.WinsAmount != 0)
+            {
+                _winsAmount = data.WinsAmount;
+            }
+            
+            if (data.BattlesAmount != 0)
+            {
+                _battlesAmount = data.BattlesAmount;
+            }
         }
 
         // public static GameData operator (GameData gd1, GameData gd2)
