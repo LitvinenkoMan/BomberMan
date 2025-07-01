@@ -6,7 +6,6 @@ namespace Runtime.MonoBehaviours.Player
     {
         [SerializeField] private GameObject visuals;
         
-        
         private Vector3 _moveDirection;
         private Vector3 _previousPosition;
         
