@@ -42,6 +42,26 @@ namespace Core.SaveSystem
             }
         }
 
+        public void SetPlayerNickname(string playerNickname)
+        {
+            _playerNickname = playerNickname;
+        }
+
+        public void SetSelectedCharacterData(CharacterData characterData)
+        {
+            _selectedCharacterData = characterData;
+        }
+
+        public void SetBattlesAmount(int battlesAmount)
+        {
+            _battlesAmount = battlesAmount;
+        }
+
+        public void SetWinsAmount(int winsAmount)
+        {
+            _winsAmount = winsAmount;
+        }
+
         // public static GameData operator (GameData gd1, GameData gd2)
         // {
         //     gd1._playerNickname ??= gd2._playerNickname;

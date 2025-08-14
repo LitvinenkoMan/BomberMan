@@ -10,6 +10,7 @@ namespace Core.SaveSystem
         private string SaveProfileName;
         
         public static SaveManager Instance;
+        public GameData PlayerData => _data;
          
         private GameData _data;
         private FileDataReader _fileDataReader;

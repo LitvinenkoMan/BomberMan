@@ -1,4 +1,3 @@
-using UnityEditor.Animations;
 using UnityEngine;
 
 namespace Core.ScriptableObjects
@@ -14,7 +13,7 @@ namespace Core.ScriptableObjects
         [SerializeField]
         private GameObject _bomb;
         [SerializeField]
-        private AnimatorController  _animatorController;
+        private RuntimeAnimatorController  _animatorController;
         
         [Header("Values:")]
         [SerializeField]
@@ -35,7 +34,7 @@ namespace Core.ScriptableObjects
         public string Name => _characterName;
         public GameObject Visuals => _visuals;
         public GameObject Bomb => _bomb;
-        public AnimatorController AnimatorController => _animatorController;
+        public RuntimeAnimatorController AnimatorController => _animatorController;
 
         public int Health => _characterHealth;
         public float Speed => _speedMultiplier;

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ee14f3131d8475544bd50668de230951, type: 3}
-  m_Name: GolemData
+  m_Name: GolemCharacter
   m_EditorClassIdentifier: 
   _characterName: Golem
   _visuals: {fileID: 919132149155446097, guid: 73a79822e5f60464396c0eaf57702880, type: 3}

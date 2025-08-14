@@ -1,5 +1,4 @@
 using Core.ScriptableObjects;
-using UnityEditor.Animations;
 using UnityEngine;
 
 namespace CSharp
@@ -19,7 +18,7 @@ namespace CSharp
 
         public GameObject Visuals => BaseData.Visuals;
         public GameObject BombPrefab => BaseData.Bomb;
-        public AnimatorController Animator => BaseData.AnimatorController;
+        public RuntimeAnimatorController Animator => BaseData.AnimatorController;
 
         public CharacterRuntime(CharacterData data)
         {
