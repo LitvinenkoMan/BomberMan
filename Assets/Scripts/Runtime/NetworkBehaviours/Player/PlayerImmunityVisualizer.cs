@@ -12,15 +12,5 @@ namespace Runtime.NetworkBehaviours.Player
         {
            
         }
-        
-        void Start()
-        {
-        
-        }
-
-        void Update()
-        {
-        
-        }
     }
 }

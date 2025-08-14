@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: VisualsLevel1
+  m_EditorClassIdentifier: 
+  m_GroupName: VisualsLevel1
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 25be8e3e3313fe540aa23e7f3aed09de
+  m_SerializeEntries:
+  - m_GUID: 91d4ad7558bda5c4fafdf687c30ebeac
+    m_Address: Assets/Prefabs/Environmrnt/Compleated Arch.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: addef79fa0c7cef4c8ed7072544baf1a
+    m_Address: Assets/Prefabs/Environmrnt/Column Bases.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 703a6655273f8c8489c2204d5a75cfc7, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 716b38a76b35bc846b4cb54bf79e9e78, type: 2}
+    - {fileID: 11400000, guid: ccfae107379150e4fbe97f349810d54f, type: 2}

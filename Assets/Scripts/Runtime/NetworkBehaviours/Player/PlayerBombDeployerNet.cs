@@ -147,7 +147,7 @@ namespace Runtime.NetworkBehaviours.Player
         private void ClearPoolRpc()
         {
             Debug.Log("ClearPoolRpc from server side");
-            _bombsPool.Clear();
+            //_bombsPool.Clear();
         }
 
         [ClientRpc]
