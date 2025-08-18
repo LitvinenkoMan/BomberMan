@@ -7,24 +7,25 @@ namespace Runtime.MonoBehaviours.Player
         [SerializeField] private GameObject _visuals;
         [SerializeField] private float _rotationSpeed;
         
-        private Vector3 _moveDirection;
+        private Quaternion _targetDirection;
         private Vector3 _previousPosition;
         
         void Start()
         {
-            _previousPosition = Vector3.zero;
-            _moveDirection = Vector3.zero;
+            _previousPosition = transform.position;
+            _targetDirection = Quaternion.identity;
         }
 
         void Update()
         {
             if (_previousPosition == transform.position) return;
 
-            Quaternion targetDirection = Quaternion.LookRotation(transform.position - _previousPosition);
+            _targetDirection = Quaternion.LookRotation(transform.position - _previousPosition);
+            _targetDirection.x = 0; // Y-axis rotation only
 
             _previousPosition = transform.position;            
 
-            _visuals.transform.rotation = Quaternion.Slerp(_visuals.transform.rotation, targetDirection, _rotationSpeed * Time.deltaTime);
+            _visuals.transform.rotation = Quaternion.Slerp(_visuals.transform.rotation, _targetDirection, _rotationSpeed * Time.deltaTime);
         }
     }
 }
