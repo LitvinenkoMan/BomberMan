@@ -4,7 +4,8 @@ namespace Runtime.MonoBehaviours.Player
 {
     public class PlayerCharacterRotator : MonoBehaviour
     {
-        [SerializeField] private GameObject visuals;
+        [SerializeField] private GameObject _visuals;
+        [SerializeField] private float _rotationSpeed;
         
         private Vector3 _moveDirection;
         private Vector3 _previousPosition;
@@ -18,13 +19,12 @@ namespace Runtime.MonoBehaviours.Player
         void Update()
         {
             if (_previousPosition == transform.position) return;
-            
-            
-            _moveDirection =  transform.position - _previousPosition;
-            
-            visuals.transform.rotation = Quaternion.LookRotation(new Vector3(_moveDirection.x, 0, _moveDirection.z));
-                
-            _previousPosition = transform.position;
+
+            Quaternion targetDirection = Quaternion.LookRotation(transform.position - _previousPosition);
+
+            _previousPosition = transform.position;            
+
+            _visuals.transform.rotation = Quaternion.Slerp(_visuals.transform.rotation, targetDirection, _rotationSpeed * Time.deltaTime);
         }
     }
 }
