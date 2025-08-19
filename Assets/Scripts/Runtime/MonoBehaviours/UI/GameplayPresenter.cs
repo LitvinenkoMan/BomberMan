@@ -53,11 +53,11 @@ namespace Runtime.MonoBehaviours.UI
             //TODO: Make Exit Menu
         }
 
-        private void UpdateHealthText(int newValue) => HealtText.text = $"{newValue}";
-        private void UpdateSpeedText(float newValue) => SpeedText.text = $"{newValue}";
-        private void UpdateBombsDamageText(int newValue) => BombsDamageText.text = $"{newValue}";
-        private void UpdateSpreadText(int newValue) => SpreadText.text = $"{newValue}";
-        private void UpdateBombsPerTimeText(int newValue) => BombsPerTimeText.text = $"{newValue}";
+        private void UpdateHealthText(int newValue) => HealtText.text = $"x{newValue}";
+        private void UpdateSpeedText(float newValue) => SpeedText.text = $"x{newValue}";
+        private void UpdateBombsDamageText(int newValue) => BombsDamageText.text = $"x{newValue}";
+        private void UpdateSpreadText(int newValue) => SpreadText.text = $"x{newValue}";
+        private void UpdateBombsPerTimeText(int newValue) => BombsPerTimeText.text = $"x{newValue}";
         
     }
 }

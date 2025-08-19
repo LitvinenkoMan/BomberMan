@@ -16,6 +16,7 @@ namespace Runtime.NetworkBehaviours.Player
 
         private IEnumerator _immunityCoroutine;
         private float _immunityTime;
+        private IImmuneVisualizer _immuneVisualizer;
 
         public override void OnNetworkSpawn()
         {
@@ -27,6 +28,7 @@ namespace Runtime.NetworkBehaviours.Player
             IsImmune = false;
             _immunityCoroutine = Immunity();
             _immunityTime = startImmunityTime;
+            _immuneVisualizer = GetComponent<IImmuneVisualizer>();
         }
 
         public void ActivateImmunity()
@@ -49,9 +51,10 @@ namespace Runtime.NetworkBehaviours.Player
 
         private IEnumerator Immunity()
         {
+            _immuneVisualizer?.VisualizeImmunity(_immunityTime);
             yield return new WaitForSeconds(_immunityTime);
             IsImmune = false;
-            _immunityCoroutine = Immunity();
+            _immunityCoroutine = Immunity();            
             yield return null;
         }
     }
