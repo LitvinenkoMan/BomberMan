@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: 5506503297875142062}
   - component: {fileID: 8949525128573402941}
   m_Layer: 0
-  m_Name: PlayerGolemPawnRemastered 1
+  m_Name: PlayerSkeletonPawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -271,7 +271,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bomberParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
   playerName: {fileID: 2931790567708399911}
-  playerVisuals: {fileID: 0}
+  playerVisuals: {fileID: 8510248757836908209}
 --- !u!114 &3533742488125631471
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -350,7 +350,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5904034c43738f4db7dc5da37bcd758, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pawnAnimator: {fileID: 0}
+  pawnAnimator: {fileID: 3148445361095935601}
   transitionSmoothness: 12.5
 --- !u!114 &-7152030252571559338
 MonoBehaviour:
@@ -364,6 +364,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0c5001dc61b124438110526bffe5182, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerMesh: {fileID: 3942686641235915}
 --- !u!114 &5506503297875142062
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -376,7 +377,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31c1ac6c55fa0ee40a2f10703c3021e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  visuals: {fileID: 0}
+  _visuals: {fileID: 8510248757836908209}
+  _rotationSpeed: 12.5
 --- !u!114 &8949525128573402941
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -668,16 +670,57 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: 729359b26d5e70b41809c355bdf1bfc1, type: 2}
+    - target: {fileID: 5866666021909216657, guid: f1b1d959bd1ba77478e61e20b96136b1,
+        type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8851000624224869419, guid: f1b1d959bd1ba77478e61e20b96136b1,
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 08f0740e3fb2da74b8d38ac92cd2eeab, type: 2}
+      objectReference: {fileID: 2100000, guid: 777480e80ede60b40904194634b18be8, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f1b1d959bd1ba77478e61e20b96136b1,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 347257769875644774}
   m_SourcePrefab: {fileID: 100100000, guid: f1b1d959bd1ba77478e61e20b96136b1, type: 3}
+--- !u!137 &3942686641235915 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 8851000624224869419, guid: f1b1d959bd1ba77478e61e20b96136b1,
+    type: 3}
+  m_PrefabInstance: {fileID: 8852691440163699680}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &3148445361095935601 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: f1b1d959bd1ba77478e61e20b96136b1,
+    type: 3}
+  m_PrefabInstance: {fileID: 8852691440163699680}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8510248757836908209 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: f1b1d959bd1ba77478e61e20b96136b1,
+    type: 3}
+  m_PrefabInstance: {fileID: 8852691440163699680}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &347257769875644774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8510248757836908209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TransitionStateInfoList: []
+  m_Animator: {fileID: 3148445361095935601}
 --- !u!4 &9030186243637664779 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f1b1d959bd1ba77478e61e20b96136b1,
