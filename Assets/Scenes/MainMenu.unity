@@ -1699,9 +1699,11 @@ MonoBehaviour:
   GameplaySceneLoader: {fileID: 1245141157}
   LevelsDataList:
   - {fileID: 11400000, guid: 6ad9cbe8ed8157d43b2244f7771f35d6, type: 2}
+  - {fileID: 11400000, guid: 3129054bf33b063408951a4fbec37177, type: 2}
   MatchTypeScenesList:
   - {fileID: 11400000, guid: e8c611c1ed6723146908f989be18ab3e, type: 2}
   - {fileID: 11400000, guid: a54937fd09645164b9b8b8b15b5d4cbe, type: 2}
+  - {fileID: 11400000, guid: 1d93e51800d741e4a82bec16c6e35a86, type: 2}
 --- !u!4 &94217397
 Transform:
   m_ObjectHideFlags: 0
@@ -4434,19 +4436,7 @@ MonoBehaviour:
   m_MultiSelect: 0
   m_Options:
     m_Options:
-    - m_Text: DeathMatch
-      m_Image: {fileID: 0}
-      m_Color: {r: 1, g: 1, b: 1, a: 1}
-    - m_Text: Level 2
-      m_Image: {fileID: 0}
-      m_Color: {r: 1, g: 1, b: 1, a: 1}
-    - m_Text: Level 3
-      m_Image: {fileID: 0}
-      m_Color: {r: 1, g: 1, b: 1, a: 1}
-    - m_Text: Level 4
-      m_Image: {fileID: 0}
-      m_Color: {r: 1, g: 1, b: 1, a: 1}
-    - m_Text: Level 5
+    - m_Text: Trainning
       m_Image: {fileID: 0}
       m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_OnValueChanged:
@@ -25546,7 +25536,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -25560,7 +25550,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 0
+  m_Interactable: 1
   m_TargetGraphic: {fileID: 1607974401}
   m_OnClick:
     m_PersistentCalls:

@@ -42,7 +42,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
                 
                 foreach (var client in NetworkManager.ConnectedClients)
                 {
-                    PlayerSpawner.Instance.SpawnClientRpc(client.Key);
+                    PlayerSpawnerNet.Instance.SpawnClientRpc(client.Key);
                     AddPlayerToLifeCounter(client.Key);
                 }
                 
@@ -178,7 +178,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         {
             NetworkManager.OnClientConnectedCallback += AddPlayerToLifeCounter;
             NetworkManager.OnClientDisconnectCallback += RemovePlayerFromLifeCounter;
-            PlayerSpawner.Instance.OnPlayerSpawned += ResetPlayerParams;
+            PlayerSpawnerNet.Instance.OnPlayerSpawned += ResetPlayerParams;
             base.SubscribeToRespawnEvents();
         }
 
@@ -186,7 +186,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         {
             NetworkManager.OnClientConnectedCallback -= AddPlayerToLifeCounter;
             NetworkManager.OnClientDisconnectCallback -= RemovePlayerFromLifeCounter;
-            PlayerSpawner.Instance.OnPlayerSpawned -= ResetPlayerParams;
+            PlayerSpawnerNet.Instance.OnPlayerSpawned -= ResetPlayerParams;
             base.UnsubscribeFromRespawnEvents();
         }
     }

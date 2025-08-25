@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Runtime.MonoBehaviours;
 using Runtime.NetworkBehaviours;
 using UnityEngine;
 
@@ -23,6 +24,7 @@ namespace MonoBehaviours.GroundSectionSystem
         void Start()
         {
             GroundSectionsUtils.Instance.SetNewDataHolder(this);
+            PlayerSpawnerNet.Instance.SetUpCurrentDataHolder(this);
             PlayerSpawner.Instance.SetUpCurrentDataHolder(this);
         }
 
