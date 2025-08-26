@@ -92,6 +92,7 @@ namespace Runtime.MonoBehaviours.UI
                 {
                     PanelsStack.Peek().gameObject.SetActive(true);    
                 }
+                OnPanelClosedEvent?.Invoke();
             }
             else
             {
