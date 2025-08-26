@@ -8761,7 +8761,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1849406015}
+      - m_Target: {fileID: 1001568507}
         m_TargetAssemblyTypeName: Runtime.MonoBehaviours.UI.PlayerCharacterSelector,
           Assembly-CSharp
         m_MethodName: SetCurrentCharacter
@@ -15410,7 +15410,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1849406015}
+      - m_Target: {fileID: 1001568507}
         m_TargetAssemblyTypeName: Runtime.MonoBehaviours.UI.PlayerCharacterSelector,
           Assembly-CSharp
         m_MethodName: ConfirmSelection
@@ -16430,6 +16430,7 @@ GameObject:
   - component: {fileID: 1001568502}
   - component: {fileID: 1001568506}
   - component: {fileID: 1001568505}
+  - component: {fileID: 1001568507}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -16561,6 +16562,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca3f548fa6dfe0e409826850f91a6fcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1001568507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1001568500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfca977d75d7ee243854ff8df9a54d07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hanger: {fileID: 4821896025732947321}
+  _characterName: {fileID: 2050552303}
+  _characterLife: {fileID: 1295792141}
+  _characterSpeed: {fileID: 1557327361}
+  _characterDamage: {fileID: 877753736}
+  _characterSpread: {fileID: 1511349442}
+  _characterBPT: {fileID: 1168721058}
+  _characterKickForce: {fileID: 337950659}
 --- !u!1 &1001903062
 GameObject:
   m_ObjectHideFlags: 0
@@ -19319,7 +19340,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1849406015}
+      - m_Target: {fileID: 1001568507}
         m_TargetAssemblyTypeName: Runtime.MonoBehaviours.UI.PlayerCharacterSelector,
           Assembly-CSharp
         m_MethodName: SetCurrentCharacter
@@ -30049,7 +30070,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1849406014}
-  - component: {fileID: 1849406015}
   m_Layer: 5
   m_Name: CustomizationMenu
   m_TagString: Untagged
@@ -30082,26 +30102,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1849406015
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1849406013}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cfca977d75d7ee243854ff8df9a54d07, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hanger: {fileID: 4821896025732947321}
-  _characterName: {fileID: 2050552303}
-  _characterLife: {fileID: 1295792141}
-  _characterSpeed: {fileID: 1557327361}
-  _characterDamage: {fileID: 877753736}
-  _characterSpread: {fileID: 1511349442}
-  _characterBPT: {fileID: 1168721058}
-  _characterKickForce: {fileID: 337950659}
 --- !u!1 &1852066281
 GameObject:
   m_ObjectHideFlags: 0
@@ -33650,6 +33650,19 @@ MonoBehaviour:
       - m_Target: {fileID: 1001568505}
         m_TargetAssemblyTypeName: Runtime.MonoBehaviours.UI.ViewPanelChanger, Assembly-CSharp
         m_MethodName: RemovePanel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1001568507}
+        m_TargetAssemblyTypeName: Runtime.MonoBehaviours.UI.PlayerCharacterSelector,
+          Assembly-CSharp
+        m_MethodName: CancelSelection
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

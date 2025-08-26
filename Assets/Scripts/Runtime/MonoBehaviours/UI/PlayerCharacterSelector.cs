@@ -31,29 +31,14 @@ namespace Runtime.MonoBehaviours.UI
             {
                 _currentCharacterData = SaveManager.Instance.PlayerData.SelectedCharacterData;
             }
-           
         }
 
         void Start()
         {
             Initialize();
-        }
-
-        private void OnEnable()
-        {
             SetCurrentCharacter(SaveManager.Instance.PlayerData.SelectedCharacterData);
         }
-
-        private void OnDisable()
-        {
-            
-        }
-
-        void Update()
-        {
         
-        }
-
         public void SetCurrentCharacter(CharacterData  characterData)
         {
             _currentCharacterData =  characterData;
@@ -74,6 +59,11 @@ namespace Runtime.MonoBehaviours.UI
         public void ConfirmSelection()
         {
             SaveManager.Instance.PlayerData.SetSelectedCharacterData(_currentCharacterData);
+        }
+
+        public void CancelSelection()
+        {
+            SetCurrentCharacter(SaveManager.Instance.PlayerData.SelectedCharacterData);
         }
     }
 }

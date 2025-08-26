@@ -17,7 +17,7 @@ namespace Runtime.MonoBehaviours.CharacterSelectionSystem
         private Dictionary<string, GameObject> _characterVisualsDictionary;
         private GameObject _currentCharacterVisuals;
 
-        private void Start()
+        private void Awake()
         {
             Initialize();
         }
@@ -40,7 +40,8 @@ namespace Runtime.MonoBehaviours.CharacterSelectionSystem
 
         public void ChangeVisuals(CharacterData characterData)
         {
-            _currentCharacterVisuals.SetActive(false);
+            if(_currentCharacterVisuals) _currentCharacterVisuals.SetActive(false);
+            
             _currentCharacterVisuals = _characterVisualsDictionary[characterData.CharacterName];
             _currentCharacterVisuals.SetActive(true);
         }
