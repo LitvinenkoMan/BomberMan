@@ -1,27 +1,40 @@
-using Interfaces;
-using Runtime.MonoBehaviours.GroundSectionSystem;
 using System;
 using System.Collections;
-using System.Collections.Generic;
+using Interfaces;
+using Runtime.MonoBehaviours.GroundSectionSystem;
+using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 {
-    public class Bomb : Obstacle
+    public class BombNet : Obstacle, INetworkSerializable
     {
         public bool IgniteOnStart;
-        public Action<Bomb> onExplode;
-
+        public Action<BombNet> onExplode;
+        
         [SerializeField]
         private GameObject BombVisuals;
-
+        
         private Collider _bombCollider;
-        private float _timer;
+        private float _timer; 
         private bool _isTimerOn;
         private bool _isExploded;
         private int _bombSpread;
         private float _timeToExplode;
         private int _bombDamage;
+        
+        public new void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref IgniteOnStart);
+            serializer.SerializeValue(ref _timer);
+            serializer.SerializeValue(ref _isTimerOn);
+            serializer.SerializeValue(ref _isExploded);
+            serializer.SerializeValue(ref _bombSpread);
+            serializer.SerializeValue(ref _timeToExplode);
+            serializer.SerializeValue(ref _bombDamage);
+            //bomberParams.NetworkSerialize(serializer);
+        }
 
         private void Start()
         {
@@ -31,6 +44,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             AutoPlaceToNearestSection();
         }
 
+        
         private void OnEnable()
         {
             ObstacleHealthCmp.OnHealthRunOut += OnHealthRunOutExplode;
@@ -40,6 +54,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         {
             ObstacleHealthCmp.OnHealthRunOut -= OnHealthRunOutExplode;
         }
+
         private void Update()
         {
             if (_isTimerOn)
@@ -47,7 +62,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
                 _timer -= Time.deltaTime;
                 if (_timer <= 0)
                 {
-                    Explode(_bombSpread, _bombDamage);
+                    ExplodeRpc(_bombSpread, _bombDamage);
                 }
             }
         }
@@ -60,21 +75,32 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             }
         }
 
+        public void Reset()
+        {
+            _timer = _timeToExplode;
+            _isTimerOn = false;
+            _isExploded = false;
+            _bombCollider.isTrigger = true;
+            BombVisuals.SetActive(true);
+            ObstacleHealthCmp.Initialize(1);
+            ObstacleHealthCmp.SetAbilityToReceiveDamage(true);
+        }
+
         public void Ignite(float timeToExplode, int bombDamage, int bombSpread)
         {
-            Debug.Log("Bomb Ignited");
             _timeToExplode = timeToExplode;
             _bombDamage = bombDamage;
             _bombSpread = bombSpread;
-
+            
             _timer = _timeToExplode;
             _isTimerOn = true;
         }
 
-        private void Explode(int bombSpreading, int bombDamage)
+        [Rpc(SendTo.ClientsAndHost)]
+        private void ExplodeRpc(int bombSpreading, int bombDamage)
         {
             BombVisuals.SetActive(false);
-
+            
             GroundSection startSection = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
             startSection.RemoveObstacle();
 
@@ -96,6 +122,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             _bombCollider.isTrigger = true;
             onExplode?.Invoke(this);
         }
+
         private void ExplodeToDirection(GroundSection currentSection, int depth, int damage, SpreadDirections direction)
         {
             if (currentSection.PlacedObstacle)
@@ -111,14 +138,14 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             PlaceExplosionEffect(currentSection.ObstaclePlacementPosition);
 
             TryDamageActorsOrPlayer(currentSection.ObstaclePlacementPosition, damage);
-
-
-            if (depth <= 0)
+            
+            
+            if (depth <= 0 )
             {
                 return;
             }
             depth -= 1;
-
+            
             switch (direction)
             {
                 case SpreadDirections.Up:
@@ -166,9 +193,10 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
                 }
             }
         }
+
         private void OnHealthRunOutExplode()
         {
-            Explode(_bombSpread, _bombDamage);
+            ExplodeRpc(_bombSpread, _bombDamage);
         }
 
         private IEnumerator ReturnExplosionToPool(GameObject expl)
@@ -181,15 +209,13 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         {
             transform.position = position;
         }
-        public void Reset()
-        {
-            _timer = _timeToExplode;
-            _isTimerOn = false;
-            _isExploded = false;
-            _bombCollider.isTrigger = true;
-            BombVisuals.SetActive(true);
-            ObstacleHealthCmp.Initialize(1);
-            ObstacleHealthCmp.SetAbilityToReceiveDamage(true);
-        }
     }
 }
+
+enum SpreadDirections
+{
+    Up,
+    Down,
+    Right,
+    Left
+} 

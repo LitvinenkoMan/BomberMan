@@ -621,7 +621,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b3f17dd52e6ca945af2ce1dafe899eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectExample: {fileID: 6260933269128134215, guid: a19dc95892433e948a0a89d9befe479e,
+  objectExample: {fileID: 8285095642912142646, guid: ccecfefa7c474434781694681a0d0e8b,
     type: 3}
   startingCount: 10
   useReparenting: 0

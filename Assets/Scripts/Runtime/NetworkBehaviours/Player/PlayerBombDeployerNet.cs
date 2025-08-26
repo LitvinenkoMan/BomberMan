@@ -14,7 +14,7 @@ namespace Runtime.NetworkBehaviours.Player
         private IObjectPool<GameObject> _bombsPool;
 
 
-        private Queue<Bomb> _dropedBombs;
+        private Queue<BombNet> _dropedBombs;
         private bool _canDeployBombs;
         private int _currentPlacedBombs;
         
@@ -87,7 +87,7 @@ namespace Runtime.NetworkBehaviours.Player
             var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
             if (section && !section.PlacedObstacle && _currentPlacedBombs < bombsAtTime)
             {
-                var bomb = _bombsPool.GetFromPool(true).GetComponent<Bomb>();
+                var bomb = _bombsPool.GetFromPool(true).GetComponent<BombNet>();
                 bomb.SetNewPosition(section.ObstaclePlacementPosition);
                 bomb.transform.SetParent(null);
                 bomb.onExplode += SubtractAmountOfCurrentBombs;
@@ -102,7 +102,7 @@ namespace Runtime.NetworkBehaviours.Player
             }
         }
 
-        private void SubtractAmountOfCurrentBombs(Bomb explodedBomb)
+        private void SubtractAmountOfCurrentBombs(BombNet explodedBomb)
         {
             _currentPlacedBombs--;
             explodedBomb.onExplode -= SubtractAmountOfCurrentBombs;
@@ -112,7 +112,7 @@ namespace Runtime.NetworkBehaviours.Player
             }
         }
 
-        private void RemoveBombFromDropedList(Bomb bomb)
+        private void RemoveBombFromDropedList(BombNet bomb)
         {
             _dropedBombs.Dequeue();
         }
@@ -125,7 +125,7 @@ namespace Runtime.NetworkBehaviours.Player
             }
         }
 
-        private IEnumerator ReturnBombBackToPoolRoutine(Bomb bomb)
+        private IEnumerator ReturnBombBackToPoolRoutine(BombNet bomb)
         {
             //yield return new WaitForSeconds(2.1f);                      // I'm pushing bombs to return explosion effects back to ObjectPool, since I do that,
             ReturnBombToPoolRpc(bomb);                 // I need to wait until coroutine will return them back, and after that I will return bomb
@@ -135,7 +135,7 @@ namespace Runtime.NetworkBehaviours.Player
         [Rpc(SendTo.Server)]
         private void ReturnBombToPoolRpc(NetworkBehaviourReference bomb)
         {
-            if (bomb.TryGet(out Bomb explodedBomb))
+            if (bomb.TryGet(out BombNet explodedBomb))
             {
                 _bombsPool.AddToPool(explodedBomb.gameObject);
                 explodedBomb.Reset();
