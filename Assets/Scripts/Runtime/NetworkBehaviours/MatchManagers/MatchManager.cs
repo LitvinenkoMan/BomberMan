@@ -38,7 +38,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
 
                 foreach (var client in NetworkManager.ConnectedClients)
                 {
-                    PlayerSpawner.Instance.SpawnClientRpc(client.Key);
+                    PlayerSpawnerNet.Instance.SpawnClientRpc(client.Key);
                 }
 
                 //RegisterPlayerForEvents(NetworkManager.Singleton.LocalClientId);
@@ -131,29 +131,29 @@ namespace Runtime.NetworkBehaviours.MatchManagers
 
         protected virtual async Task SendRespawnRequestForPlayer(ulong clientID)
         {
-            await PlayerSpawner.Instance.SpawnPlayer(clientID, 3);         // TODO Set this Time to variable
+            await PlayerSpawnerNet.Instance.SpawnPlayer(clientID, 3);         // TODO Set this Time to variable
         }
 
         protected virtual void SubscribeToRespawnEvents()
         {
-            NetworkManager.OnClientConnectedCallback += PlayerSpawner.Instance.SpawnClientRpc;
+            NetworkManager.OnClientConnectedCallback += PlayerSpawnerNet.Instance.SpawnClientRpc;
 
-            NetworkManager.OnClientDisconnectCallback += PlayerSpawner.Instance.ClearSpawnPositionOfPlayer;
+            NetworkManager.OnClientDisconnectCallback += PlayerSpawnerNet.Instance.ClearSpawnPositionOfPlayer;
 
-            PlayerSpawner.Instance.OnPlayerSpawned += RegisterPlayerForEvents;
-            PlayerSpawner.Instance.OnPlayerSpawned += CheckForPlayerAbilities;
+            PlayerSpawnerNet.Instance.OnPlayerSpawned += RegisterPlayerForEvents;
+            PlayerSpawnerNet.Instance.OnPlayerSpawned += CheckForPlayerAbilities;
         }
 
         protected virtual void UnsubscribeFromRespawnEvents()
         {
-            NetworkManager.OnClientConnectedCallback -= PlayerSpawner.Instance.SpawnClientRpc;
+            NetworkManager.OnClientConnectedCallback -= PlayerSpawnerNet.Instance.SpawnClientRpc;
 
-            NetworkManager.OnClientDisconnectCallback -= PlayerSpawner.Instance.ClearSpawnPositionOfPlayer;
+            NetworkManager.OnClientDisconnectCallback -= PlayerSpawnerNet.Instance.ClearSpawnPositionOfPlayer;
 
-            PlayerSpawner.Instance.OnPlayerSpawned -= RegisterPlayerForEvents;
-            PlayerSpawner.Instance.OnPlayerSpawned -= CheckForPlayerAbilities;
+            PlayerSpawnerNet.Instance.OnPlayerSpawned -= RegisterPlayerForEvents;
+            PlayerSpawnerNet.Instance.OnPlayerSpawned -= CheckForPlayerAbilities;
 
-            PlayerSpawner.Instance.SetToDefaults();
+            PlayerSpawnerNet.Instance.SetToDefaults();
         }
     }
 }

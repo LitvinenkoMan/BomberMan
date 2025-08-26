@@ -1,12 +1,13 @@
 using Interfaces;
-using Unity.Netcode;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace Runtime.NetworkBehaviours.Player
+namespace Runtime.MonoBehaviours.Player
 {
-    public class PlayerCharacterAnimatorNet : NetworkBehaviour, ICharacterAnimator
+    public class PlayerCharacterAnimator : MonoBehaviour, ICharacterAnimator
     {
-        [SerializeField] 
+        [SerializeField]
         private Animator pawnAnimator;
         [SerializeField]
         private float transitionSmoothness = 1;
@@ -17,12 +18,11 @@ namespace Runtime.NetworkBehaviours.Player
 
         private float _currentSpeedValue;
         private float _endSpeedValue;
-
-        void Update()
+        private void Update()
         {
             if (_currentSpeedValue == _endSpeedValue) return;
             _currentSpeedValue = Mathf.Lerp(_currentSpeedValue, _endSpeedValue, Time.deltaTime * transitionSmoothness);
-            
+
             pawnAnimator.SetFloat(MoveValue, _currentSpeedValue);
         }
 
@@ -33,47 +33,30 @@ namespace Runtime.NetworkBehaviours.Player
             pawnAnimator.SetBool(Dead, false);
         }
 
-        public void PlayWalkAnimation()
-        {
-            PlayWalkAnimationRpc();
-        }
-
         public void PlayDeathAnimation()
         {
-            PlayDeathAnimationRpc();
-        }
-
-        public void PlayIdleAnimation()
-        {
-            PlayIdleAnimationRpc();
+            pawnAnimator.SetBool(Dead, true);
         }
 
         public void PlayHitAnimation()
         {
-            throw new System.NotImplementedException();
+
         }
 
-        public void PlayKickedAnimation()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        [Rpc(SendTo.Everyone)]
-        private void PlayWalkAnimationRpc()
-        {
-            _endSpeedValue = 1;
-        }
-
-        [Rpc(SendTo.Everyone)]
-        private void PlayIdleAnimationRpc()
+        public void PlayIdleAnimation()
         {
             _endSpeedValue = 0;
         }
 
-        [Rpc(SendTo.Everyone)]
-        private void PlayDeathAnimationRpc()
+        public void PlayKickedAnimation()
         {
-            pawnAnimator.SetBool(Dead, true);
+
+        }
+
+        public void PlayWalkAnimation()
+        {
+            _endSpeedValue = 1;
         }
     }
 }
+

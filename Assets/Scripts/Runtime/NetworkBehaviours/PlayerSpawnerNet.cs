@@ -5,21 +5,23 @@ using MonoBehaviours.GroundSectionSystem;
 using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Runtime.NetworkBehaviours
 {
-    public class PlayerSpawner : NetworkBehaviour
+    public class PlayerSpawnerNet : NetworkBehaviour
     {
         [SerializeField] private GameObject Player;
 
-        public static PlayerSpawner Instance;
+        public static PlayerSpawnerNet Instance;
 
         private LevelSectionsDataHolder _currentLevelDataHolder;
 
         private List<ClientIdAssociatedSpawn> _associatedPositions;
 
         public event Action<ulong> OnPlayerSpawned;
-
 
         private void Awake()
         {
