@@ -1,3 +1,5 @@
+using Core.ScriptableObjects;
+using Interfaces;
 using Runtime.MonoBehaviours;
 using Runtime.NetworkBehaviours;
 using System;
@@ -5,22 +7,45 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
-public class TrainingMatchManager : MonoBehaviour
+namespace Runtime.NetworkBehaviours.MatchManagers
 {
-    [SerializeField] GameObject StartButton;
-
-    public UnityEvent StartMatchUnityEvent;
-    public UnityEvent EndMatchUnityEvent;
-
-    public Action OnInitialized;
-
-    private void Start()
+    public class TrainingMatchManager : MonoBehaviour
     {
-        SpawnPlayer();
-    }
-    public void SpawnPlayer()
-    {
-        PlayerSpawner.Instance.RandomSpawnPlayer();   // Need to redo PlayerSpawner
+        [SerializeField] private BaseBomberParameters bomberParams;
+
+
+        public UnityEvent StartMatchUnityEvent;
+
+        private void Start()
+        {
+            SpawnPlayer();
+            SubscribeToEvents();
+            StartMatchUnityEvent?.Invoke();
+        }
+        private void OnDestroy()
+        {
+            UnSubscribeToEvents();
+        }
+        public void SpawnPlayer()
+        {
+            //PlayerSpawner.Instance.RandomSpawnPlayer(); 
+        }
+
+        private void ResetPlayerParams()
+        {
+            PlayerSpawner.Instance.Player.TryGetComponent(out ICharacter playerCharacter);
+            playerCharacter.Reset();
+        }
+        
+        private void SubscribeToEvents()
+        {
+            PlayerSpawner.Instance.OnPlayerSpawned += ResetPlayerParams;
+        }
+        private void UnSubscribeToEvents()
+        {
+            PlayerSpawner.Instance.OnPlayerSpawned -= ResetPlayerParams;
+        }
     }
 }

@@ -11,7 +11,8 @@ namespace Runtime.MonoBehaviours
     public class PlayerSpawner : MonoBehaviour
     {
         [SerializeField] private GameObject _player;
-        [SerializeField] private GameObject _spawnPoint;
+        [SerializeField] private GameObject _bot;
+        public GameObject Player { get; private set; }
 
         public static PlayerSpawner Instance;
 
@@ -42,10 +43,12 @@ namespace Runtime.MonoBehaviours
             {
                 _associatedPositions.Add(new AssociatedSpawn(spawnPlace.transform.position, false));
             }
+            RandomSpawnPlayer();
         }
 
         public void RandomSpawnPlayer()
         {
+            if (_associatedPositions == null) Debug.LogError("No DataHolder assigned to PlayerSpawner");
             int chosenNumber = UnityEngine.Random.Range(0, _associatedPositions.Count);
             if (!_associatedPositions[chosenNumber].isTaken)
             {
@@ -53,9 +56,11 @@ namespace Runtime.MonoBehaviours
                 spawnPlace.isTaken = true;
                 _associatedPositions[chosenNumber] = spawnPlace;
 
-                GameObject player = Instantiate(_player, spawnPlace.position, Quaternion.identity);
+                Player = Instantiate(_player, spawnPlace.position, Quaternion.identity);
 
                 OnPlayerSpawned?.Invoke();
+
+                SpawnBots();
             }
             else
             {
@@ -63,17 +68,17 @@ namespace Runtime.MonoBehaviours
             }
         }
 
-        public void SpawnPlayer()
-        {                        
-            var spawnPoint = _associatedPositions[0];
-            if (!spawnPoint.isTaken)
+        private void SpawnBots()
+        {     
+            for (int i = 0; i < _dataHolder.SpawnPlaces.Count; i++)
             {
-                Instantiate(_player, spawnPoint.position, Quaternion.identity);
-                OnPlayerSpawned?.Invoke();
-            }
-            else
-            {
-                return;
+                var spawnPlace = _associatedPositions[i];
+                if (!spawnPlace.isTaken)
+                {
+                    spawnPlace.isTaken = true;
+                    _associatedPositions[i] = spawnPlace;
+                    Instantiate(_bot, spawnPlace.position, Quaternion.identity);
+                }
             }
         }
 

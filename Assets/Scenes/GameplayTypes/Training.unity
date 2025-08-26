@@ -3676,7 +3676,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &825351205
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4740,11 +4740,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 717d85f327671084f89e6a0c02038aec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  StartButton: {fileID: 1729862115}
+  bomberParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
   StartMatchUnityEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  EndMatchUnityEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &1393653415
@@ -4961,7 +4958,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1520176737
 MonoBehaviour:
   m_ObjectHideFlags: 0
