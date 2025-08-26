@@ -22,6 +22,8 @@ namespace Runtime.MonoBehaviours.UI
 
         [SerializeField]
         private UnityEvent OnQuitWhileInMainPanelEvent;
+        [SerializeField]
+        private UnityEvent OnPanelClosedEvent;
 
 
         private InputActions _input;
