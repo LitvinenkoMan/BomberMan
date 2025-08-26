@@ -31,7 +31,7 @@ namespace Core.ScriptableObjects
         [SerializeField]
         private float _kickForce;
 
-        public string Name => _characterName;
+        public string CharacterName => _characterName;
         public GameObject Visuals => _visuals;
         public GameObject Bomb => _bomb;
         public RuntimeAnimatorController AnimatorController => _animatorController;

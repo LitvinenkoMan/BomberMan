@@ -7,39 +7,33 @@ namespace Core.SaveSystem
     [Serializable]
     public class GameData
     {
-        private CharacterData _selectedCharacterData;
-        private string _playerNickname;
-        private int _winsAmount;
-        private int _battlesAmount;
+        [SerializeField] private string _selectedCharacterDataID;
+        [SerializeField] private string _playerNickname;
+        [SerializeField] private int _winsAmount;
+        [SerializeField] private int _battlesAmount;
         //TODO: may add some extra data related to player
+        
+        private CharacterData _selectedCharacterData;
         
         public CharacterData SelectedCharacterData => _selectedCharacterData;
         public string PlayerNickname => _playerNickname;
         public int WinsAmount => _winsAmount;
         public int BattlesAmount => _battlesAmount;
         
-        public GameData(string playerNickname, int winsAmount, int battlesAmount, CharacterData selectedCharacterData)
+        
+        
+        public GameData(string playerNickname, int winsAmount, int battlesAmount, string selectedCharacterDataID)
         {
             _playerNickname = playerNickname;
             _winsAmount = winsAmount;
             _battlesAmount = battlesAmount;
-            _selectedCharacterData = selectedCharacterData;
+            _selectedCharacterDataID = selectedCharacterDataID;
+            _selectedCharacterData = Resources.Load<CharacterData>($"SOInstances/CharactersData/{selectedCharacterDataID}Character");      //TODO: this looks bad
         }
 
-        public void UpdateValues(GameData data)
+        public void LoadCharacterDataFromResources()
         {
-            _playerNickname ??= data._playerNickname;
-            _selectedCharacterData ??= data._selectedCharacterData;
-
-            if (data.WinsAmount != 0)
-            {
-                _winsAmount = data.WinsAmount;
-            }
-            
-            if (data.BattlesAmount != 0)
-            {
-                _battlesAmount = data.BattlesAmount;
-            }
+            _selectedCharacterData = Resources.Load<CharacterData>($"SOInstances/CharactersData/{_selectedCharacterDataID}Character");
         }
 
         public void SetPlayerNickname(string playerNickname)
@@ -50,6 +44,7 @@ namespace Core.SaveSystem
         public void SetSelectedCharacterData(CharacterData characterData)
         {
             _selectedCharacterData = characterData;
+            _selectedCharacterDataID = characterData.CharacterName;
         }
 
         public void SetBattlesAmount(int battlesAmount)

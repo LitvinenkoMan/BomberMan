@@ -22,7 +22,7 @@ namespace Runtime.MonoBehaviours.CharacterSelectionSystem
             Initialize();
         }
 
-        private void Initialize()
+        public void Initialize()
         {
             _characterVisualsDictionary = new Dictionary<string, GameObject>();
             _charactersDataList.ForEach(characterData =>
@@ -33,7 +33,7 @@ namespace Runtime.MonoBehaviours.CharacterSelectionSystem
                 visuals.GetComponent<Animator>().runtimeAnimatorController = characterData.AnimatorController;
                 visuals.SetActive(false);
                 
-                _characterVisualsDictionary.Add(characterData.Name, visuals);
+                _characterVisualsDictionary.Add(characterData.CharacterName, visuals);
             });
             _currentCharacterVisuals = _characterVisualsDictionary.First().Value;
         }
@@ -41,10 +41,8 @@ namespace Runtime.MonoBehaviours.CharacterSelectionSystem
         public void ChangeVisuals(CharacterData characterData)
         {
             _currentCharacterVisuals.SetActive(false);
-            _currentCharacterVisuals = _characterVisualsDictionary[characterData.Name];
+            _currentCharacterVisuals = _characterVisualsDictionary[characterData.CharacterName];
             _currentCharacterVisuals.SetActive(true);
-            
-            _currentCharacterVisuals.GetComponent<RuntimeAnimatorController>();
         }
     }
 }

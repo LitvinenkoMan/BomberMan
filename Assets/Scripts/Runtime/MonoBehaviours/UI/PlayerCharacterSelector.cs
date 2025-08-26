@@ -20,26 +20,28 @@ namespace Runtime.MonoBehaviours.UI
         [SerializeField] private TMP_Text _characterSpread;
         [SerializeField] private TMP_Text _characterBPT;
         [SerializeField] private TMP_Text _characterKickForce;
-
-
-        private CharacterData _characterData;
         
-        public CharacterData CurrentCharacter => _characterData;
+        private CharacterData _currentCharacterData;
+        
+        public CharacterData CurrentCharacter => _currentCharacterData;
 
         private void Initialize()
         {
-            //_characterData = SaveManager.Instance.PlayerData.SelectedCharacterData;
+            if (SaveManager.Instance.PlayerData != null)
+            {
+                _currentCharacterData = SaveManager.Instance.PlayerData.SelectedCharacterData;
+            }
+           
         }
 
         void Start()
         {
             Initialize();
-            //SetCurrentCharacter(_characterData);
         }
 
         private void OnEnable()
         {
-            //SetCurrentCharacter();
+            SetCurrentCharacter(SaveManager.Instance.PlayerData.SelectedCharacterData);
         }
 
         private void OnDisable()
@@ -54,9 +56,9 @@ namespace Runtime.MonoBehaviours.UI
 
         public void SetCurrentCharacter(CharacterData  characterData)
         {
-            _characterData =  characterData;
+            _currentCharacterData =  characterData;
             
-            _characterName.text = characterData.Name;
+            _characterName.text = characterData.CharacterName;
             _characterLife.text = characterData.Health.ToString();
             _characterSpeed.text = characterData.Speed.ToString(CultureInfo.InvariantCulture);
             _characterDamage.text = characterData.BombDamage.ToString();
@@ -69,9 +71,9 @@ namespace Runtime.MonoBehaviours.UI
             // There should be shown CharactersVisuals
         }
 
-        public void ConfirmSelection(CharacterData  characterData)
+        public void ConfirmSelection()
         {
-            SaveManager.Instance.PlayerData.SetSelectedCharacterData(characterData);
+            SaveManager.Instance.PlayerData.SetSelectedCharacterData(_currentCharacterData);
         }
     }
 }

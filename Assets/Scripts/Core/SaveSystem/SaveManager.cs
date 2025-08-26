@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace Core.SaveSystem
@@ -26,8 +25,9 @@ namespace Core.SaveSystem
 
         void Start()
         {
-            _fileDataReader = new FileDataReader(Application.dataPath, SaveProfileName);
-            Debug.Log(Application.dataPath);
+            _fileDataReader = new FileDataReader(Application.persistentDataPath, SaveProfileName);
+            Debug.LogError(Application.persistentDataPath);
+            _data = new GameData("", 0, 0, "");
             LoadGame();
         }
 
@@ -35,11 +35,6 @@ namespace Core.SaveSystem
         {
             SaveGame();
         }
-
-        public void AddDataForSaving(GameData data)
-        {
-            _data.UpdateValues(data);
-        } 
 
         public void SaveGame()
         {
@@ -49,6 +44,15 @@ namespace Core.SaveSystem
         public void LoadGame()
         {
             _data = _fileDataReader.Load(SaveProfileName);
+            if (_data != null)
+            {
+                _data.LoadCharacterDataFromResources();
+            }
+            else
+            {
+                Debug.LogError("Couldn't load character data, creating new one");
+                _data = new GameData("PlayerNone", 0, 0, "Golem");
+            }
         }
     }
 }
