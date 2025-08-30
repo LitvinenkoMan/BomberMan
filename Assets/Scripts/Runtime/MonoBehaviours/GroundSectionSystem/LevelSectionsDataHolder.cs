@@ -21,10 +21,10 @@ namespace MonoBehaviours.GroundSectionSystem
         {
         }
 
-        void Start()
+        void Awake()
         {
             GroundSectionsUtils.Instance.SetNewDataHolder(this);
-            PlayerSpawnerNet.Instance.SetUpCurrentDataHolder(this);
+            //PlayerSpawnerNet.Instance.SetUpCurrentDataHolder(this);
             PlayerSpawner.Instance.SetUpCurrentDataHolder(this);
         }
 

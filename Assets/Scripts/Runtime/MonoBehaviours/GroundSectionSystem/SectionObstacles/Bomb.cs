@@ -62,7 +62,6 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         public void Ignite(float timeToExplode, int bombDamage, int bombSpread)
         {
-            Debug.Log("Bomb Ignited");
             _timeToExplode = timeToExplode;
             _bombDamage = bombDamage;
             _bombSpread = bombSpread;

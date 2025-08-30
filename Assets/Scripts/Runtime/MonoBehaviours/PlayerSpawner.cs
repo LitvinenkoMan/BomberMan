@@ -1,9 +1,11 @@
+using Interfaces;
 using MonoBehaviours.GroundSectionSystem;
 using Runtime.NetworkBehaviours;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 namespace Runtime.MonoBehaviours
@@ -41,34 +43,75 @@ namespace Runtime.MonoBehaviours
             _associatedPositions = new List<AssociatedSpawn>();
             foreach (var spawnPlace in dataHolder.SpawnPlaces)
             {
-                _associatedPositions.Add(new AssociatedSpawn(spawnPlace.transform.position, false));
+                _associatedPositions.Add(new AssociatedSpawn(spawnPlace.transform.position, false, false));
             }
-            RandomSpawnPlayer();
         }
 
-        public void RandomSpawnPlayer()
+        public async void SpawnPlayer(float delay)
+        {
+            if (!CheckForPlayerSpawnPlace())
+            {
+                AssociateRandomSpawnPlaceForPlayer();
+            }
+
+            await Task.Delay((int)(delay * 1000));
+
+            if (Player != null)
+            {
+                Destroy(Player);
+                Player = Instantiate(_player, GetPositionForSpawn(), Quaternion.identity);
+            }
+            else Player = Instantiate(_player, GetPositionForSpawn(), Quaternion.identity);
+
+            OnPlayerSpawned?.Invoke();
+        }
+
+        private void AssociateRandomSpawnPlaceForPlayer()
         {
             if (_associatedPositions == null) Debug.LogError("No DataHolder assigned to PlayerSpawner");
+
             int chosenNumber = UnityEngine.Random.Range(0, _associatedPositions.Count);
             if (!_associatedPositions[chosenNumber].isTaken)
             {
                 var spawnPlace = _associatedPositions[chosenNumber];
                 spawnPlace.isTaken = true;
+                spawnPlace.forPlayer = true;
                 _associatedPositions[chosenNumber] = spawnPlace;
-
-                Player = Instantiate(_player, spawnPlace.position, Quaternion.identity);
-
-                OnPlayerSpawned?.Invoke();
-
-                SpawnBots();
             }
             else
             {
-                RandomSpawnPlayer();
+                AssociateRandomSpawnPlaceForPlayer();
             }
         }
 
-        private void SpawnBots()
+        private bool CheckForPlayerSpawnPlace()
+        {
+            foreach (var clientIdAssociatedSpawn in _associatedPositions)
+            {
+                if (clientIdAssociatedSpawn.forPlayer == true)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private Vector3 GetPositionForSpawn()
+        {
+            Vector3 position = Vector3.zero;
+            _associatedPositions.ForEach(x =>
+                {
+                    if (x.forPlayer == true)
+                    {
+                        position = x.position;
+                    }
+                }
+            );
+            return position;
+        }
+
+        public void SpawnBots()
         {     
             for (int i = 0; i < _dataHolder.SpawnPlaces.Count; i++)
             {
@@ -84,12 +127,14 @@ namespace Runtime.MonoBehaviours
 
         public struct AssociatedSpawn
         {
-            public AssociatedSpawn(Vector3 position, bool isTaken)
+            public AssociatedSpawn(Vector3 position, bool isTaken, bool forPlayer)
             {
                 this.position = position;
                 this.isTaken = isTaken;
+                this.forPlayer = forPlayer;
             }
-            
+
+            public bool forPlayer;
             public Vector3 position;
             public bool isTaken;
         }

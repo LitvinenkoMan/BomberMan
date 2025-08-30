@@ -2,6 +2,8 @@ using Core.ScriptableObjects;
 using Interfaces;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -22,6 +24,20 @@ namespace Runtime.MonoBehaviours.Player
         private InputActions _input;
         private CharacterController _characterController;
 
+        private void Awake()
+        {
+            CollectRefs();
+        }
+
+        private void OnEnable()
+        {
+            Health.OnHealthRunOut += StartDeathSequence;
+        }
+        private void OnDisable()
+        {
+            Health.OnHealthRunOut -= StartDeathSequence;
+        }
+
         private void Start()
         {
             Initialize();
@@ -29,8 +45,7 @@ namespace Runtime.MonoBehaviours.Player
 
         // В методе Initialize используйте PlayerMap для добавления колбэков
         public void Initialize()
-        {
-            CollectRefs();
+        {            
             if (_input == null)
                 _input = new InputActions();
             _input.PlayerMap.AddCallbacks(this);
@@ -44,6 +59,13 @@ namespace Runtime.MonoBehaviours.Player
 
         public void Damage(int damageAmount)
         {
+            if (Immune.IsImmune) return;
+
+            if (Health.GetHealth() > 0)
+            {
+                Health.SubtractHealth(damageAmount);
+                Immune.ActivateImmunity();
+            }
         }
 
         public void DeployBomb()
@@ -56,6 +78,11 @@ namespace Runtime.MonoBehaviours.Player
         }
         public void Reset()
         {
+            if (Health == null)
+            {
+                Debug.LogWarning("PlayerCharacter: have not PlayerHealth component");
+                return;
+            }
             Health.Initialize(3);
             _characterController.enabled = true;
         }
@@ -67,6 +94,7 @@ namespace Runtime.MonoBehaviours.Player
 
         public void SetMoveAbility(bool canMove)
         {
+            CharacterMovement.SetAbilityToMove(canMove);
         }
         private void CollectRefs()
         {
@@ -77,6 +105,17 @@ namespace Runtime.MonoBehaviours.Player
             if (TryGetComponent(out ICharacterAnimator characterAnimator)) CharacterAnimator = characterAnimator;
             if (TryGetComponent(out CharacterController characterController)) _characterController = characterController;
         }
+        private void StartDeathSequence()
+        {
+            SetMoveAbility(false);
+            SetBombDeployAbility(false);
+            _input.PlayerMap.RemoveCallbacks(this);
+            _input.Disable();
+
+            _characterController.enabled = false;
+            CharacterAnimator.PlayDeathAnimation();            
+        }
+
         public void OnMove(InputAction.CallbackContext context)
         {
             Vector2 inputVector = context.ReadValue<Vector2>();

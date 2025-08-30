@@ -1,10 +1,12 @@
 using Core.ScriptableObjects;
 using Interfaces;
 using Runtime.MonoBehaviours;
+using Runtime.MonoBehaviours.Player;
 using Runtime.NetworkBehaviours;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -19,9 +21,9 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         public UnityEvent StartMatchUnityEvent;
 
         private void Start()
-        {
-            SpawnPlayer();
+        {            
             SubscribeToEvents();
+            SpawnPlayer();
             StartMatchUnityEvent?.Invoke();
         }
         private void OnDestroy()
@@ -30,12 +32,14 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         }
         public void SpawnPlayer()
         {
-            //PlayerSpawner.Instance.RandomSpawnPlayer(); 
+            PlayerSpawner.Instance.SpawnPlayer(0);
+            PlayerSpawner.Instance.SpawnBots();
         }
 
         private void ResetPlayerParams()
         {
             PlayerSpawner.Instance.Player.TryGetComponent(out ICharacter playerCharacter);
+            
             playerCharacter.Reset();
         }
         

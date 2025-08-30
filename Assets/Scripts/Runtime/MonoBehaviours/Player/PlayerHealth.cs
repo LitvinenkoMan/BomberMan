@@ -38,6 +38,7 @@ namespace Runtime.MonoBehaviours.Player
 
             if (_baseParams.ActorHealth <= 0)
             {
+                PlayerSpawner.Instance.SpawnPlayer(3);
                 OnHealthRunOut?.Invoke();
             }
         }
