@@ -1,5 +1,6 @@
 using Core.ScriptableObjects;
 using Interfaces;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -20,9 +21,10 @@ namespace Runtime.MonoBehaviours.Player
         public IMovable CharacterMovement { get; private set; }
         public ICharacterAnimator CharacterAnimator { get; private set; }
 
-        // Замените тип поля _input с InputAction на InputActions
         private InputActions _input;
         private CharacterController _characterController;
+
+        public event Action OnPlayerDeath;
 
         private void Awake()
         {
@@ -43,7 +45,6 @@ namespace Runtime.MonoBehaviours.Player
             Initialize();
         }
 
-        // В методе Initialize используйте PlayerMap для добавления колбэков
         public void Initialize()
         {            
             if (_input == null)
@@ -113,7 +114,9 @@ namespace Runtime.MonoBehaviours.Player
             _input.Disable();
 
             _characterController.enabled = false;
-            CharacterAnimator.PlayDeathAnimation();            
+            CharacterAnimator.PlayDeathAnimation();
+
+            OnPlayerDeath?.Invoke();
         }
 
         public void OnMove(InputAction.CallbackContext context)

@@ -23,33 +23,38 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         private void Start()
         {            
             SubscribeToEvents();
-            SpawnPlayer();
+            Spawn();
             StartMatchUnityEvent?.Invoke();
         }
         private void OnDestroy()
         {
             UnSubscribeToEvents();
         }
-        public void SpawnPlayer()
+        public void Spawn()
         {
             PlayerSpawner.Instance.SpawnPlayer(0);
             PlayerSpawner.Instance.SpawnBots();
         }
 
-        private void ResetPlayerParams()
+        private void RespawnPlayer()
         {
-            PlayerSpawner.Instance.Player.TryGetComponent(out ICharacter playerCharacter);
-            
-            playerCharacter.Reset();
+            PlayerSpawner.Instance.SpawnPlayer(3);
+        }
+
+        private void RegisterPlayerForEvents()
+        {
+            if (PlayerSpawner.Instance.Player.TryGetComponent(out PlayerCharacter playerCharacter)) {
+                playerCharacter.OnPlayerDeath += RespawnPlayer;
+            }
         }
         
         private void SubscribeToEvents()
         {
-            PlayerSpawner.Instance.OnPlayerSpawned += ResetPlayerParams;
+            PlayerSpawner.Instance.OnPlayerSpawned += RegisterPlayerForEvents;
         }
         private void UnSubscribeToEvents()
         {
-            PlayerSpawner.Instance.OnPlayerSpawned -= ResetPlayerParams;
+            PlayerSpawner.Instance.OnPlayerSpawned -= RegisterPlayerForEvents;
         }
     }
 }

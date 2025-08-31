@@ -14,6 +14,11 @@ public class BotCharacter : MonoBehaviour, ICharacter
 
     private NavMeshAgent _agent;
 
+    private void Awake()
+    {
+        CollectRefs();
+    }
+
     public void Initialize()
     {
     }
@@ -43,6 +48,11 @@ public class BotCharacter : MonoBehaviour, ICharacter
 
     public void SetMoveAbility(bool canMove)
     {
+    }
+
+    private void RespawnBot()
+    {
+
     }
 
     private void CollectRefs()
