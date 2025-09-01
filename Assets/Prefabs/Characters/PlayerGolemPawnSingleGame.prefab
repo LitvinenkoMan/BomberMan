@@ -424,11 +424,11 @@ GameObject:
   - component: {fileID: 3035596102408443879}
   - component: {fileID: 8227993111673027890}
   - component: {fileID: 431016108847323945}
-  - component: {fileID: 1080834460041243312}
   - component: {fileID: 4845943247067810294}
   - component: {fileID: 9047449683793000139}
   - component: {fileID: 4787215817297682486}
   - component: {fileID: 4120646245773549312}
+  - component: {fileID: -6921048187574618563}
   - component: {fileID: 6057072022000222852}
   - component: {fileID: 9059728599084747098}
   - component: {fileID: 3254840445637860053}
@@ -539,20 +539,6 @@ MonoBehaviour:
   m_DefaultActionMap: PlayerMap
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &1080834460041243312
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 943517624420053595}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31c1ac6c55fa0ee40a2f10703c3021e8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _visuals: {fileID: 0}
-  _rotationSpeed: 0
 --- !u!114 &4845943247067810294
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -594,7 +580,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _visuals: {fileID: 239183445836674406}
-  _rotationSpeed: 13
+  _rotationSpeed: 15
 --- !u!114 &4120646245773549312
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -609,6 +595,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pawnAnimator: {fileID: 9075553797320656453}
   transitionSmoothness: 12.5
+--- !u!114 &-6921048187574618563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 943517624420053595}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7f97499f469b524ab26de77d94a72d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _baseParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
 --- !u!114 &6057072022000222852
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -649,7 +648,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d777a8300d900147b2be201efebfb3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerParams: {fileID: 0}
+  playerParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
 --- !u!114 &-5639016598503654087
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -662,7 +661,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a7484f7871bb0540ab5bdd7b4c0f41d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startImmunityTime: 0
+  startImmunityTime: 3
 --- !u!114 &-2006694202085887193
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -675,7 +674,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0c5001dc61b124438110526bffe5182, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerMesh: {fileID: 0}
+  _playerMesh: {fileID: 3338704732784787473}
 --- !u!1 &1022289823458925607
 GameObject:
   m_ObjectHideFlags: 0

@@ -3,7 +3,6 @@ using MonoBehaviours.GroundSectionSystem;
 using MonoBehaviours.GroundSectionSystem.SectionObstacles;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace Runtime.MonoBehaviours.Player
@@ -42,10 +41,6 @@ namespace Runtime.MonoBehaviours.Player
                 bomb.onExplode += SubtractAmountOfCurrentBombs;
                 section.AddObstacle(bomb);
                 bomb.Ignite(timeToExplode, bombDamage, bombSpread);
-                if (!bomb.NetworkObject.IsSpawned)
-                {
-                    bomb.NetworkObject.Spawn();
-                }
 
                 _currentPlacedBombs++;
             }

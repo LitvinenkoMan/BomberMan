@@ -9,7 +9,6 @@ public class PlayerCameraModeController : MonoBehaviour
 {
     [SerializeField] private GameObject CameraExample;
 
-    private GameObject _player;
     private ICameraViewer _cameraViewer;
     private GameObject _instantiatedCamera;
 
@@ -31,27 +30,16 @@ public class PlayerCameraModeController : MonoBehaviour
             _cameraViewer = _instantiatedCamera.GetComponent<ICameraViewer>();
         }
     }
-    private void CheckForInstancedPlayer()
-    {
-        if (_player == null)
-        {
-            _player = FindAnyObjectByType<PlayerCharacter>().gameObject;
-        }
-        else
-        {
-            FollowSpawnedPlayer();
-        }
-    }
 
     private void SwitchToGameplayMode()
     {
         _cameraViewer.ClearTargetsList();
-        _cameraViewer.AddToViewTarget(_player.transform);
+        _cameraViewer.AddToViewTarget(PlayerSpawner.Instance.Player.transform);
     }
 
     public void FollowSpawnedPlayer()
     {
-        CheckForInstancedPlayer();
+        Debug.Log("FollowSpawnedPlayer");
         SwitchToGameplayMode();
     }
 }
