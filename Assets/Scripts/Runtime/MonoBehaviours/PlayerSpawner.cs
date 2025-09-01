@@ -24,6 +24,7 @@ namespace Runtime.MonoBehaviours
         private List<AssociatedSpawn> _associatedPositions;
 
         public Action OnPlayerSpawned;
+        public Action<string> OnBotSpawned;
 
         private void Awake()
         {
@@ -122,6 +123,13 @@ namespace Runtime.MonoBehaviours
                     _bots[numberOfBot - 1] = spawnedBot;
 
                     numberOfBot++;
+
+                    if (spawnedBot.TryGetComponent(out ICharacter playerCharacter))
+                    {
+                        playerCharacter.Reset();
+                    }
+
+                    OnBotSpawned?.Invoke(spawnedBot.name);
                 }
             }
         }
@@ -130,15 +138,35 @@ namespace Runtime.MonoBehaviours
         {
             await Task.Delay((int)delay * 1000);
 
-            for (int i = 0; i  <= _bots.Length; i++)
+            for (int i = 0; i  < _bots.Length; i++)
             {
                 if (_bots[i].name == name)
                 {
                     Destroy(_bots[i]);
                     _bots[i] = Instantiate(_bot, GetPositionForSpawn(name), Quaternion.identity);
                     _bots[i].name = name;
+
+                    if (_bots[i].TryGetComponent(out ICharacter playerCharacter))
+                    {
+                        playerCharacter.Reset();
+                    }
+
+                    OnBotSpawned?.Invoke(name);
                 }
             }
+        }
+
+        public GameObject GetBotByName(string name)
+        {
+            for (int i = 0; i <= _bots.Length; i++)
+            {
+                if (_bots[i].name == name)
+                {
+                    return _bots[i];
+                }
+            }
+            Debug.LogError("GetBotByName: did not find bot");
+            return null;
         }
 
         public struct AssociatedSpawn

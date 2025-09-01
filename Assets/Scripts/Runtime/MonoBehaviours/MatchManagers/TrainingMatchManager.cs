@@ -40,6 +40,11 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         {
             PlayerSpawner.Instance.SpawnPlayer(3);
         }
+        
+        private void RespawnBotByName(string name)
+        {
+            PlayerSpawner.Instance.RespawnBot(name, 3);
+        }
 
         private void RegisterPlayerForEvents()
         {
@@ -47,14 +52,25 @@ namespace Runtime.NetworkBehaviours.MatchManagers
                 playerCharacter.OnPlayerDeath += RespawnPlayer;
             }
         }
+
+        private void RegisterBotForEvents(string name)
+        {
+            GameObject bot = PlayerSpawner.Instance.GetBotByName(name);
+            if (bot.TryGetComponent(out BotCharacter botCharacter))
+            {
+                botCharacter.OnBotDeath += RespawnBotByName;
+            }
+        }
         
         private void SubscribeToEvents()
         {
             PlayerSpawner.Instance.OnPlayerSpawned += RegisterPlayerForEvents;
+            PlayerSpawner.Instance.OnBotSpawned += RegisterBotForEvents;
         }
         private void UnSubscribeToEvents()
         {
             PlayerSpawner.Instance.OnPlayerSpawned -= RegisterPlayerForEvents;
+            PlayerSpawner.Instance.OnBotSpawned -= RegisterBotForEvents;
         }
     }
 }
