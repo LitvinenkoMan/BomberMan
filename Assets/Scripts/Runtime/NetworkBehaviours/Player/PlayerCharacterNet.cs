@@ -1,4 +1,6 @@
 using System;
+using Core.DataTransferObjects;
+using Core.SaveSystem;
 using Core.ScriptableObjects;
 using CSharp;
 using Interfaces;
@@ -28,6 +30,7 @@ namespace Runtime.NetworkBehaviours.Player
         private CharacterController _characterController;
         
         private PlayerCharacterRuntimeNet _playerCharacterRuntimeNet;
+        private BombDto _bombDto;
 
         public event Action<ulong> OnPlayerDeath;
 
@@ -96,7 +99,8 @@ namespace Runtime.NetworkBehaviours.Player
 
         public void DeployBomb()
         {
-            //BombDeployer.DeployBomb(characterData.BombsAtTime, characterData.BombsCountdown, characterData.BombsDamage, characterData.BombsSpreading);
+            _bombDto = new BombDto(characterData.BombCountdown, characterData.BombsAtTime, characterData.BombSpread, characterData.BombDamage);
+            BombDeployer.DeployBomb(_bombDto);
         }
 
         public void SetMoveAbility(bool canMove)
@@ -164,6 +168,8 @@ namespace Runtime.NetworkBehaviours.Player
 
         private void CollectRefs()
         {
+            characterData = SaveManager.Instance.PlayerData.SelectedCharacterData;
+            
             if (TryGetComponent(out IImmune immune)) Immune = immune;
             if (TryGetComponent(out IBombDeployer bombDeployer)) BombDeployer = bombDeployer;
             if (TryGetComponent(out IMovable playerMovement)) CharacterMovement = playerMovement;
