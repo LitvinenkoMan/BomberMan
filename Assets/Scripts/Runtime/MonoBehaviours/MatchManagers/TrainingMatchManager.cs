@@ -23,33 +23,54 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         private void Start()
         {            
             SubscribeToEvents();
-            SpawnPlayer();
+            Spawn();
             StartMatchUnityEvent?.Invoke();
         }
         private void OnDestroy()
         {
             UnSubscribeToEvents();
         }
-        public void SpawnPlayer()
+        public void Spawn()
         {
             PlayerSpawner.Instance.SpawnPlayer(0);
             PlayerSpawner.Instance.SpawnBots();
         }
 
-        private void ResetPlayerParams()
+        private void RespawnPlayer()
         {
-            PlayerSpawner.Instance.Player.TryGetComponent(out ICharacter playerCharacter);
-            
-            playerCharacter.Reset();
+            PlayerSpawner.Instance.SpawnPlayer(3);
+        }
+        
+        private void RespawnBotByName(string name)
+        {
+            PlayerSpawner.Instance.RespawnBot(name, 3);
+        }
+
+        private void RegisterPlayerForEvents()
+        {
+            if (PlayerSpawner.Instance.Player.TryGetComponent(out PlayerCharacter playerCharacter)) {
+                playerCharacter.OnPlayerDeath += RespawnPlayer;
+            }
+        }
+
+        private void RegisterBotForEvents(string name)
+        {
+            GameObject bot = PlayerSpawner.Instance.GetBotByName(name);
+            if (bot.TryGetComponent(out BotCharacter botCharacter))
+            {
+                botCharacter.OnBotDeath += RespawnBotByName;
+            }
         }
         
         private void SubscribeToEvents()
         {
-            PlayerSpawner.Instance.OnPlayerSpawned += ResetPlayerParams;
+            PlayerSpawner.Instance.OnPlayerSpawned += RegisterPlayerForEvents;
+            PlayerSpawner.Instance.OnBotSpawned += RegisterBotForEvents;
         }
         private void UnSubscribeToEvents()
         {
-            PlayerSpawner.Instance.OnPlayerSpawned -= ResetPlayerParams;
+            PlayerSpawner.Instance.OnPlayerSpawned -= RegisterPlayerForEvents;
+            PlayerSpawner.Instance.OnBotSpawned -= RegisterBotForEvents;
         }
     }
 }

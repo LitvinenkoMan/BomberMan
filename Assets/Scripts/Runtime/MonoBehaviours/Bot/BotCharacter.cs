@@ -1,4 +1,5 @@
 using Interfaces;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,6 +15,23 @@ public class BotCharacter : MonoBehaviour, ICharacter
 
     private NavMeshAgent _agent;
 
+    public event Action<string> OnBotDeath;
+
+    private void Awake()
+    {
+        CollectRefs();
+    }
+
+    private void OnEnable()
+    {
+        Health.OnHealthRunOut += BotDeath;
+    }
+
+    private void OnDisable()
+    {
+        Health.OnHealthRunOut -= BotDeath;
+    }
+
     public void Initialize()
     {
     }
@@ -23,6 +41,13 @@ public class BotCharacter : MonoBehaviour, ICharacter
 
     public void Damage(int damageAmount)
     {
+        if (Immune.IsImmune) return;
+
+        if (Health.GetHealth() > 0)
+        {
+            Health.SubtractHealth(damageAmount);
+            Immune.ActivateImmunity();
+        }
     }
 
     public void DeployBomb()
@@ -34,7 +59,12 @@ public class BotCharacter : MonoBehaviour, ICharacter
     }
     public void Reset()
     {
-
+        if (Health == null)
+        {
+            Debug.LogWarning("PlayerCharacter: have not PlayerHealth component");
+            return;
+        }
+        Health.Initialize(3);
     }
 
     public void SetBombDeployAbility(bool canDeploy)
@@ -44,6 +74,13 @@ public class BotCharacter : MonoBehaviour, ICharacter
     public void SetMoveAbility(bool canMove)
     {
     }
+
+    private void BotDeath()
+    {
+        OnBotDeath?.Invoke(gameObject.name);
+        Debug.Log("Смерть бота");
+    }
+
 
     private void CollectRefs()
     {

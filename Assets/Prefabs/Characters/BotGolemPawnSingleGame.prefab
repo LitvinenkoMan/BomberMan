@@ -12,6 +12,9 @@ GameObject:
   - component: {fileID: 6149577082067582396}
   - component: {fileID: 4586101652305288361}
   - component: {fileID: 8736060648955859673}
+  - component: {fileID: 6430653406272118023}
+  - component: {fileID: 1253752500629601659}
+  - component: {fileID: 5182445110127427835}
   m_Layer: 0
   m_Name: BotGolemPawnSingleGame
   m_TagString: Untagged
@@ -86,6 +89,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a4edb792ff6bcc438727af03089398f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &6430653406272118023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 61186045847386152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7f97499f469b524ab26de77d94a72d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _baseParams: {fileID: 11400000, guid: 343b278d52b2d04458d57863450050ba, type: 2}
+--- !u!114 &1253752500629601659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 61186045847386152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a7484f7871bb0540ab5bdd7b4c0f41d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startImmunityTime: 3
+--- !u!114 &5182445110127427835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 61186045847386152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0c5001dc61b124438110526bffe5182, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _playerMesh: {fileID: 5802046400138911973}
 --- !u!1 &176990980487758069
 GameObject:
   m_ObjectHideFlags: 0
