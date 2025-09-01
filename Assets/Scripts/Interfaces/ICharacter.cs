@@ -2,7 +2,7 @@ namespace Interfaces
 {
     public interface ICharacter
     {
-        public IHealth Health { get; }
+        public ICharacterRuntimeData CharacterRuntimeData { get; }
         public IImmune Immune { get; }
         public IBombDeployer BombDeployer { get; }
         public IMovable CharacterMovement { get; }

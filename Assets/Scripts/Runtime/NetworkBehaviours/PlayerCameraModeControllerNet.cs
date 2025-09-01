@@ -88,7 +88,7 @@ namespace Runtime.NetworkBehaviours
                 {
                     if (playerObject.gameObject.TryGetComponent(out ICharacter character))
                     {
-                        character.Health.OnHealthRunOut += OnPlayerDeathResponce;
+                        character.CharacterRuntimeData.OnHealthRunOut += OnPlayerDeathResponce;
                         SwitchToGameplayMode();
                     }
                 }

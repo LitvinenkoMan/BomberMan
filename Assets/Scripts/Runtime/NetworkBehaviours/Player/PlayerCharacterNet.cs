@@ -18,7 +18,7 @@ namespace Runtime.NetworkBehaviours.Player
         [SerializeField]
         private GameObject playerVisuals;
         
-        public IHealth Health { get; private set; }
+        public ICharacterRuntimeData CharacterRuntimeData { get; private set; }
         public IImmune Immune { get; private set; }
         public IBombDeployer BombDeployer { get; private set; }
         public IMovable CharacterMovement { get; private set; }
@@ -37,12 +37,12 @@ namespace Runtime.NetworkBehaviours.Player
 
         private void OnEnable()
         {
-            Health.OnHealthRunOut += StartDeathSequence;
+            CharacterRuntimeData.OnHealthRunOut += StartDeathSequence;
         }
 
         private void OnDisable()
         {
-            Health.OnHealthRunOut -= StartDeathSequence;
+            CharacterRuntimeData.OnHealthRunOut -= StartDeathSequence;
         }
 
         public override void OnNetworkSpawn()
@@ -50,6 +50,8 @@ namespace Runtime.NetworkBehaviours.Player
             Initialize();
             name = $"P{GetComponent<NetworkObject>().OwnerClientId}";
             playerName.text = name;
+            
+            //TODO: Initialize PlayerCharacterRuntimeDataNet
         }
 
         public override void OnNetworkDespawn()
@@ -75,16 +77,16 @@ namespace Runtime.NetworkBehaviours.Player
         {
             if (Immune.IsImmune) return;
 
-            if (Health.GetHealth() > 0)
+            if (CharacterRuntimeData.CharacterHealth > 0)
             { 
-                Health.SubtractHealth(damageAmount);
+                CharacterRuntimeData.SubtractHealth(damageAmount);
                 Immune.ActivateImmunity();
             }
         }
 
         public void Heal(int healAmount)
         {
-            Health.AddHealth(healAmount);
+            CharacterRuntimeData.AddHealth(healAmount);
         }
 
         public void ActivateSpecial()
@@ -165,7 +167,7 @@ namespace Runtime.NetworkBehaviours.Player
             if (TryGetComponent(out IImmune immune)) Immune = immune;
             if (TryGetComponent(out IBombDeployer bombDeployer)) BombDeployer = bombDeployer;
             if (TryGetComponent(out IMovable playerMovement)) CharacterMovement = playerMovement;
-            if (TryGetComponent(out IHealth health)) Health = health;
+            if (TryGetComponent(out ICharacterRuntimeData characterRuntimeData)) CharacterRuntimeData = characterRuntimeData;
             if (TryGetComponent(out ICharacterAnimator characterAnimator)) CharacterAnimator = characterAnimator;
             if (TryGetComponent(out CharacterController characterController)) _characterController = characterController;
         }
@@ -179,7 +181,7 @@ namespace Runtime.NetworkBehaviours.Player
         [Rpc(SendTo.SpecifiedInParams)]
         private void ResetPlayerRpc(RpcParams rpcParams)
         {
-            Health.Initialize(3);
+            //CharacterRuntimeData.Initialize(3);
             _characterController.enabled = true;
         }
     }
