@@ -1197,7 +1197,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f152a6b512f991469561ebb6ca59e46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bomberParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
+  characterData: {fileID: 11400000, guid: 445abc726b0cad241b2225285cbf8427, type: 2}
   playerName: {fileID: 2931790567708399911}
   playerVisuals: {fileID: 5630106756533224544}
 --- !u!114 &3533742488125631471

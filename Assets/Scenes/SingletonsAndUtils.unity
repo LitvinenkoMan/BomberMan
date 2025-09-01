@@ -355,7 +355,7 @@ PrefabInstance:
     - target: {fileID: 4941679796587064009, guid: 0dc3db77422b66b41aa780655626f80c,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -463,6 +463,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: PlayerSpawner
+      objectReference: {fileID: 0}
+    - target: {fileID: 73559297982795815, guid: 47dba093589fde540bff59d362f20020,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4995401843360770855, guid: 47dba093589fde540bff59d362f20020,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4995401843360770855, guid: 47dba093589fde540bff59d362f20020,
         type: 3}

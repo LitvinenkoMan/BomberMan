@@ -12,7 +12,7 @@ namespace Runtime.NetworkBehaviours.Player
     public class PlayerCharacterNet : NetworkBehaviour, ICharacter, InputActions.IPlayerMapActions
     {
         [SerializeField]
-        private BaseBomberParameters bomberParams;
+        private CharacterData characterData;
         [SerializeField]
         private TMP_Text playerName;
         [SerializeField]
@@ -26,7 +26,8 @@ namespace Runtime.NetworkBehaviours.Player
 
         private InputActions _input;
         private CharacterController _characterController;
-        private CharacterRuntime _characterRuntime;
+        
+        private PlayerCharacterRuntimeNet _playerCharacterRuntimeNet;
 
         public event Action<ulong> OnPlayerDeath;
 
@@ -66,7 +67,6 @@ namespace Runtime.NetworkBehaviours.Player
                 _input ??= new InputActions();
                 _input.PlayerMap.AddCallbacks(this);
                 _input.Enable();
-                //bomberParams.ResetValues();
                 playerVisuals.SetActive(true);
                 playerName.enabled = true;
             }
@@ -96,7 +96,7 @@ namespace Runtime.NetworkBehaviours.Player
 
         public void DeployBomb()
         {
-            BombDeployer.DeployBomb(bomberParams.BombsAtTime, bomberParams.BombsCountdown, bomberParams.BombsDamage, bomberParams.BombsSpreading);
+            //BombDeployer.DeployBomb(characterData.BombsAtTime, characterData.BombsCountdown, characterData.BombsDamage, characterData.BombsSpreading);
         }
 
         public void SetMoveAbility(bool canMove)
@@ -138,7 +138,7 @@ namespace Runtime.NetworkBehaviours.Player
             var input = context.ReadValue<Vector2>();
             var moveDirection = new Vector3(input.x, 0, input.y);
             
-            CharacterMovement.Move(moveDirection * bomberParams.SpeedMultiplier);
+            CharacterMovement.Move(moveDirection * CharacterRuntimeData.SpeedMultiplier);
             if (input != Vector2.zero)
             {
                 CharacterAnimator.PlayWalkAnimation();
@@ -167,9 +167,12 @@ namespace Runtime.NetworkBehaviours.Player
             if (TryGetComponent(out IImmune immune)) Immune = immune;
             if (TryGetComponent(out IBombDeployer bombDeployer)) BombDeployer = bombDeployer;
             if (TryGetComponent(out IMovable playerMovement)) CharacterMovement = playerMovement;
-            if (TryGetComponent(out ICharacterRuntimeData characterRuntimeData)) CharacterRuntimeData = characterRuntimeData;
             if (TryGetComponent(out ICharacterAnimator characterAnimator)) CharacterAnimator = characterAnimator;
             if (TryGetComponent(out CharacterController characterController)) _characterController = characterController;
+
+            _playerCharacterRuntimeNet = new PlayerCharacterRuntimeNet();
+            _playerCharacterRuntimeNet.Initialize(characterData);
+            CharacterRuntimeData = _playerCharacterRuntimeNet;
         }
         
         [Rpc(SendTo.Server)]
@@ -181,7 +184,7 @@ namespace Runtime.NetworkBehaviours.Player
         [Rpc(SendTo.SpecifiedInParams)]
         private void ResetPlayerRpc(RpcParams rpcParams)
         {
-            //CharacterRuntimeData.Initialize(3);
+            _playerCharacterRuntimeNet.Initialize(characterData);
             _characterController.enabled = true;
         }
     }
