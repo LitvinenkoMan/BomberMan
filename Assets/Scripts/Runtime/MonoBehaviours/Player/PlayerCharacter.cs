@@ -13,16 +13,18 @@ namespace Runtime.MonoBehaviours.Player
     public class PlayerCharacter : MonoBehaviour, ICharacter, InputActions.IPlayerMapActions
     {
         [SerializeField]
-        private BaseBomberParameters bomberParams;
+        private CharacterData _characterData;
 
-        public IHealth Health { get; private set; }
+        public ICharacterRuntimeData CharacterRuntimeData { get; private set; }
         public IImmune Immune { get; private set; }
         public IBombDeployer BombDeployer { get; private set; }
         public IMovable CharacterMovement { get; private set; }
         public ICharacterAnimator CharacterAnimator { get; private set; }
 
+
         private InputActions _input;
         private CharacterController _characterController;
+        private CharacterRuntimeData _characterRuntimeData;
 
         public event Action OnPlayerDeath;
 
@@ -33,11 +35,11 @@ namespace Runtime.MonoBehaviours.Player
 
         private void OnEnable()
         {
-            Health.OnHealthRunOut += StartDeathSequence;
+            CharacterRuntimeData.OnHealthRunOut += StartDeathSequence;
         }
         private void OnDisable()
         {
-            Health.OnHealthRunOut -= StartDeathSequence;
+            CharacterRuntimeData.OnHealthRunOut -= StartDeathSequence;
         }
 
         private void Start()
@@ -62,16 +64,16 @@ namespace Runtime.MonoBehaviours.Player
         {
             if (Immune.IsImmune) return;
 
-            if (Health.GetHealth() > 0)
+            if (CharacterRuntimeData.CharacterHealth > 0)
             {
-                Health.SubtractHealth(damageAmount);
+                CharacterRuntimeData.SubtractHealth(damageAmount);
                 Immune.ActivateImmunity();
             }
         }
 
         public void DeployBomb()
         {
-            BombDeployer.DeployBomb(bomberParams.BombsAtTime, bomberParams.BombsCountdown, bomberParams.BombsDamage, bomberParams.BombsSpreading);
+            BombDeployer.DeployBomb(CharacterRuntimeData.BombsAtTime, CharacterRuntimeData.BombsCountdown, CharacterRuntimeData.BombsDamage, CharacterRuntimeData.BombsSpreading);
         }
 
         public void Heal(int healAmount)
@@ -79,12 +81,12 @@ namespace Runtime.MonoBehaviours.Player
         }
         public void Reset()
         {
-            if (Health == null)
+            if (CharacterRuntimeData == null)
             {
-                Debug.LogWarning("PlayerCharacter: have not PlayerHealth component");
+                Debug.LogWarning("PlayerCharacter: have not CharacterRuntimeData");
                 return;
             }
-            Health.Initialize(3);
+            CharacterRuntimeData.Initialize(3);
             _characterController.enabled = true;
         }
 
@@ -102,9 +104,12 @@ namespace Runtime.MonoBehaviours.Player
             if (TryGetComponent(out IImmune immune)) Immune = immune;
             if (TryGetComponent(out IBombDeployer bombDeployer)) BombDeployer = bombDeployer;
             if (TryGetComponent(out IMovable playerMovement)) CharacterMovement = playerMovement;
-            if (TryGetComponent(out IHealth health)) Health = health;
             if (TryGetComponent(out ICharacterAnimator characterAnimator)) CharacterAnimator = characterAnimator;
             if (TryGetComponent(out CharacterController characterController)) _characterController = characterController;
+
+            _characterRuntimeData = new CharacterRuntimeData();
+            _characterRuntimeData.Initialize(_characterData);
+            CharacterRuntimeData = _characterRuntimeData;
         }
         private void StartDeathSequence()
         {
@@ -124,7 +129,7 @@ namespace Runtime.MonoBehaviours.Player
             Vector2 inputVector = context.ReadValue<Vector2>();
             Vector3 moveDirection = new Vector3(inputVector.x, 0, inputVector.y);
 
-            CharacterMovement.Move(moveDirection * bomberParams.SpeedMultiplier);
+            CharacterMovement.Move(moveDirection * CharacterRuntimeData.SpeedMultiplier);
             if (inputVector != Vector2.zero)
             {
                 CharacterAnimator.PlayWalkAnimation();

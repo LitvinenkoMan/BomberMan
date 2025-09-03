@@ -1,94 +1,106 @@
+using Core.ScriptableObjects;
 using Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-
-public class BotCharacter : MonoBehaviour, ICharacter
+namespace Runtime.MonoBehaviours.Bot
 {
-    public IHealth Health { get; private set; }
-    public IImmune Immune { get; private set; }
-    public IBombDeployer BombDeployer { get; private set; }
-    public IMovable CharacterMovement { get; private set; }
-    public ICharacterAnimator CharacterAnimator { get; private set; }
-
-    private NavMeshAgent _agent;
-
-    public event Action<string> OnBotDeath;
-
-    private void Awake()
+    public class BotCharacter : MonoBehaviour, ICharacter
     {
-        CollectRefs();
-    }
+        [SerializeField] private CharacterData _characterData;
+        public ICharacterRuntimeData CharacterRuntimeData { get; private set; }
+        public IImmune Immune { get; private set; }
+        public IBombDeployer BombDeployer { get; private set; }
+        public IMovable CharacterMovement { get; private set; }
+        public ICharacterAnimator CharacterAnimator { get; private set; }
 
-    private void OnEnable()
-    {
-        Health.OnHealthRunOut += BotDeath;
-    }
+        private CharacterRuntimeData _characterRuntimeData;
+        public CharacterRuntimeData CharacterData => _characterRuntimeData;
 
-    private void OnDisable()
-    {
-        Health.OnHealthRunOut -= BotDeath;
-    }
+        private NavMeshAgent _agent;
 
-    public void Initialize()
-    {
-    }
-    public void ActivateSpecial()
-    {
-    }
+        public event Action<string> OnBotDeath;
 
-    public void Damage(int damageAmount)
-    {
-        if (Immune.IsImmune) return;
-
-        if (Health.GetHealth() > 0)
+        private void Awake()
         {
-            Health.SubtractHealth(damageAmount);
-            Immune.ActivateImmunity();
+            CollectRefs();
         }
-    }
 
-    public void DeployBomb()
-    {
-    }
-
-    public void Heal(int healAmount)
-    {
-    }
-    public void Reset()
-    {
-        if (Health == null)
+        private void OnEnable()
         {
-            Debug.LogWarning("PlayerCharacter: have not PlayerHealth component");
-            return;
+            CharacterRuntimeData.OnHealthRunOut += BotDeath;
         }
-        Health.Initialize(3);
-    }
 
-    public void SetBombDeployAbility(bool canDeploy)
-    {
-    }
+        private void OnDisable()
+        {
+            CharacterRuntimeData.OnHealthRunOut -= BotDeath;
+        }
 
-    public void SetMoveAbility(bool canMove)
-    {
-    }
+        public void Initialize()
+        {
+        }
+        public void ActivateSpecial()
+        {
+        }
 
-    private void BotDeath()
-    {
-        OnBotDeath?.Invoke(gameObject.name);
-        Debug.Log("Смерть бота");
-    }
+        public void Damage(int damageAmount)
+        {
+            if (Immune.IsImmune) return;
+
+            if (CharacterRuntimeData.CharacterHealth > 0)
+            {
+                CharacterRuntimeData.SubtractHealth(damageAmount);
+                Immune.ActivateImmunity();
+            }
+        }
+
+        public void DeployBomb()
+        {
+            BombDeployer.DeployBomb(CharacterRuntimeData.BombsAtTime, CharacterRuntimeData.BombsCountdown, CharacterRuntimeData.BombsDamage, CharacterRuntimeData.BombsSpreading);
+        }
+
+        public void Heal(int healAmount)
+        {
+        }
+        public void Reset()
+        {
+            if (CharacterRuntimeData == null)
+            {
+                Debug.LogWarning("PlayerCharacter: have not CharacterRuntimeData");
+                return;
+            }
+            CharacterRuntimeData.Initialize(3);
+        }
+
+        public void SetBombDeployAbility(bool canDeploy)
+        {
+            BombDeployer.SetAbilityToDeployBombs(canDeploy);
+        }
+
+        public void SetMoveAbility(bool canMove)
+        {
+        }
+
+        private void BotDeath()
+        {
+            OnBotDeath?.Invoke(gameObject.name);
+            CharacterAnimator.PlayDeathAnimation();
+        }
 
 
-    private void CollectRefs()
-    {
-        if (TryGetComponent(out IImmune immune)) Immune = immune;
-        if (TryGetComponent(out IBombDeployer bombDeployer)) BombDeployer = bombDeployer;
-        if (TryGetComponent(out IMovable playerMovement)) CharacterMovement = playerMovement;
-        if (TryGetComponent(out IHealth health)) Health = health;
-        if (TryGetComponent(out ICharacterAnimator characterAnimator)) CharacterAnimator = characterAnimator;
-        if (TryGetComponent(out NavMeshAgent agent)) _agent = agent;
+        private void CollectRefs()
+        {
+            if (TryGetComponent(out IImmune immune)) Immune = immune;
+            if (TryGetComponent(out IBombDeployer bombDeployer)) BombDeployer = bombDeployer;
+            if (TryGetComponent(out IMovable playerMovement)) CharacterMovement = playerMovement;
+            if (TryGetComponent(out ICharacterAnimator characterAnimator)) CharacterAnimator = characterAnimator;
+            if (TryGetComponent(out NavMeshAgent agent)) _agent = agent;
+            _characterRuntimeData = new CharacterRuntimeData();
+            _characterRuntimeData.Initialize(_characterData);
+            CharacterRuntimeData = _characterRuntimeData;
+        }
     }
 }
+
