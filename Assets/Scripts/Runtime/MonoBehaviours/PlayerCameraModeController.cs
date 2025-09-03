@@ -14,12 +14,12 @@ public class PlayerCameraModeController : MonoBehaviour
 
     private void OnEnable()
     {
-        PlayerSpawner.Instance.OnPlayerSpawned += FollowSpawnedPlayer;
+        Spawner.Instance.OnPlayerSpawned += FollowSpawnedPlayer;
         CheckForCameraInstance();
     }
     private void OnDisable()
     {
-        PlayerSpawner.Instance.OnPlayerSpawned -= FollowSpawnedPlayer;
+        Spawner.Instance.OnPlayerSpawned -= FollowSpawnedPlayer;
     }
 
     private void CheckForCameraInstance()
@@ -34,7 +34,7 @@ public class PlayerCameraModeController : MonoBehaviour
     private void SwitchToGameplayMode()
     {
         _cameraViewer.ClearTargetsList();
-        _cameraViewer.AddToViewTarget(PlayerSpawner.Instance.Player.transform);
+        _cameraViewer.AddToViewTarget(Spawner.Instance.Player.transform);
     }
 
     public void FollowSpawnedPlayer()

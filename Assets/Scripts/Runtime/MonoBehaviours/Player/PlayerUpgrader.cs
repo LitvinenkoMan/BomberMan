@@ -8,42 +8,36 @@ namespace Runtime.NetworkBehaviours.Player
 {
     public class PlayerUpgrader : MonoBehaviour, ICharacterUpgradable
     {
-        [SerializeField] private BaseBomberParameters playerParams;
+        private CharacterRuntimeData _characterRuntimeData;
 
-        private IHealth _playerHealthComponent;
-
-        private void Start()
-        {
-            _playerHealthComponent = GetComponent<IHealth>();
-        }
         public void IncreaseBombsDamage(float increaseAmount)
         {
-            playerParams.SetBombsDamage(playerParams.BombsDamage + (int)increaseAmount);
+            _characterRuntimeData.SetBombsDamage(_characterRuntimeData.BombsDamage + (int)increaseAmount);
         }
 
         public void IncreaseBombsPerTime(float increaseAmount)
         {
-            playerParams.SetBombsAtTime(playerParams.BombsAtTime + (int)increaseAmount);
+            _characterRuntimeData.SetBombsAtTime(_characterRuntimeData.BombsAtTime + (int)increaseAmount);
         }
 
         public void IncreaseBombsSpreading(float increaseAmount)
         {
-            playerParams.SetBombsSpreading(playerParams.BombsSpreading + (int)increaseAmount);
+            _characterRuntimeData.SetBombsSpreading(_characterRuntimeData.BombsSpreading + (int)increaseAmount);
         }
 
         public void IncreaseHealth(float increaseAmount)
         {
-            _playerHealthComponent.AddHealth((int)increaseAmount);
+            _characterRuntimeData.AddHealth((int)increaseAmount);
         }
 
         public void IncreaseMovementSpeed(float increaseAmount)
         {
-            playerParams.SetSpeedMultiplier(playerParams.SpeedMultiplier + increaseAmount);
+            _characterRuntimeData.SetSpeedMultiplier(_characterRuntimeData.SpeedMultiplier + increaseAmount);
         }
 
         public void Reset()
         {
-            playerParams.ResetValues();
+            
         }
     }
 }

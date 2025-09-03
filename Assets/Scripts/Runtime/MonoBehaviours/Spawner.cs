@@ -7,13 +7,13 @@ using UnityEngine;
 
 namespace Runtime.MonoBehaviours
 {
-    public class PlayerSpawner : MonoBehaviour
+    public class Spawner : MonoBehaviour
     {
         [SerializeField] private GameObject _player;
         [SerializeField] private GameObject _bot;
         public GameObject Player { get; private set; }
 
-        public static PlayerSpawner Instance;
+        public static Spawner Instance;
 
         private GameObject[] _bots;
         private LevelSectionsDataHolder _dataHolder;
@@ -123,6 +123,7 @@ namespace Runtime.MonoBehaviours
                     if (spawnedBot.TryGetComponent(out ICharacter playerCharacter))
                     {
                         playerCharacter.Reset();
+                        playerCharacter.SetBombDeployAbility(true);
                     }
 
                     OnBotSpawned?.Invoke(spawnedBot.name);
@@ -145,6 +146,7 @@ namespace Runtime.MonoBehaviours
                     if (_bots[i].TryGetComponent(out ICharacter playerCharacter))
                     {
                         playerCharacter.Reset();
+                        playerCharacter.SetBombDeployAbility(true);
                     }
 
                     OnBotSpawned?.Invoke(name);

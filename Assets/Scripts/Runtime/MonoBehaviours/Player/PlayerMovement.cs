@@ -22,7 +22,7 @@ namespace Runtime.MonoBehaviours.Player
         private float _velocity;
         private bool _canMove;
 
-        private const float CONSTANTSPEEDDEVIDER = 1.25f;
+        private const float CONSTANTSPEEDDEVIDER = 12.5f;
 
         void Start()
         {
