@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 426458469771513397}
   - component: {fileID: -4750872074940096956}
   - component: {fileID: -2727126051133297285}
-  - component: {fileID: -8798606668993043825}
+  - component: {fileID: -5683206113663477397}
   m_Layer: 0
   m_Name: Bricks_LV1 1
   m_TagString: Untagged
@@ -91,7 +91,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   visuals: {fileID: 8629476180602649643}
---- !u!208 &-8798606668993043825
+--- !u!208 &-5683206113663477397
 NavMeshObstacle:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -169,6 +169,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: MudStone
+      objectReference: {fileID: 0}
+    - target: {fileID: 7516703547791615825, guid: 507c8a1e30ab7d74b8e8e05a0917f060,
+        type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

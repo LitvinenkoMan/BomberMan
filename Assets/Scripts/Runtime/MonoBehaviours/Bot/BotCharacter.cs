@@ -1,5 +1,6 @@
 using Core.ScriptableObjects;
 using Interfaces;
+using Runtime.MonoBehaviours.Player;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,11 +16,11 @@ namespace Runtime.MonoBehaviours.Bot
         public IBombDeployer BombDeployer { get; private set; }
         public IMovable CharacterMovement { get; private set; }
         public ICharacterAnimator CharacterAnimator { get; private set; }
+        public PlayerBombDeployer concreteBombDeployer { get; private set; }
+
 
         private CharacterRuntimeData _characterRuntimeData;
         public CharacterRuntimeData CharacterData => _characterRuntimeData;
-
-        private NavMeshAgent _agent;
 
         public event Action<string> OnBotDeath;
 
@@ -58,7 +59,7 @@ namespace Runtime.MonoBehaviours.Bot
 
         public void DeployBomb()
         {
-            BombDeployer.DeployBomb(CharacterRuntimeData.BombsAtTime, CharacterRuntimeData.BombsCountdown, CharacterRuntimeData.BombsDamage, CharacterRuntimeData.BombsSpreading);
+            concreteBombDeployer.DeployBomb(CharacterRuntimeData.BombsAtTime, CharacterRuntimeData.BombsCountdown, CharacterRuntimeData.BombsDamage, CharacterRuntimeData.BombsSpreading);
         }
 
         public void Heal(int healAmount)
@@ -76,7 +77,7 @@ namespace Runtime.MonoBehaviours.Bot
 
         public void SetBombDeployAbility(bool canDeploy)
         {
-            BombDeployer.SetAbilityToDeployBombs(canDeploy);
+            concreteBombDeployer.SetAbilityToDeployBombs(canDeploy);
         }
 
         public void SetMoveAbility(bool canMove)
@@ -93,10 +94,10 @@ namespace Runtime.MonoBehaviours.Bot
         private void CollectRefs()
         {
             if (TryGetComponent(out IImmune immune)) Immune = immune;
-            if (TryGetComponent(out IBombDeployer bombDeployer)) BombDeployer = bombDeployer;
+            if (TryGetComponent(out PlayerBombDeployer bombDeployer)) this.concreteBombDeployer = bombDeployer;
             if (TryGetComponent(out IMovable playerMovement)) CharacterMovement = playerMovement;
             if (TryGetComponent(out ICharacterAnimator characterAnimator)) CharacterAnimator = characterAnimator;
-            if (TryGetComponent(out NavMeshAgent agent)) _agent = agent;
+
             _characterRuntimeData = new CharacterRuntimeData();
             _characterRuntimeData.Initialize(_characterData);
             CharacterRuntimeData = _characterRuntimeData;

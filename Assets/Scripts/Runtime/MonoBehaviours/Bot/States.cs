@@ -4,67 +4,92 @@ using System.Collections.Generic;
 using UnityEngine;
 using Interfaces;
 
-namespace Interfaces 
+namespace Interfaces
 {
     public interface IState
     {
-        void Enter(BotAIManager manager);
-        void Update(BotAIManager manager);
-        void Exit(BotAIManager manager);
+        void Enter(BotLogicExecuter manager);
+        void Update(BotLogicExecuter manager);
+        void Exit(BotLogicExecuter manager);
     }
 }
 
 
 namespace Runtime.MonoBehaviours.Bot
 {
-    public class Agro : IState
+    public class SimpleAgro : IState
     {
-        public void Enter(BotAIManager manager)
+        float timer = 1f;
+        public void Enter(BotLogicExecuter manager)
         {
-            manager.StateSwitcher.SetSpeed(2.7f);
+            manager.SetSpeed(3f);
             manager.Character.CharacterAnimator.PlayWalkAnimation();
+            manager.SetTarget(Spawner.Instance.Player.transform.position);
         }
 
-        public void Exit(BotAIManager manager)
+        public void Exit(BotLogicExecuter manager)
         {
             manager.Character.CharacterAnimator.PlayIdleAnimation();
         }
 
-        public void Update(BotAIManager manager)
+        public void Update(BotLogicExecuter manager)
         {
+            manager.SetTarget(manager.Target);
+            float distance = manager.CheckDistance();
 
+            timer += Time.deltaTime;
+            
+            if (timer >= 1f)
+            {
+                manager.CheckPath();
+                timer = 0f;
+            }
+            if (distance <= 0.5f)
+            {
+                manager.SwitchState(manager.States["Deploy Bomb"]);
+            }
         }
     }
-
-    public class SearchShelter : IState
+    public class SimpleSearchShelter : IState
     {
-        public void Enter(BotAIManager manager)
+        public void Enter(BotLogicExecuter manager)
         {
+            
         }
 
-        public void Exit(BotAIManager manager)
+        public void Exit(BotLogicExecuter manager)
         {
+
         }
 
-        public void Update(BotAIManager manager)
+        public void Update(BotLogicExecuter manager)
         {
+          
         }
     }
-
-    public class DeployBomb : IState
+    public class SimpleDeployBomb : IState
     {
-        public void Enter(BotAIManager manager)
+        float timer = 0f;
+        public void Enter(BotLogicExecuter manager)
         {
-            manager.StateSwitcher.SetSpeed(0f);
             manager.Character.DeployBomb();
+            manager.RetreatFromBomb();
         }
 
-        public void Exit(BotAIManager manager)
+        public void Exit(BotLogicExecuter manager)
         {
+
         }
 
-        public void Update(BotAIManager manager)
+        public void Update(BotLogicExecuter manager)
         {
+            
+            timer += Time.deltaTime;
+            if (timer >= 3f)
+            {
+                manager.SwitchState(manager.States["Agro"]);
+                timer = 0f;
+            }
         }
     }
 }
