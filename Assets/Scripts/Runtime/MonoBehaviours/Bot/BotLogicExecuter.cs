@@ -23,23 +23,21 @@ namespace Runtime.MonoBehaviours.Bot
         private IState _currentState;
         private Vector3 _spawnedBombPos;
 
-
         public Vector3 Target => _target;
         public Dictionary<string, IState> States => _states;
         public BotCharacter Character => _character;
         public ICharacterRuntimeData CharacterData => _characterData;
 
-        List<Vector3> possiblePositions;
-        List<Vector3> availablePositions;
+        //List<Vector3> possiblePos = new List<Vector3>();
+        //List<Vector3> availablePos = new List<Vector3>();
 
         private void Awake()
         {
             CollectRefs();
             SwitchState(_states["Agro"]);
             SetTarget(_player.position);
-            possiblePositions = new List<Vector3>();
-            availablePositions = new List<Vector3>();
         }
+       
         private void Start()
         {
             _character.concreteBombDeployer.BombSpawned += SetBombPosition;
@@ -51,22 +49,22 @@ namespace Runtime.MonoBehaviours.Bot
 
         private void OnDrawGizmos()
         {
-            if (possiblePositions != null)
-            {
-                foreach (var point in possiblePositions)
-                {
-                    Gizmos.color = UnityEngine.Color.red;
-                    Gizmos.DrawSphere(point + new Vector3(0, 1, 0), 0.3f);
-                }
-            }
-            if (availablePositions != null)
-            {
-                foreach (var point in availablePositions)
-                {
-                    Gizmos.color = UnityEngine.Color.green;
-                    Gizmos.DrawSphere(point + new Vector3(0, 1, 0), 0.3f);
-                }
-            }
+            //if (possiblePos != null)
+            //{
+            //    foreach (var point in possiblePos)
+            //    {
+            //        Gizmos.color = UnityEngine.Color.red;
+            //        Gizmos.DrawSphere(point + new Vector3(0, 1, 0), 0.3f);
+            //    }
+            //}
+            //if (availablePos != null)
+            //{
+            //    foreach (var point in availablePos)
+            //    {
+            //        Gizmos.color = UnityEngine.Color.green;
+            //        Gizmos.DrawSphere(point + new Vector3(0, 1, 0), 0.3f);
+            //    }
+            //}
         }
 
         private void CollectRefs()
@@ -76,15 +74,9 @@ namespace Runtime.MonoBehaviours.Bot
 
             _characterData = _character.CharacterRuntimeData;
             _player = Spawner.Instance.Player.transform;
+
             StatesSelector statesSelector = new StatesSelector();
             _states = statesSelector.GetStatesForType(BotType.Easy);
-
-            switch (_botType)
-            {
-                case BotType.Easy:
-                    _botType = BotType.Easy;
-                    break;
-            }
         }
         public float CheckDistance()
         {
@@ -117,7 +109,7 @@ namespace Runtime.MonoBehaviours.Bot
             _agent.CalculatePath(_target, path);
             if (path.status == NavMeshPathStatus.PathComplete)
             {
-                SetTarget(_target);
+                SetTarget(Spawner.Instance.Player.transform.position);
             }
             else
             {
@@ -125,47 +117,66 @@ namespace Runtime.MonoBehaviours.Bot
             }
         }
 
-        private void SetAvailablePos(List<Vector3> pos)
+        private bool PointInBlackList(List<Vector3> blackList, Vector3 point)
         {
-            availablePositions = null;
-            availablePositions = pos;
-        }
+            Vector3 checkingPoint = new Vector3(point.x, 0, point.z);
 
-        private bool PointInArea(Vector3 point, float range)
-        {
-            if ((point - _spawnedBombPos).magnitude > Mathf.Pow(range * 2 - 2, 0.5f))
+            foreach(Vector3 blackListPoint in blackList)
             {
-                return false;
+                Vector3 blackPoint = new Vector3(blackListPoint.x, 0, blackListPoint.z);
+
+                if (checkingPoint == blackPoint) return true;
             }
-            return true;
+            return false;
         }
 
-        public void RetreatFromBomb()
+        private List<Vector3> GenerateBlacklistPositions(byte explosionRange, Vector3 bombPos)
         {
-            possiblePositions.Clear();
+            var blacklist = new List<Vector3> { bombPos };
+            for (int i = 1; i <= explosionRange; i++)
+            {
+                blacklist.Add(bombPos + new Vector3(i, 0, 0));
+                blacklist.Add(bombPos + new Vector3(-i, 0, 0));
+                blacklist.Add(bombPos + new Vector3(0, 0, i));
+                blacklist.Add(bombPos + new Vector3(0, 0, -i));
+            }
+            return blacklist;
+        }
 
-
+        private List<Vector3> GeneratePossiblePositions(byte explosionRange, List<Vector3> blacklist)
+        {
+            var possiblePositions = new List<Vector3>();
             float centerX = _spawnedBombPos.x;
             float centerZ = _spawnedBombPos.z;
-            int range = _characterData.BombsSpreading + 1;
 
-            var availablePos = new List<Vector3>();
-            var blackListPositions = new List<Vector3>();
-
-            for (int x = -range; x <= range; x++)
+            for (int x = -explosionRange - 1; x <= explosionRange + 1; x++)
             {
-                for (int z = -range; z <= range; z++)
+                for (int z = -explosionRange - 1; z <= explosionRange + 1; z++)
                 {
-                    Vector3 point = new Vector3(centerX + x, transform.position.y, centerZ + z);
+                    Vector3 point = new Vector3(centerX + x, 0, centerZ + z);
 
-                    if (!PointInArea(point, range))
+                    if (!PointInBlackList(blacklist, point))
                     {
                         possiblePositions.Add(point);
                     }
                 }
             }
+            if (possiblePositions.Count > 0)
+            {
+                return possiblePositions;
+            }
+            else
+            {
+                Debug.LogError("GeneratePossiblePositions: list of possible positions is null");
+                return null;
+            }
+        }
+        private List<Vector3> FindAvailablePosForRetreat(List<Vector3> possiblePos, List<Vector3> blacklist)
+        {
+            Vector3[] sideOffsets = { new Vector3(1, 0, 0), new Vector3(-1, 0, 0) };
+            var availablePositions = new List<Vector3>();
 
-            foreach (Vector3 point in possiblePositions)
+            foreach (Vector3 point in possiblePos)
             {
                 if (NavMesh.SamplePosition(point, out NavMeshHit hit, 0.5f, NavMesh.AllAreas))
                 {
@@ -174,28 +185,45 @@ namespace Runtime.MonoBehaviours.Bot
 
                     if (path.status == NavMeshPathStatus.PathComplete)
                     {
-                        availablePos.Add(hit.position);
+                        availablePositions.Add(hit.position);
 
                         // проверяем боковую секцию чтобы сразу уйти с поля поражения бомбы
-                        _agent.CalculatePath(hit.position + new Vector3(1, 0, 0), path);
-                        if (path.status == NavMeshPathStatus.PathComplete && !PointInArea(hit.position + new Vector3(1, 0, 0), range))
+                        foreach (var offset in sideOffsets)
                         {
-                            availablePos.Add(hit.position + new Vector3(1, 0, 0));
-                        }
-
-                        // проверяем боковую секцию чтобы сразу уйти с поля поражения бомбы
-                        _agent.CalculatePath(hit.position - new Vector3(1, 0, 0), path);
-                        if (path.status == NavMeshPathStatus.PathComplete && !PointInArea(hit.position - new Vector3(1, 0, 0), range))
-                        {
-                            availablePos.Add(hit.position - new Vector3(1, 0, 0));
+                            var sidePos = hit.position + offset;
+                            _agent.CalculatePath(sidePos, path);
+                            if (path.status == NavMeshPathStatus.PathComplete && !PointInBlackList(blacklist, sidePos))
+                            {
+                                availablePositions.Add(sidePos);
+                            }
                         }
                     }
                     else continue;
                 }
             }
-            int randInt = UnityEngine.Random.Range(0, availablePos.Count);
-            SetTarget(availablePos[randInt]);
-            SetAvailablePos(availablePos);
+            if (availablePositions.Count > 0)
+            {
+                return availablePositions;
+            }
+            else
+            {
+                Debug.LogError("FindAvailablePosForRetreat: did not find available positions for retreat");
+                return null;
+            }
+        }
+
+        public void RetreatFromBomb()
+        {
+            byte explosionRange = (byte)_characterData.BombsSpreading;
+
+            var blacklistPositions = GenerateBlacklistPositions(explosionRange, _spawnedBombPos);
+            var possiblePositions = GeneratePossiblePositions(explosionRange, blacklistPositions);
+            var availablePositions = FindAvailablePosForRetreat(possiblePositions, blacklistPositions);
+
+            int randInt = UnityEngine.Random.Range(0, availablePositions.Count);
+            SetTarget(availablePositions[randInt]);
+            //availablePos = availablePositions;
+            //possiblePos = possiblePositions;
         }
         
         public void SwitchState(IState newState)
@@ -208,12 +236,9 @@ namespace Runtime.MonoBehaviours.Bot
             _currentState.Enter(this);
         }
 
-
         private void Update()
         {
             _currentState.Update(this);
         }
     }
 }
-
-
