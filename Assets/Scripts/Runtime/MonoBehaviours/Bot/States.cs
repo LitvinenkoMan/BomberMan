@@ -19,7 +19,7 @@ namespace Runtime.MonoBehaviours.Bot
 {
     public class SimpleAgro : IState
     {
-        float timer = 1f;
+        float timer = 0.5f;
         public void Enter(BotLogicExecuter manager)
         {
             manager.SetSpeed(3f);
@@ -34,16 +34,16 @@ namespace Runtime.MonoBehaviours.Bot
 
         public void Update(BotLogicExecuter manager)
         {
-            manager.SetTarget(manager.Target);
             float distance = manager.CheckDistance();
 
             timer += Time.deltaTime;
             
-            if (timer >= 1f)
+            if (timer >= 0.5f)
             {
                 manager.CheckPath();
-                timer = 0f;
+                timer = 0.5f;
             }
+
             if (distance <= 0.5f)
             {
                 manager.SwitchState(manager.States["Deploy Bomb"]);
@@ -72,6 +72,7 @@ namespace Runtime.MonoBehaviours.Bot
         float timer = 0f;
         public void Enter(BotLogicExecuter manager)
         {
+            manager.Character.CharacterAnimator.PlayWalkAnimation();
             manager.Character.DeployBomb();
             manager.RetreatFromBomb();
         }
@@ -83,8 +84,15 @@ namespace Runtime.MonoBehaviours.Bot
 
         public void Update(BotLogicExecuter manager)
         {
-            
+            float distance = manager.CheckDistance();
+
+            if (distance <= 0.1f)
+            {
+                manager.Character.CharacterAnimator.PlayIdleAnimation();
+            }
+
             timer += Time.deltaTime;
+
             if (timer >= 3f)
             {
                 manager.SwitchState(manager.States["Agro"]);
