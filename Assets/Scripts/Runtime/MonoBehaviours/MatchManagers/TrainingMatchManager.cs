@@ -49,7 +49,7 @@ namespace Runtime.NetworkBehaviours.MatchManagers
 
         private void RegisterBotForEvents(string name)
         {
-            GameObject bot = Spawner.Instance.GetBotByName(name);
+            GameObject bot = Spawner.Instance.GetOpponentByName(name);
             if (bot.TryGetComponent(out BotCharacter botCharacter))
             {
                 botCharacter.OnBotDeath += RespawnBotByName;

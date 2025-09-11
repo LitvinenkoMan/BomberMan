@@ -11,16 +11,16 @@ namespace Runtime.MonoBehaviours.Bot
     public class BotCharacter : MonoBehaviour, ICharacter
     {
         [SerializeField] private CharacterData _characterData;
+        [SerializeField] private PlayerBombDeployer _concreteBombDeployer;
         public ICharacterRuntimeData CharacterRuntimeData { get; private set; }
         public IImmune Immune { get; private set; }
         public IBombDeployer BombDeployer { get; private set; }
         public IMovable CharacterMovement { get; private set; }
         public ICharacterAnimator CharacterAnimator { get; private set; }
-        public PlayerBombDeployer concreteBombDeployer { get; private set; }
-
 
         private CharacterRuntimeData _characterRuntimeData;
         public CharacterRuntimeData CharacterData => _characterRuntimeData;
+        public PlayerBombDeployer PlayerBombDeployer => _concreteBombDeployer;
 
         public event Action<string> OnBotDeath;
 
@@ -59,7 +59,7 @@ namespace Runtime.MonoBehaviours.Bot
 
         public void DeployBomb()
         {
-            concreteBombDeployer.DeployBomb(CharacterRuntimeData.BombsAtTime, CharacterRuntimeData.BombsCountdown, CharacterRuntimeData.BombsDamage, CharacterRuntimeData.BombsSpreading);
+            BombDeployer.DeployBomb(CharacterRuntimeData.BombsAtTime, CharacterRuntimeData.BombsCountdown, CharacterRuntimeData.BombsDamage, CharacterRuntimeData.BombsSpreading);
         }
 
         public void Heal(int healAmount)
@@ -77,28 +77,33 @@ namespace Runtime.MonoBehaviours.Bot
 
         public void SetBombDeployAbility(bool canDeploy)
         {
-            concreteBombDeployer.SetAbilityToDeployBombs(canDeploy);
+            BombDeployer.SetAbilityToDeployBombs(canDeploy);
         }
 
         public void SetMoveAbility(bool canMove)
         {
+            gameObject.GetComponent<NavMeshAgent>().speed = canMove ? 3 : 0;
         }
 
         private void BotDeath()
         {
             OnBotDeath?.Invoke(gameObject.name);
             CharacterAnimator.PlayDeathAnimation();
+            SetBombDeployAbility(false);
+            SetMoveAbility(false);
         }
 
 
         private void CollectRefs()
         {
             if (TryGetComponent(out IImmune immune)) Immune = immune;
-            if (TryGetComponent(out PlayerBombDeployer bombDeployer)) this.concreteBombDeployer = bombDeployer;
             if (TryGetComponent(out IMovable playerMovement)) CharacterMovement = playerMovement;
             if (TryGetComponent(out ICharacterAnimator characterAnimator)) CharacterAnimator = characterAnimator;
 
+            BombDeployer = _concreteBombDeployer;
+
             _characterRuntimeData = new CharacterRuntimeData();
+
             _characterRuntimeData.Initialize(_characterData);
             CharacterRuntimeData = _characterRuntimeData;
         }

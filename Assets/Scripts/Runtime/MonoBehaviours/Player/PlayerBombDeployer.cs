@@ -1,6 +1,7 @@
 using Interfaces;
 using MonoBehaviours.GroundSectionSystem;
 using MonoBehaviours.GroundSectionSystem.SectionObstacles;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,6 +15,8 @@ namespace Runtime.MonoBehaviours.Player
         private Queue<Bomb> _dropedBombs;
         private bool _canDeployBombs;
         private int _currentPlacedBombs;
+
+        public Action<Vector3> BombSpawned;
 
         private void OnEnable()
         {
@@ -43,6 +46,8 @@ namespace Runtime.MonoBehaviours.Player
                 bomb.Ignite(timeToExplode, bombDamage, bombSpread);
 
                 _currentPlacedBombs++;
+
+                BombSpawned?.Invoke(bomb.transform.position);
             }
         }
         private void SubtractAmountOfCurrentBombs(Bomb explodedBomb)

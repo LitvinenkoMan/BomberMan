@@ -39,7 +39,6 @@ public class PlayerCameraModeController : MonoBehaviour
 
     public void FollowSpawnedPlayer()
     {
-        Debug.Log("FollowSpawnedPlayer");
         SwitchToGameplayMode();
     }
 }
