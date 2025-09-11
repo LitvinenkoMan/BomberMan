@@ -9,46 +9,66 @@ using UnityEngine.AI;
 using static UnityEditor.Experimental.GraphView.GraphView;
 using static UnityEditor.PlayerSettings;
 
+namespace Interfaces
+{
+    public interface IBotEasyLogic
+    {
+
+    }
+}
 namespace Runtime.MonoBehaviours.Bot
 {
     public class BotLogicExecuter : MonoBehaviour
     {
-        private BotType _botType;
         private BotCharacter _character;
         private NavMeshAgent _agent;
-        private Transform _player;
+        private List<GameObject> _opponents;
+        private Transform _targetOpponent;
         private Vector3 _target;
         private Dictionary<string, IState> _states;
         private ICharacterRuntimeData _characterData;
         private IState _currentState;
         private Vector3 _spawnedBombPos;
+        private GameObject _player;
 
+        public Transform TargetOpponent => _targetOpponent;
         public Vector3 Target => _target;
         public Dictionary<string, IState> States => _states;
         public BotCharacter Character => _character;
         public ICharacterRuntimeData CharacterData => _characterData;
 
-        //List<Vector3> possiblePos = new List<Vector3>();
-        //List<Vector3> availablePos = new List<Vector3>();
+        List<Vector3> possiblePos = new List<Vector3>();
+        List<Vector3> availablePos = new List<Vector3>();
 
         private void Awake()
         {
             CollectRefs();
-            SwitchState(_states["Agro"]);
-            SetTarget(_player.position);
         }
-       
+        
         private void Start()
         {
-            _character.concreteBombDeployer.BombSpawned += SetBombPosition;
+            Spawner.Instance.OnBotSpawned += UpdateOpponentsList;
+            Spawner.Instance.OnPlayerSpawned += UpdatePlayerInList;
+            _character.PlayerBombDeployer.BombSpawned += SetBombPosition;
+
+            GetOpponentsList();
+
+            _player = Spawner.Instance.Player;
+
+            SwitchState(_states["Agro"]);
+            SetTarget(_targetOpponent.position);
+            SetSpeed(3f);
         }
         private void OnDisable()
         {
-            _character.concreteBombDeployer.BombSpawned -= SetBombPosition;
+            Spawner.Instance.OnBotSpawned -= UpdateOpponentsList;
+            Spawner.Instance.OnPlayerSpawned -= UpdatePlayerInList;
+            _character.PlayerBombDeployer.BombSpawned -= SetBombPosition;
         }
 
         private void OnDrawGizmos()
-        {
+        {            
+            //Gizmos.DrawSphere(_targetOpponent.position, 0.5f);
             //if (possiblePos != null)
             //{
             //    foreach (var point in possiblePos)
@@ -72,20 +92,36 @@ namespace Runtime.MonoBehaviours.Bot
             if (TryGetComponent(out BotCharacter character)) _character = character;
             if (TryGetComponent(out NavMeshAgent agent)) _agent = agent;
 
+            
             _characterData = _character.CharacterRuntimeData;
-            _player = Spawner.Instance.Player.transform;
+            
 
             StatesSelector statesSelector = new StatesSelector();
             _states = statesSelector.GetStatesForType(BotType.Easy);
+        }
+        public void GetOpponentsList()
+        {
+            _opponents = new List<GameObject>();
+            foreach (var opponent in Spawner.Instance.OpponentsList)
+            {
+                if (opponent != null && opponent != gameObject) _opponents.Add(opponent);
+            }
         }
         public float CheckDistance()
         {
             if (_target == null)
             {
-                Debug.Log("target = null");
+                Debug.Log("CheckDistance: target = null");
                 return 0f;
             }
-            return (transform.position - _target).magnitude;
+            if (_targetOpponent == null)
+            {
+                Debug.Log("CheckDistance: targetOpponent = null");
+                SelectTargetPlayer();
+            }
+
+            return Mathf.Min((transform.position - _target).magnitude, 
+                (transform.position - _targetOpponent.position).magnitude);
         }
         public void SetBombPosition(Vector3 position)
         {
@@ -106,14 +142,62 @@ namespace Runtime.MonoBehaviours.Bot
         public void CheckPath()
         {
             NavMeshPath path = new NavMeshPath();
-            _agent.CalculatePath(_target, path);
+            _agent.CalculatePath(_targetOpponent.position, path);
             if (path.status == NavMeshPathStatus.PathComplete)
             {
-                SetTarget(Spawner.Instance.Player.transform.position);
+                SetTarget(_targetOpponent.transform.position);
             }
             else
             {
-                SetTarget(path.corners[path.corners.Length - 1]);
+                if (path.corners.Length > 0)
+                {
+                    SetTarget(path.corners[path.corners.Length - 1]);
+                }
+                else
+                {
+                    Debug.Log("Ќет углов по пути");
+                    SelectTargetPlayer();
+                }
+            }
+        }
+        public void SelectTargetPlayer()
+        {
+            float minDistance = 10000f;
+            Transform target = null;
+
+            foreach (var opponent in _opponents)
+            {
+                if (opponent == null) continue;
+                if ((transform.position - opponent.transform.position).magnitude < minDistance)
+                {
+                    minDistance = (transform.position - opponent.transform.position).magnitude;
+                    target = opponent.transform;
+                }
+            }
+            if (target != null)
+            {
+                _targetOpponent = target;
+                
+            }
+            else Debug.Log("SelectTargetPlayer: не найдена цель преследовани€");
+        }
+
+        public void UpdateOpponentsList(string name)
+        {         
+            _opponents.RemoveAll(opponent => opponent == null || opponent.name == name);
+            GameObject newBot = Spawner.Instance.GetOpponentByName(name);
+            _opponents.Add(newBot);
+        }
+
+        public void UpdatePlayerInList()
+        {
+            _opponents.RemoveAll(opponents => opponents == null || opponents == _player);
+
+            GameObject newPlayer = Spawner.Instance.Player;
+            if (newPlayer != null && !_opponents.Contains(newPlayer))
+            {
+                _opponents.Add(newPlayer);
+                _player = newPlayer;
             }
         }
 
@@ -173,6 +257,11 @@ namespace Runtime.MonoBehaviours.Bot
         }
         private List<Vector3> FindAvailablePosForRetreat(List<Vector3> possiblePos, List<Vector3> blacklist)
         {
+            if (possiblePos.Count == 0)
+            {
+                Debug.LogError(gameObject.name + " FindAvailablePosForRetreat: parametr 'possiblePos' is null");
+                return null;
+            }
             Vector3[] sideOffsets = { new Vector3(1, 0, 0), new Vector3(-1, 0, 0) };
             var availablePositions = new List<Vector3>();
 
@@ -207,7 +296,7 @@ namespace Runtime.MonoBehaviours.Bot
             }
             else
             {
-                Debug.LogError("FindAvailablePosForRetreat: did not find available positions for retreat");
+                Debug.LogError(gameObject.name + " FindAvailablePosForRetreat: did not find available positions for retreat");
                 return null;
             }
         }
@@ -220,10 +309,20 @@ namespace Runtime.MonoBehaviours.Bot
             var possiblePositions = GeneratePossiblePositions(explosionRange, blacklistPositions);
             var availablePositions = FindAvailablePosForRetreat(possiblePositions, blacklistPositions);
 
-            int randInt = UnityEngine.Random.Range(0, availablePositions.Count);
-            SetTarget(availablePositions[randInt]);
-            //availablePos = availablePositions;
-            //possiblePos = possiblePositions;
+            if (availablePositions == null || availablePositions.Count == 0)
+            {
+                Debug.LogWarning("No available positions for retreat, staying in place.");
+                SetTarget(transform.position);
+                return;
+            }
+            else
+            {
+                int randInt = UnityEngine.Random.Range(0, availablePositions.Count);
+                SetTarget(availablePositions[randInt]);
+            }
+
+            availablePos = availablePositions;
+            possiblePos = possiblePositions;
         }
         
         public void SwitchState(IState newState)

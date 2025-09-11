@@ -1,8 +1,13 @@
 using Interfaces;
 using MonoBehaviours.GroundSectionSystem;
+using Runtime.MonoBehaviours.Bot;
+using Runtime.NetworkBehaviours;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 namespace Runtime.MonoBehaviours
@@ -15,9 +20,11 @@ namespace Runtime.MonoBehaviours
 
         public static Spawner Instance;
 
-        private GameObject[] _bots;
+        private List<GameObject> _opponents;
         private LevelSectionsDataHolder _dataHolder;
         private List<AssociatedSpawn> _associatedPositions;
+
+        public List<GameObject> OpponentsList => _opponents;
 
         public Action OnPlayerSpawned;
         public Action<string> OnBotSpawned;
@@ -33,13 +40,12 @@ namespace Runtime.MonoBehaviours
             {
                 Destroy(gameObject);
             }
-            
         }
 
         public void SetUpCurrentDataHolder(LevelSectionsDataHolder dataHolder)
         {
             _dataHolder = dataHolder;
-            _bots = new GameObject[_dataHolder.SpawnPlaces.Count - 1];
+            _opponents = new List<GameObject>();
             _associatedPositions = new List<AssociatedSpawn>();
             foreach (var spawnPlace in dataHolder.SpawnPlaces)
             {
@@ -51,17 +57,30 @@ namespace Runtime.MonoBehaviours
         {
             if (Player == null) AssociateRandomSpawnPlaceForPlayer();
 
+            for (int i = 0; i < _opponents.Count; i++)
+            {
+                if (_opponents[i] == _player)
+                {
+                    _opponents[i] = null;
+                }
+            }
+
             await Task.Delay((int)(delay * 1000));
 
             if (Player == null)
-            {                
+            {
                 Player = Instantiate(_player, GetPositionForSpawn("Player"), Quaternion.identity);
             }
             else
             {
                 Destroy(Player);
-                Player = Instantiate(_player, GetPositionForSpawn("Player"), Quaternion.identity);
+                Player = Instantiate(_player, GetPositionForSpawn("Player"), Quaternion.identity);                                
             }
+
+            Player.name = "Player";
+            if (!_opponents.Contains(Player))
+                _opponents.Add(Player);
+
             OnPlayerSpawned?.Invoke();
             if (Player.TryGetComponent(out ICharacter playerCharacter))
             {
@@ -105,23 +124,23 @@ namespace Runtime.MonoBehaviours
         {
             int numberOfBot = 1;
             for (int i = 0; i < _dataHolder.SpawnPlaces.Count; i++)
-            {                
+            {
                 var spawnPlace = _associatedPositions[i];
                 if (!spawnPlace.isTaken)
                 {
                     GameObject spawnedBot = Instantiate(_bot, spawnPlace.position, Quaternion.identity);
 
-                    spawnedBot.name = "Bot" + Convert.ToString(numberOfBot);                    
+                    spawnedBot.name = "Bot" + Convert.ToString(numberOfBot);
                     spawnPlace.isTaken = true;
                     spawnPlace.name = spawnedBot.name;
 
                     _associatedPositions[i] = spawnPlace;
-                    _bots[numberOfBot - 1] = spawnedBot;
+                    _opponents.Add(spawnedBot);
 
                     numberOfBot++;
 
                     if (spawnedBot.TryGetComponent(out ICharacter playerCharacter))
-                    {
+                    {                        
                         playerCharacter.Reset();
                         playerCharacter.SetBombDeployAbility(true);
                     }
@@ -130,41 +149,63 @@ namespace Runtime.MonoBehaviours
                 }
             }
         }
-        
+
         public async void RespawnBot(string name, float delay)
         {
+            GameObject respawningBot = null;
+            for(int i = 0; i < _opponents.Count; i++)
+            {
+                if (_opponents[i] == null) continue;
+                if (_opponents[i].name == name)
+                {
+                    respawningBot = _opponents[i];
+                    _opponents[i] = null;
+                    break;
+                }
+            }
             await Task.Delay((int)delay * 1000);
 
-            for (int i = 0; i  < _bots.Length; i++)
+            var spawnPos = GetPositionForSpawn(name);
+            Destroy(respawningBot);
+            var newBot = Instantiate(_bot, spawnPos, Quaternion.identity);
+            newBot.name = name;
+            _opponents.Add(newBot);
+
+            if (newBot.TryGetComponent(out ICharacter playerCharacter))
             {
-                if (_bots[i].name == name)
-                {
-                    Destroy(_bots[i]);
-                    _bots[i] = Instantiate(_bot, GetPositionForSpawn(name), Quaternion.identity);
-                    _bots[i].name = name;
-
-                    if (_bots[i].TryGetComponent(out ICharacter playerCharacter))
-                    {
-                        playerCharacter.Reset();
-                        playerCharacter.SetBombDeployAbility(true);
-                    }
-
-                    OnBotSpawned?.Invoke(name);
-                }
+                playerCharacter.Reset();
+                playerCharacter.SetBombDeployAbility(true);
             }
+
+            OnBotSpawned?.Invoke(name);
+            return;
         }
 
-        public GameObject GetBotByName(string name)
+        public GameObject GetOpponentByName(string name)
         {
-            for (int i = 0; i <= _bots.Length; i++)
+            _opponents.RemoveAll(item => item == null);
+            for (int i = 0; i < _opponents.Count; i++)
             {
-                if (_bots[i].name == name)
+                if (_opponents[i] == null) continue;
+                if (_opponents[i].name == name)
                 {
-                    return _bots[i];
+                    return _opponents[i];
                 }
             }
-            Debug.LogError("GetBotByName: did not find bot");
+            Debug.LogError("GetOpponentByName: did not find bot");
             return null;
+        }
+
+        public List<GameObject> GetAllOpponents()
+        {
+            _opponents.RemoveAll(item => item == null);
+            List<GameObject> allPlayers = new List<GameObject>();
+            foreach (var bot in _opponents)
+            {
+                allPlayers.Add(bot);
+            }
+            allPlayers.Add(Player);
+            return allPlayers;
         }
 
         public struct AssociatedSpawn
