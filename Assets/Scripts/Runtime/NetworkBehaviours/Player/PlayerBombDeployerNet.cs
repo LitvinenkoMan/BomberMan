@@ -26,7 +26,7 @@ namespace Runtime.NetworkBehaviours.Player
 
         public override void OnNetworkDespawn()
         {
-            ClearPoolRpc();
+            //ClearPoolRpc();
             if (IsOwner)
             {
                 _bombsPool.Clear();

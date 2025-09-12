@@ -1,5 +1,6 @@
 using System;
 using Core.ScriptableObjects;
+using Interfaces;
 using UnityEngine;
 
 namespace Core.SaveSystem
@@ -14,6 +15,7 @@ namespace Core.SaveSystem
         //TODO: may add some extra data related to player
         
         private CharacterData _selectedCharacterData;
+        private ICharacterRuntimeData _characterRuntimeData;
         
         public CharacterData SelectedCharacterData => _selectedCharacterData;
         public string PlayerNickname => _playerNickname;

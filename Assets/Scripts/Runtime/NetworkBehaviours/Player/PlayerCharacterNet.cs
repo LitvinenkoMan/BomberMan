@@ -1,5 +1,6 @@
 using System;
 using Core.DataTransferObjects;
+using Core.EventBuses;
 using Core.SaveSystem;
 using Core.ScriptableObjects;
 using CSharp;
@@ -18,7 +19,7 @@ namespace Runtime.NetworkBehaviours.Player
         [SerializeField]
         private TMP_Text playerName;
         [SerializeField]
-        private GameObject playerVisuals;
+        private GameObject playerVisuals;   
         
         public ICharacterRuntimeData CharacterRuntimeData { get; private set; }
         public IImmune Immune { get; private set; }
@@ -28,9 +29,7 @@ namespace Runtime.NetworkBehaviours.Player
 
         private InputActions _input;
         private CharacterController _characterController;
-        
         private PlayerCharacterRuntimeNet _playerCharacterRuntimeNet;
-        private BombDto _bombDto;
 
         public event Action<ulong> OnPlayerDeath;
 
@@ -41,12 +40,12 @@ namespace Runtime.NetworkBehaviours.Player
 
         private void OnEnable()
         {
-            CharacterRuntimeData.OnHealthRunOut += StartDeathSequence;
+            //CharacterRuntimeData.OnHealthRunOut += StartDeathSequence;
         }
 
         private void OnDisable()
         {
-            CharacterRuntimeData.OnHealthRunOut -= StartDeathSequence;
+            //CharacterRuntimeData.OnHealthRunOut -= StartDeathSequence;
         }
 
         public override void OnNetworkSpawn()
@@ -54,6 +53,12 @@ namespace Runtime.NetworkBehaviours.Player
             Initialize();
             name = $"P{GetComponent<NetworkObject>().OwnerClientId}";
             playerName.text = name;
+
+            if (IsOwner)
+            {
+                //GameplayUIEvents.Instance.Publish(new PlayerCharacterRuntimeNet());
+            }
+            _playerCharacterRuntimeNet.Initialize(characterData);
             
             //TODO: Initialize PlayerCharacterRuntimeDataNet
         }
@@ -73,6 +78,7 @@ namespace Runtime.NetworkBehaviours.Player
                 playerVisuals.SetActive(true);
                 playerName.enabled = true;
             }
+            //CharacterRuntimeData.
             CharacterAnimator.Initialize();
         }
 
@@ -84,6 +90,10 @@ namespace Runtime.NetworkBehaviours.Player
             { 
                 CharacterRuntimeData.SubtractHealth(damageAmount);
                 Immune.ActivateImmunity();
+            }
+            else
+            {
+                StartDeathSequence();
             }
         }
 
@@ -99,8 +109,7 @@ namespace Runtime.NetworkBehaviours.Player
 
         public void DeployBomb()
         {
-            _bombDto = new BombDto(characterData.BombCountdown, characterData.BombsAtTime, characterData.BombSpread, characterData.BombDamage);
-            BombDeployer.DeployBomb(_bombDto);
+            BombDeployer.DeployBomb(new BombDto(CharacterRuntimeData.BombsCountdown, CharacterRuntimeData.BombsAtTime, CharacterRuntimeData.BombsSpreading, CharacterRuntimeData.BombsDamage));
         }
 
         public void SetMoveAbility(bool canMove)
@@ -122,17 +131,15 @@ namespace Runtime.NetworkBehaviours.Player
         {
             if (IsOwner)
             { 
-                //playerVisuals.SetActive(false);
                 SetMoveAbility(false);
                 SetBombDeployAbility(false);      
-                    //playerName.enabled = false;
                 _input.PlayerMap.RemoveCallbacks(this);
                 _input.Disable();
             }
-            //gameObject.SetActive(false);
             _characterController.enabled = false;
             CharacterAnimator.PlayDeathAnimation();
 
+            GameplayUIEvents.Instance.RiseOnHealthRunOutEvent(NetworkManager.Singleton.LocalClientId, _playerCharacterRuntimeNet.CharacterHealth);
             OnPlayerDeath?.Invoke(OwnerClientId);
             //UnspawnPlayerRpc();
         }
@@ -176,9 +183,11 @@ namespace Runtime.NetworkBehaviours.Player
             if (TryGetComponent(out ICharacterAnimator characterAnimator)) CharacterAnimator = characterAnimator;
             if (TryGetComponent(out CharacterController characterController)) _characterController = characterController;
 
-            _playerCharacterRuntimeNet = new PlayerCharacterRuntimeNet();
-            _playerCharacterRuntimeNet.Initialize(characterData);
-            CharacterRuntimeData = _playerCharacterRuntimeNet;
+            if (TryGetComponent(out ICharacterRuntimeData characterRuntimeData))
+            {
+                CharacterRuntimeData = characterRuntimeData;
+                _playerCharacterRuntimeNet = characterRuntimeData as PlayerCharacterRuntimeNet;
+            }
         }
         
         [Rpc(SendTo.Server)]

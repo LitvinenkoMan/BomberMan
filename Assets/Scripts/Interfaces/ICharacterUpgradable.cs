@@ -7,6 +7,5 @@ namespace Interfaces
         public void IncreaseBombsDamage(float increaseAmount);
         public void IncreaseMovementSpeed(float increaseAmount);
         public void IncreaseBombsSpreading(float increaseAmount);
-        public void Reset();
     }
 }

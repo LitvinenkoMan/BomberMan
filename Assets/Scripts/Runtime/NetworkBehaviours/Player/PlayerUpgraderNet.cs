@@ -7,20 +7,20 @@ namespace Runtime.NetworkBehaviours.Player
 {
     public class PlayerUpgraderNet : NetworkBehaviour, ICharacterUpgradable
     {
-        [SerializeField] private BaseBomberParameters playerParams;
-
-        private IHealth _playerHealthComponent;
+        private ICharacter _playerCharacter;
+        private ICharacterRuntimeData _characterRuntimeData;
 
         public override void OnNetworkSpawn()
         {
-            _playerHealthComponent = GetComponent<IHealth>();
+            _playerCharacter = GetComponent<ICharacter>();
+            _characterRuntimeData = _playerCharacter.CharacterRuntimeData;
         }
 
         public void IncreaseHealth(float increaseAmount)
         {
             if (IsOwner)
             {
-                _playerHealthComponent.AddHealth((int)increaseAmount);
+                _playerCharacter.Heal((int)increaseAmount);
             }
         }
 
@@ -28,7 +28,7 @@ namespace Runtime.NetworkBehaviours.Player
         {
             if (IsOwner)
             {
-                playerParams.SetBombsAtTime(playerParams.BombsAtTime + (int)increaseAmount);
+                _characterRuntimeData.SetBombsAtTime(_characterRuntimeData.BombsAtTime + (int)increaseAmount);
             }
         }
 
@@ -36,7 +36,7 @@ namespace Runtime.NetworkBehaviours.Player
         {
             if (IsOwner)
             {
-                playerParams.SetBombsDamage(playerParams.BombsDamage + (int)increaseAmount);
+                _characterRuntimeData.SetBombsDamage(_characterRuntimeData.BombsDamage + (int)increaseAmount);
             }
         }
 
@@ -44,7 +44,7 @@ namespace Runtime.NetworkBehaviours.Player
         {
             if (IsOwner)
             {
-                playerParams.SetSpeedMultiplier(playerParams.SpeedMultiplier + increaseAmount);
+                _characterRuntimeData.SetSpeedMultiplier(_characterRuntimeData.SpeedMultiplier + increaseAmount);
             }
         }
 
@@ -52,13 +52,8 @@ namespace Runtime.NetworkBehaviours.Player
         {
             if (IsOwner)
             {
-                playerParams.SetBombsSpreading(playerParams.BombsSpreading + (int)increaseAmount);
+                _characterRuntimeData.SetBombsSpreading(_characterRuntimeData.BombsSpreading + (int)increaseAmount);
             }
-        }
-
-        public void Reset()
-        {
-            playerParams.ResetValues();
         }
     }
 }
