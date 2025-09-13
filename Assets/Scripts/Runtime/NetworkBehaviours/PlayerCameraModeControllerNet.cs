@@ -36,9 +36,10 @@ namespace Runtime.NetworkBehaviours
                 FindObjectsByType<CharacterController>(FindObjectsSortMode.None); // Every bot or player will have it (i thinmk so..)
             foreach (var obj in playersObj)
             {
-                if (obj.enabled)
+                if (obj.TryGetComponent<ICharacter>(out var character))
                 {
-                    playersTransform.Add(obj.transform);
+                    if (character.CharacterRuntimeData.CharacterHealth > 0)
+                        playersTransform.Add(obj.transform);
                 }
             }
         }
@@ -88,7 +89,7 @@ namespace Runtime.NetworkBehaviours
                 {
                     if (playerObject.gameObject.TryGetComponent(out ICharacter character))
                     {
-                        character.CharacterRuntimeData.OnHealthRunOut += OnPlayerDeathResponce;
+                        //character.CharacterRuntimeData.OnHealthRunOut += OnPlayerDeathResponce;
                         SwitchToGameplayMode();
                     }
                 }

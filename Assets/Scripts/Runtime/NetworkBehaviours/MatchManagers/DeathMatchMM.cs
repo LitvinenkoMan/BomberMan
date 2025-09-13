@@ -16,8 +16,6 @@ namespace Runtime.NetworkBehaviours.MatchManagers
         [Space(10)]
 
         [SerializeField]
-        private BaseBomberParameters bomberParams;
-        [SerializeField]
         private byte InitialPlayersLifeCount = 3;
         
         private Dictionary<ulong, int> _playersLifeCount;
@@ -49,7 +47,6 @@ namespace Runtime.NetworkBehaviours.MatchManagers
                 //TODO: Add section for bots
                 
             }
-            bomberParams.ResetValues();
 
             JoinCodeText.text = RelayManager.Instance.JoinCode;
             

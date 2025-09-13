@@ -5250,10 +5250,10 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 559771653}
-  - {fileID: 1886137342}
   - {fileID: 1371608560}
   - {fileID: 607009575}
   - {fileID: 1211720438}
+  - {fileID: 1886137342}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -5291,6 +5291,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  OnPanelClosedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1646455181
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5366,7 +5369,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df3020230b6120c4e9a6dc4d50a374f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BomberParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
   CurrentMatchManager: {fileID: 402356694}
   HealtText: {fileID: 2021252348}
   SpeedText: {fileID: 2092435014}

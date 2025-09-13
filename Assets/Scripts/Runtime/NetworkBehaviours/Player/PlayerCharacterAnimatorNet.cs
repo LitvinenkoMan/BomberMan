@@ -50,12 +50,12 @@ namespace Runtime.NetworkBehaviours.Player
 
         public void PlayHitAnimation()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void PlayKickedAnimation()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         [Rpc(SendTo.Everyone)]

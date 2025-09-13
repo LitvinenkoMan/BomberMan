@@ -114,7 +114,7 @@ MonoBehaviour:
   TimedEffect: 0
   EffectTime: 0
   Visuals: {fileID: 9207213807940266067}
-  SpeedIncreaseValue: 0.0125
+  SpeedIncreaseValue: 0.125
 --- !u!1 &8450219486580588625
 GameObject:
   m_ObjectHideFlags: 0

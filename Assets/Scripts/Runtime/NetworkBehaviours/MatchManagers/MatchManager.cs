@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using Interfaces;
 using MonoBehaviours.Network;
-using Runtime.MonoBehaviours;
 using Runtime.NetworkBehaviours.Player;
 using TMPro;
 using Unity.Netcode;
@@ -94,12 +93,6 @@ namespace Runtime.NetworkBehaviours.MatchManagers
             {
                 deployer.SetAbilityToDeployBombs(canUse);
             }
-            //
-            // if (newClientObject.TryGetComponent(out PlayerMovement playerMovement))
-            // {
-            //     Debug.Log($"disabled Movement for player with ID {clientId}");           //TODO: Cant normally block movement from server side
-            //     playerMovement.SetAbilityToMoveClientRpc(canUse);    
-            // }
         }
 
         protected void CheckForPlayerAbilities(ulong clientId)

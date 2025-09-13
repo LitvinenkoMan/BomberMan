@@ -1,4 +1,5 @@
 using System;
+using Core.ScriptableObjects;
 
 namespace Interfaces
 {
@@ -12,9 +13,7 @@ namespace Interfaces
         public int BombsDamage { get; }
         public float KickForce { get; }
 
-        public event Action OnHealthRunOut;
 
-        public void Initialize(float initialValue);
         public void AddHealth(int healthToAdd);
         public void SubtractHealth(int healthToSubtract);
         public void SetSpeedMultiplier(float speedMultiplier);

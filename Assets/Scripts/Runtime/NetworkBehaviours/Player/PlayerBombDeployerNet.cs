@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Core.DataTransferObjects;
 using Interfaces;
 using MonoBehaviours.GroundSectionSystem;
 using MonoBehaviours.GroundSectionSystem.SectionObstacles;
@@ -25,7 +26,7 @@ namespace Runtime.NetworkBehaviours.Player
 
         public override void OnNetworkDespawn()
         {
-            ClearPoolRpc();
+            //ClearPoolRpc();
             if (IsOwner)
             {
                 _bombsPool.Clear();
@@ -53,15 +54,15 @@ namespace Runtime.NetworkBehaviours.Player
             SetAbilityToDeployBombsClientRpc(canIt);
         }
         
-        public void DeployBomb(int bombsAtTime, float timeToExplode, int bombDamage, int bombSpread)
+        public void DeployBomb(BombDto bombDto)
         {
             if (!_canDeployBombs) return;
 
-            DeployBombRpc(bombsAtTime, timeToExplode, bombDamage, bombSpread);
+            DeployBombRpc(bombDto);
         }
 
         [Rpc(SendTo.Server)]
-        private void DeployBombRpc(int bombsAtTime, float timeToExplode, int bombDamage, int bombSpread)
+        private void DeployBombRpc(BombDto bombDto)
         {
             // var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
             // if (section && !section.PlacedObstacle && _currentPlacedBombs < bombsAtTime)
@@ -85,14 +86,14 @@ namespace Runtime.NetworkBehaviours.Player
             // }
             
             var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
-            if (section && !section.PlacedObstacle && _currentPlacedBombs < bombsAtTime)
+            if (section && !section.PlacedObstacle && _currentPlacedBombs < bombDto.BombsAtTime)
             {
                 var bomb = _bombsPool.GetFromPool(true).GetComponent<BombNet>();
                 bomb.SetNewPosition(section.ObstaclePlacementPosition);
                 bomb.transform.SetParent(null);
                 bomb.onExplode += SubtractAmountOfCurrentBombs;
                 section.AddObstacle(bomb);
-                bomb.Ignite(timeToExplode, bombDamage, bombSpread);
+                bomb.Ignite(bombDto.BombCountdown, bombDto.BombsDamage, bombDto.BombsSpreading);
                 if (!bomb.NetworkObject.IsSpawned)
                 {
                     bomb.NetworkObject.Spawn();
