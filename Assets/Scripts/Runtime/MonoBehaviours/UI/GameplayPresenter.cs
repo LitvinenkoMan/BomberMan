@@ -1,8 +1,8 @@
+using Core.EventBuses;
+using Core.SaveSystem;
 using Core.ScriptableObjects;
-using MonoBehaviours;
-using Runtime.NetworkBehaviours;
+using Interfaces;
 using Runtime.NetworkBehaviours.MatchManagers;
-using ScriptableObjects;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -11,8 +11,6 @@ namespace Runtime.MonoBehaviours.UI
 {
     public class GameplayPresenter : MonoBehaviour
     {
-        [SerializeField]
-        private BaseBomberParameters BomberParams;
         [SerializeField]
         private MatchManager CurrentMatchManager;
 
@@ -25,26 +23,21 @@ namespace Runtime.MonoBehaviours.UI
 
         protected virtual void OnEnable()
         {
-            UpdateHealthText(BomberParams.ActorHealth);
-            UpdateSpeedText(BomberParams.SpeedMultiplier);
-            UpdateBombsDamageText(BomberParams.BombsDamage);
-            UpdateSpreadText(BomberParams.BombsSpreading);
-            UpdateBombsPerTimeText(BomberParams.BombsAtTime);
-            
-            BomberParams.OnHealthChangedEvent += UpdateHealthText;
-            BomberParams.OnSpeedChangedEvent += UpdateSpeedText;
-            BomberParams.OnDamageChangedEvent += UpdateBombsDamageText;
-            BomberParams.OnSpreadingChangedEvent += UpdateSpreadText;
-            BomberParams.OnBombsPerTimeChangedEvent += UpdateBombsPerTimeText;
+            //GameplayUIEvents.Instance.Subscribe<ICharacterRuntimeData>(UpdateUI);
+        }
+
+        private void UpdateUI(ICharacterRuntimeData obj)
+        {
+            UpdateHealthText(obj.CharacterHealth);
+            UpdateSpeedText(obj.SpeedMultiplier);
+            UpdateBombsDamageText(obj.BombsDamage);
+            UpdateSpreadText(obj.BombsSpreading);
+            UpdateBombsPerTimeText(obj.BombsSpreading);
         }
 
         protected virtual void OnDisable()
         {
-            BomberParams.OnHealthChangedEvent -= UpdateHealthText;
-            BomberParams.OnSpeedChangedEvent -= UpdateSpeedText;
-            BomberParams.OnDamageChangedEvent -= UpdateBombsDamageText;
-            BomberParams.OnSpreadingChangedEvent -= UpdateSpreadText;
-            BomberParams.OnBombsPerTimeChangedEvent -= UpdateBombsPerTimeText;
+            //GameplayUIEvents.Instance.Unsubscribe<ICharacterRuntimeData>(UpdateUI);
         }
         
         public void ExitToMainMenu()
