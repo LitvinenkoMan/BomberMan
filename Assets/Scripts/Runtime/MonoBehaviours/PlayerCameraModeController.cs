@@ -1,45 +1,49 @@
 using Interfaces;
-using Runtime.MonoBehaviours;
-using Runtime.MonoBehaviours.Player;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerCameraModeController : MonoBehaviour
+namespace Runtime.MonoBehaviours
 {
-    [SerializeField] private GameObject CameraExample;
-
-    private ICameraViewer _cameraViewer;
-    private GameObject _instantiatedCamera;
-
-    private void OnEnable()
+    public class PlayerCameraModeController : MonoBehaviour, ICameraModeController
     {
-        PlayerSpawner.Instance.OnPlayerSpawned += FollowSpawnedPlayer;
-        CheckForCameraInstance();
-    }
-    private void OnDisable()
-    {
-        PlayerSpawner.Instance.OnPlayerSpawned -= FollowSpawnedPlayer;
-    }
+        [SerializeField] private GameObject CameraExample;
 
-    private void CheckForCameraInstance()
-    {
-        if (_instantiatedCamera == null)
+        private ICameraViewer _cameraViewer;
+        private GameObject _instantiatedCamera;
+
+        private void OnEnable()
         {
-            _instantiatedCamera = Instantiate(CameraExample, Vector3.zero, Quaternion.identity);
-            _cameraViewer = _instantiatedCamera.GetComponent<ICameraViewer>();
+            PlayerSpawner.Instance.OnPlayerSpawned += FollowSpawnedPlayer;
+            CheckForCameraInstance();
         }
-    }
+        private void OnDisable()
+        {
+            PlayerSpawner.Instance.OnPlayerSpawned -= FollowSpawnedPlayer;
+        }
 
-    private void SwitchToGameplayMode()
-    {
-        _cameraViewer.ClearTargetsList();
-        _cameraViewer.AddToViewTarget(PlayerSpawner.Instance.Player.transform);
-    }
+        private void CheckForCameraInstance()
+        {
+            if (_instantiatedCamera == null)
+            {
+                _instantiatedCamera = Instantiate(CameraExample, Vector3.zero, Quaternion.identity);
+                _cameraViewer = _instantiatedCamera.GetComponent<ICameraViewer>();
+            }
+        }
 
-    public void FollowSpawnedPlayer()
-    {
-        Debug.Log("FollowSpawnedPlayer");
-        SwitchToGameplayMode();
+        public void SwitchToGameplayMode()
+        {
+            _cameraViewer.ClearTargetsList();
+            _cameraViewer.AddToViewTarget(PlayerSpawner.Instance.Player.transform);
+        }
+
+        public void SwitchToViewerMode()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void FollowSpawnedPlayer()
+        {
+            Debug.Log("FollowSpawnedPlayer");
+            SwitchToGameplayMode();
+        }
     }
 }
