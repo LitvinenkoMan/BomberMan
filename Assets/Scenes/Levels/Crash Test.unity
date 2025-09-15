@@ -19274,6 +19274,79 @@ Transform:
   - {fileID: 1434638040}
   m_Father: {fileID: 1509508472}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &628188189
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 628188193}
+  - component: {fileID: 628188195}
+  - component: {fileID: 628188194}
+  m_Layer: 0
+  m_Name: Power Up Spawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &628188193
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 628188189}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 9.000376, y: 6.894528, z: 2.0307403}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &628188194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 628188189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31d53d28504a9614980b474dacbea7bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PowerUpsExamples:
+  - {fileID: 4254753876890765952, guid: ec8a56a45032e57408568d70d492295a, type: 3}
+  - {fileID: 5447648150043509698, guid: 96091adbda3536941b616f20caed4ae1, type: 3}
+  - {fileID: 1961290817403870761, guid: 92d6ff410919dd844a0c2dfa76c9ce87, type: 3}
+  - {fileID: 46862703273569310, guid: 3b5e43a23009cc74994327e09a841658, type: 3}
+  - {fileID: 18113497874491121, guid: 1f0e6b9c328b9534385ab703a694fbab, type: 3}
+  TimePerSpawn: 2
+  AmountOfPreparedPowerUps: 30
+  SpawnPlaces:
+  - {fileID: 440297049}
+  - {fileID: 1723216460}
+  - {fileID: 637449789}
+  - {fileID: 637449789}
+--- !u!114 &628188195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 628188189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d90f97cc89543a44887580b884b9ed47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectExample: {fileID: 0}
+  StartingCount: 0
+  UseReparenting: 0
 --- !u!1 &629624091
 GameObject:
   m_ObjectHideFlags: 0
@@ -61964,6 +62037,7 @@ MeshFilter:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 628188193}
   - {fileID: 1887653108}
   - {fileID: 1209482269}
   - {fileID: 1425018380}

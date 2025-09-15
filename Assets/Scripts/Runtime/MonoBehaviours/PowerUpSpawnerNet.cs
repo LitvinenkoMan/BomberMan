@@ -9,20 +9,19 @@ using Random = UnityEngine.Random;
 namespace Runtime.MonoBehaviours
 {
     [RequireComponent(typeof(ObjectPoolQueue))]
-    public class PowerUpSpawner : MonoBehaviour
+    public class PowerUpSpawnerNet : NetworkBehaviour
     {
         [Header("List of Power ups to spawn")]
         [SerializeField]
         private List<GameObject> PowerUpsExamples;
 
-        [Space(15)]
-        [Header("Spawn Settings")]
+        [Space(15)] [Header("Spawn Settings")] 
         [SerializeField, Tooltip("The time that Power ups need to be spawned")]
         private float TimePerSpawn;
 
         [SerializeField, Tooltip("Amount of power ups that should to be instanced before game starts")]
         private int AmountOfPreparedPowerUps;
-
+        
         [SerializeField]
         private List<GroundSection> SpawnPlaces;
 
@@ -37,15 +36,19 @@ namespace Runtime.MonoBehaviours
             _currentSectionToSpawn = null;
         }
 
-        private void Start()
+        public override void OnNetworkSpawn()
         {
             EnableSpawning();
+            if (!IsServer)
+            {
+                return;
+            }  
             CreatePowerUpsQueue();
         }
 
         private void Update()
         {
-            if (!_canSpawn)
+            if (!_canSpawn || !IsServer)
             {
                 return;
             }
@@ -57,9 +60,9 @@ namespace Runtime.MonoBehaviours
                     var powerUpObject = _powerUpsPool.GetFromPool(true);
                     if (powerUpObject.TryGetComponent(out PowerUp powerUp))
                     {
-                        if (!powerUp.IsSpawned) powerUp.gameObject.SetActive(true);
+                        if (!powerUp.IsSpawned) powerUp.NetworkObject.Spawn();
 
-                        SpawnPowerUp(powerUp, _currentSectionToSpawn.ObstaclePlacementPosition);
+                        SpawnPowerUpRpc(powerUp, _currentSectionToSpawn.ObstaclePlacementPosition);
                     }
                 }
                 //TODO: Change this!
@@ -79,12 +82,16 @@ namespace Runtime.MonoBehaviours
         {
             _canSpawn = true;
         }
-
-        private void SpawnPowerUp(PowerUp powerUpRef, Vector3 position)
+        
+        [Rpc(SendTo.ClientsAndHost)]
+        private void SpawnPowerUpRpc(NetworkBehaviourReference powerUpRef, Vector3 position)
         {
-            powerUpRef.SetNewPosition(position);
-            powerUpRef.Initialize();
-            powerUpRef.AutoPlaceToNearestSection();
+            if (powerUpRef.TryGet(out PowerUp powerUp))
+            {
+                powerUp.SetNewPosition(position);
+                powerUp.Initialize();
+                powerUp.AutoPlaceToNearestSection();
+            }
         }
 
         private bool ChooseSectionForSpawning()

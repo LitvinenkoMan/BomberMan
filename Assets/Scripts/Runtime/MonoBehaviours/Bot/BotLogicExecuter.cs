@@ -1,13 +1,8 @@
 using Interfaces;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
 using UnityEngine;
 using UnityEngine.AI;
-using static UnityEditor.Experimental.GraphView.GraphView;
-using static UnityEditor.PlayerSettings;
+using MonoBehaviours.GroundSectionSystem;
 
 namespace Interfaces
 {
@@ -47,7 +42,6 @@ namespace Runtime.MonoBehaviours.Bot
         {
             Spawner.Instance.OnBotSpawned += UpdateOpponentsList;
             Spawner.Instance.OnPlayerSpawned += UpdatePlayerInList;
-            _character.PlayerBombDeployer.BombSpawned += SetBombPosition;
 
             GetOpponentsList();
 
@@ -61,7 +55,6 @@ namespace Runtime.MonoBehaviours.Bot
         {
             Spawner.Instance.OnBotSpawned -= UpdateOpponentsList;
             Spawner.Instance.OnPlayerSpawned -= UpdatePlayerInList;
-            _character.PlayerBombDeployer.BombSpawned -= SetBombPosition;
         }
 
         private void CollectRefs()
@@ -132,7 +125,7 @@ namespace Runtime.MonoBehaviours.Bot
                 }
                 else
                 {
-                    Debug.Log("Нет углов по пути");
+                    Debug.Log("CheckPath: have not corners of the path");
                     SelectTargetPlayer();
                 }
             }
@@ -181,8 +174,8 @@ namespace Runtime.MonoBehaviours.Bot
         {
             byte explosionRange = (byte)_characterData.BombsSpreading;
 
-            var blacklistPositions = _retreatPositionFinder.GenerateBlacklistPositions(explosionRange, _spawnedBombPos);
-            var possiblePositions = _retreatPositionFinder.GeneratePossiblePositions(explosionRange, blacklistPositions, _spawnedBombPos);
+            var blacklistPositions = _retreatPositionFinder.GenerateBlacklistPositions(explosionRange, _character.BombDto.BombPosition);
+            var possiblePositions = _retreatPositionFinder.GeneratePossiblePositions(explosionRange, blacklistPositions, _character.BombDto.BombPosition);
             var availablePositions = _retreatPositionFinder.FindAvailablePosForRetreat(possiblePositions, blacklistPositions, _agent);
 
             if (availablePositions == null || availablePositions.Count == 0)

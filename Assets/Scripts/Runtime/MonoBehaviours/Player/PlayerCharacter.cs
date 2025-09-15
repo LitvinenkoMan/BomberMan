@@ -1,3 +1,4 @@
+using Core.DataTransferObjects;
 using Core.ScriptableObjects;
 using Interfaces;
 using System;
@@ -25,21 +26,15 @@ namespace Runtime.MonoBehaviours.Player
         private InputActions _input;
         private CharacterController _characterController;
         private CharacterRuntimeData _characterRuntimeData;
+        private BombDto _bombDto;
+
+        public BombDto BombDto => _bombDto;
 
         public event Action OnPlayerDeath;
 
         private void Awake()
         {
             CollectRefs();
-        }
-
-        private void OnEnable()
-        {
-            CharacterRuntimeData.OnHealthRunOut += StartDeathSequence;
-        }
-        private void OnDisable()
-        {
-            CharacterRuntimeData.OnHealthRunOut -= StartDeathSequence;
         }
 
         private void Start()
@@ -69,11 +64,15 @@ namespace Runtime.MonoBehaviours.Player
                 CharacterRuntimeData.SubtractHealth(damageAmount);
                 Immune.ActivateImmunity();
             }
+            else
+            {
+                StartDeathSequence();
+            }
         }
 
         public void DeployBomb()
         {
-            BombDeployer.DeployBomb(CharacterRuntimeData.BombsAtTime, CharacterRuntimeData.BombsCountdown, CharacterRuntimeData.BombsDamage, CharacterRuntimeData.BombsSpreading);
+            BombDeployer.DeployBomb(_bombDto);
         }
 
         public void Heal(int healAmount)
@@ -86,7 +85,7 @@ namespace Runtime.MonoBehaviours.Player
                 Debug.LogWarning("PlayerCharacter: have not CharacterRuntimeData");
                 return;
             }
-            CharacterRuntimeData.Initialize(3);
+            _characterRuntimeData.Initialize(_characterData);
             _characterController.enabled = true;
         }
 
@@ -110,6 +109,8 @@ namespace Runtime.MonoBehaviours.Player
             _characterRuntimeData = new CharacterRuntimeData();
             _characterRuntimeData.Initialize(_characterData);
             CharacterRuntimeData = _characterRuntimeData;
+
+            _bombDto = new BombDto(_characterRuntimeData.BombsCountdown, _characterRuntimeData.BombsAtTime, _characterRuntimeData.BombsSpreading, _characterRuntimeData.BombsDamage);
         }
         private void StartDeathSequence()
         {

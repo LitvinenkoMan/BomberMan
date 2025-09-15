@@ -8,7 +8,12 @@ namespace Runtime.NetworkBehaviours.Player
 {
     public class PlayerUpgrader : MonoBehaviour, ICharacterUpgradable
     {
-        private CharacterRuntimeData _characterRuntimeData;
+        private ICharacterRuntimeData _characterRuntimeData;
+
+        private void OnEnable()
+        {
+            _characterRuntimeData = GetComponent<ICharacter>().CharacterRuntimeData;
+        }
 
         public void IncreaseBombsDamage(float increaseAmount)
         {

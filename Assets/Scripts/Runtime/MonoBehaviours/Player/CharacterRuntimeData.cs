@@ -27,12 +27,6 @@ public class CharacterRuntimeData : ICharacterRuntimeData
     {
         CharacterHealth += healthToAdd;
     }
-
-    public void Initialize(float initialValue)
-    {
-        
-    }
-
     public void Initialize(CharacterData characterData)
     {
         CharacterHealth = characterData.Health;

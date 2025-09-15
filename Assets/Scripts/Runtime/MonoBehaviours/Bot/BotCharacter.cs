@@ -6,6 +6,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Core.DataTransferObjects;
+
 namespace Runtime.MonoBehaviours.Bot
 {
     public class BotCharacter : MonoBehaviour, ICharacter
@@ -18,7 +20,10 @@ namespace Runtime.MonoBehaviours.Bot
         public IMovable CharacterMovement { get; private set; }
         public ICharacterAnimator CharacterAnimator { get; private set; }
 
+        private BombDto _bombDto;
         private CharacterRuntimeData _characterRuntimeData;
+
+        public BombDto BombDto => _bombDto;
         public CharacterRuntimeData CharacterData => _characterRuntimeData;
         public PlayerBombDeployer PlayerBombDeployer => _concreteBombDeployer;
 
@@ -27,16 +32,6 @@ namespace Runtime.MonoBehaviours.Bot
         private void Awake()
         {
             CollectRefs();
-        }
-
-        private void OnEnable()
-        {
-            CharacterRuntimeData.OnHealthRunOut += BotDeath;
-        }
-
-        private void OnDisable()
-        {
-            CharacterRuntimeData.OnHealthRunOut -= BotDeath;
         }
 
         public void Initialize()
@@ -50,16 +45,21 @@ namespace Runtime.MonoBehaviours.Bot
         {
             if (Immune.IsImmune) return;
 
-            if (CharacterRuntimeData.CharacterHealth > 0)
+            if (_characterRuntimeData.CharacterHealth > 0)
             {
-                CharacterRuntimeData.SubtractHealth(damageAmount);
+                _characterRuntimeData.SubtractHealth(damageAmount);
                 Immune.ActivateImmunity();
+            }
+            else
+            {
+                BotDeath();
             }
         }
 
         public void DeployBomb()
         {
-            BombDeployer.DeployBomb(CharacterRuntimeData.BombsAtTime, CharacterRuntimeData.BombsCountdown, CharacterRuntimeData.BombsDamage, CharacterRuntimeData.BombsSpreading);
+            
+            BombDeployer.DeployBomb(_bombDto);
         }
 
         public void Heal(int healAmount)
@@ -67,12 +67,12 @@ namespace Runtime.MonoBehaviours.Bot
         }
         public void Reset()
         {
-            if (CharacterRuntimeData == null)
+            if (_characterRuntimeData == null)
             {
                 Debug.LogWarning("PlayerCharacter: have not CharacterRuntimeData");
                 return;
             }
-            CharacterRuntimeData.Initialize(3);
+            _characterRuntimeData.Initialize(_characterData);
         }
 
         public void SetBombDeployAbility(bool canDeploy)
@@ -87,6 +87,7 @@ namespace Runtime.MonoBehaviours.Bot
 
         private void BotDeath()
         {
+            Debug.Log("бот умер: " + gameObject.name);
             OnBotDeath?.Invoke(gameObject.name);
             CharacterAnimator.PlayDeathAnimation();
             SetBombDeployAbility(false);
@@ -105,6 +106,11 @@ namespace Runtime.MonoBehaviours.Bot
             _characterRuntimeData = new CharacterRuntimeData();
 
             _characterRuntimeData.Initialize(_characterData);
+
+            _bombDto = new BombDto(_characterRuntimeData.BombsCountdown, _characterRuntimeData.BombsAtTime, _characterRuntimeData.BombsSpreading, _characterRuntimeData.BombsDamage);
+
+
+            
             CharacterRuntimeData = _characterRuntimeData;
         }
     }

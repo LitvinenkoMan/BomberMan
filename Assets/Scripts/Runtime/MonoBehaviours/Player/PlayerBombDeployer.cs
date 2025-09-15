@@ -1,3 +1,4 @@
+using Core.DataTransferObjects;
 using Interfaces;
 using MonoBehaviours.GroundSectionSystem;
 using MonoBehaviours.GroundSectionSystem.SectionObstacles;
@@ -16,8 +17,6 @@ namespace Runtime.MonoBehaviours.Player
         private bool _canDeployBombs;
         private int _currentPlacedBombs;
 
-        public Action<Vector3> BombSpawned;
-
         private void OnEnable()
         {
 
@@ -31,23 +30,23 @@ namespace Runtime.MonoBehaviours.Player
             Initialize();
         }
 
-        public void DeployBomb(int bombsAtTime, float timeToExplode, int bombDamage, int bombSpread)
+        public void DeployBomb(BombDto bombDTO)
         {
             if (!_canDeployBombs) return;
 
             var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
-            if (section && !section.PlacedObstacle && _currentPlacedBombs < bombsAtTime)
+            if (section && !section.PlacedObstacle && _currentPlacedBombs < bombDTO.BombsAtTime)
             {
                 var bomb = _bombsPool.GetFromPool(true).GetComponent<Bomb>();
                 bomb.SetNewPosition(section.ObstaclePlacementPosition);
                 bomb.transform.SetParent(null);
                 bomb.onExplode += SubtractAmountOfCurrentBombs;
                 section.AddObstacle(bomb);
-                bomb.Ignite(timeToExplode, bombDamage, bombSpread);
+                bomb.Ignite(bombDTO.BombCountdown, bombDTO.BombsDamage, bombDTO.BombsSpreading);
 
                 _currentPlacedBombs++;
 
-                BombSpawned?.Invoke(bomb.transform.position);
+                bombDTO.SetBombPosition(bomb.transform.position);
             }
         }
         private void SubtractAmountOfCurrentBombs(Bomb explodedBomb)
