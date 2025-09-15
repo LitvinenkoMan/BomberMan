@@ -4740,7 +4740,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 717d85f327671084f89e6a0c02038aec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bomberParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
   StartMatchUnityEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -6656,7 +6655,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab7211cd1eb8c5d47b8924302c693410, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BomberParams: {fileID: 11400000, guid: dd3b20478f112094e94937527e5aff14, type: 2}
   CurrentMatchManager: {fileID: 0}
   HealtText: {fileID: 867830244}
   SpeedText: {fileID: 2116171436}

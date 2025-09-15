@@ -1,6 +1,8 @@
+using Core.DataTransferObjects;
 using Interfaces;
 using MonoBehaviours.GroundSectionSystem;
 using MonoBehaviours.GroundSectionSystem.SectionObstacles;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -28,21 +30,23 @@ namespace Runtime.MonoBehaviours.Player
             Initialize();
         }
 
-        public void DeployBomb(int bombsAtTime, float timeToExplode, int bombDamage, int bombSpread)
+        public void DeployBomb(BombDto bombDTO)
         {
             if (!_canDeployBombs) return;
 
             var section = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
-            if (section && !section.PlacedObstacle && _currentPlacedBombs < bombsAtTime)
+            if (section && !section.PlacedObstacle && _currentPlacedBombs < bombDTO.BombsAtTime)
             {
                 var bomb = _bombsPool.GetFromPool(true).GetComponent<Bomb>();
                 bomb.SetNewPosition(section.ObstaclePlacementPosition);
                 bomb.transform.SetParent(null);
                 bomb.onExplode += SubtractAmountOfCurrentBombs;
                 section.AddObstacle(bomb);
-                bomb.Ignite(timeToExplode, bombDamage, bombSpread);
+                bomb.Ignite(bombDTO.BombCountdown, bombDTO.BombsDamage, bombDTO.BombsSpreading);
 
                 _currentPlacedBombs++;
+
+                bombDTO.SetBombPosition(bomb.transform.position);
             }
         }
         private void SubtractAmountOfCurrentBombs(Bomb explodedBomb)

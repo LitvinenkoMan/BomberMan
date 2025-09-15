@@ -269,6 +269,7 @@ GameObject:
   - component: {fileID: 2823905789988001039}
   - component: {fileID: 1166421739338367290}
   - component: {fileID: 8405923379661585008}
+  - component: {fileID: -8483508925370468450}
   m_Layer: 0
   m_Name: BombSingleGame
   m_TagString: Untagged
@@ -325,7 +326,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 683411162
+  GlobalObjectIdHash: 1259683513
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -348,3 +349,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IgniteOnStart: 0
   BombVisuals: {fileID: 1302225832201595735}
+--- !u!208 &-8483508925370468450
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8285095642912142646}
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.4, y: 0.5, z: 0.4}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0.5

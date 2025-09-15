@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 {
@@ -15,6 +16,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
         [SerializeField]
         private GameObject BombVisuals;
 
+        private NavMeshObstacle _navMeshObstacle;
         private Collider _bombCollider;
         private float _timer;
         private bool _isTimerOn;
@@ -25,6 +27,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
         private void Start()
         {
+            if (TryGetComponent(out NavMeshObstacle navMeshObstacle)) _navMeshObstacle = navMeshObstacle;
             _bombCollider = GetComponent<Collider>();
             ObstacleHealthCmp.Initialize(1);
             ObstacleHealthCmp.SetAbilityToReceiveDamage(true);
@@ -57,6 +60,10 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             if (!_isExploded)
             {
                 _bombCollider.isTrigger = false;
+                if (_navMeshObstacle != null)
+                {
+                    _navMeshObstacle.enabled = true;
+                }
             }
         }
 
@@ -92,6 +99,7 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
             _isTimerOn = false;
             _isExploded = true;
+            _navMeshObstacle.enabled = false;
             _bombCollider.isTrigger = true;
             onExplode?.Invoke(this);
         }
@@ -110,7 +118,6 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             PlaceExplosionEffect(currentSection.ObstaclePlacementPosition);
 
             TryDamageActorsOrPlayer(currentSection.ObstaclePlacementPosition, damage);
-
 
             if (depth <= 0)
             {
