@@ -9,9 +9,6 @@ namespace Runtime.NetworkBehaviours.MatchManagers
 {
     public class TrainingMatchManager : MonoBehaviour
     {
-        [SerializeField] private BaseBomberParameters bomberParams;
-
-
         public UnityEvent StartMatchUnityEvent;
 
         private void Start()
