@@ -1,14 +1,12 @@
 using System.Collections.Generic;
-using MonoBehaviours;
+using Interfaces;
 using MonoBehaviours.GroundSectionSystem;
-using Runtime.NetworkBehaviours.PowerUps;
 using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Runtime.MonoBehaviours
+namespace Runtime.NetworkBehaviours.PowerUps
 {
-    [RequireComponent(typeof(ObjectPoolQueue))]
     public class PowerUpSpawnerNet : NetworkBehaviour
     {
         [Header("List of Power ups to spawn")]
@@ -25,19 +23,20 @@ namespace Runtime.MonoBehaviours
         [SerializeField]
         private List<GroundSection> SpawnPlaces;
 
-        private ObjectPoolQueue _powerUpsPool;
+        private IObjectPool<GameObject> _powerUpsPool;
         private GroundSection _currentSectionToSpawn;
         private float _timer;
         private bool _canSpawn;
 
         private void Awake()
         {
-            _powerUpsPool = GetComponent<ObjectPoolQueue>();
+            _powerUpsPool = GetComponent<IObjectPool<GameObject>>();
             _currentSectionToSpawn = null;
         }
 
         public override void OnNetworkSpawn()
         {
+            _powerUpsPool.Initialize();
             EnableSpawning();
             if (!IsServer)
             {
@@ -58,14 +57,13 @@ namespace Runtime.MonoBehaviours
                 if (ChooseSectionForSpawning())
                 {
                     var powerUpObject = _powerUpsPool.GetFromPool(true);
-                    if (powerUpObject.TryGetComponent(out PowerUp powerUp))
+                    if (powerUpObject && powerUpObject.TryGetComponent(out PowerUp powerUp))
                     {
                         if (!powerUp.IsSpawned) powerUp.NetworkObject.Spawn();
 
                         SpawnPowerUpRpc(powerUp, _currentSectionToSpawn.ObstaclePlacementPosition);
                     }
                 }
-                //TODO: Change this!
                 _timer = 0;
             }
         }

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3997011122832386645}
   - component: {fileID: 4387639480902194081}
-  - component: {fileID: 7194225343234531622}
+  - component: {fileID: -6428623917918515631}
   - component: {fileID: 3996468417301818720}
   m_Layer: 0
   m_Name: PowerUpSpawner
@@ -55,7 +55,7 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &7194225343234531622
+--- !u!114 &-6428623917918515631
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -64,12 +64,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 5884859181082246799}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d90f97cc89543a44887580b884b9ed47, type: 3}
+  m_Script: {fileID: 11500000, guid: 5b3f17dd52e6ca945af2ce1dafe899eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectExample: {fileID: 0}
-  StartingCount: 0
-  UseReparenting: 0
+  objectExample: {fileID: 0}
+  startingCount: 0
+  useReparenting: 0
 --- !u!114 &3996468417301818720
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -88,6 +88,6 @@ MonoBehaviour:
   - {fileID: 1961290817403870761, guid: 92d6ff410919dd844a0c2dfa76c9ce87, type: 3}
   - {fileID: 46862703273569310, guid: 3b5e43a23009cc74994327e09a841658, type: 3}
   - {fileID: 18113497874491121, guid: 1f0e6b9c328b9534385ab703a694fbab, type: 3}
-  TimePerSpawn: 20
-  AmountOfPreparedPowerUps: 30
+  TimePerSpawn: 7
+  AmountOfPreparedPowerUps: 50
   SpawnPlaces: []

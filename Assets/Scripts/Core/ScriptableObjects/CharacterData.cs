@@ -3,7 +3,7 @@ using UnityEngine;
 namespace Core.ScriptableObjects
 {
     [CreateAssetMenu(menuName = "Scriptable Objects/Character Data")]
-    public class CharacterData : ScriptableObject
+    public class CharacterData : ScriptableObject, ICharacterData
     {
         [Header("Main Refs")]
         [SerializeField]
@@ -43,5 +43,21 @@ namespace Core.ScriptableObjects
         public int BombSpread => _bombsSpreading;
         public int BombDamage => _bombsDamage;
         public float KickForce => _kickForce;
+    }
+
+    public interface ICharacterData
+    {
+        public string CharacterName { get; }
+        public GameObject Visuals { get; }
+        public GameObject Bomb { get; }
+        public RuntimeAnimatorController AnimatorController { get; }
+
+        public int Health { get; }
+        public float Speed { get; }
+        public float BombCountdown { get; }
+        public int BombsAtTime { get; }
+        public int BombSpread { get; }
+        public int BombDamage { get; }
+        public float KickForce { get; }
     }
 }
