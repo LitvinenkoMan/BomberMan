@@ -52,23 +52,6 @@ namespace Runtime.MonoBehaviours.Bot
             }
         }
     }
-    public class SimpleSearchShelter : IState
-    {
-        public void Enter(BotLogicExecuter manager)
-        {
-            
-        }
-
-        public void Exit(BotLogicExecuter manager)
-        {
-
-        }
-
-        public void Update(BotLogicExecuter manager)
-        {
-            
-        }
-    }
     public class SimpleDeployBomb : IState
     {
         float timer = 0f;
@@ -100,6 +83,36 @@ namespace Runtime.MonoBehaviours.Bot
                 manager.SwitchState(manager.States["Agro"]);
                 timer = 0f;
             }
+        }
+    }
+    public class StandartAgro : IState
+    {
+        public void Enter(BotLogicExecuter manager)
+        {
+        }
+
+        public void Exit(BotLogicExecuter manager)
+        {
+
+        }
+
+        public void Update(BotLogicExecuter manager)
+        {
+        }
+    }
+    public class StandartDeployBomb : IState
+    {
+        public void Enter(BotLogicExecuter manager)
+        {
+        }
+
+        public void Exit(BotLogicExecuter manager)
+        {
+
+        }
+
+        public void Update(BotLogicExecuter manager)
+        {
         }
     }
 }

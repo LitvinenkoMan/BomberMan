@@ -84,9 +84,9 @@ public class TargetOpponentSelector : ITargetOpponentSelector
     private List<GameObject> _opponentsList;
     public Transform TargetOpponent => _targetOpponent;
 
-    public TargetOpponentSelector(Transform thisBot)
+    public TargetOpponentSelector(NavMeshAgent agent)
     {
-        _thisBot = thisBot;
+        _thisBot = agent.transform;
     }
 
     public void SetOpponentsList(List<GameObject> opponentsList)
@@ -144,6 +144,7 @@ namespace Runtime.MonoBehaviours.Bot
 {
     public class BotLogicExecuter : MonoBehaviour
     {
+        [SerializeField] private BotType _botType;
         private IBotNavigation _botNavigation;
         private ITargetOpponentSelector _targetOpponentFinder;
 
@@ -186,15 +187,16 @@ namespace Runtime.MonoBehaviours.Bot
         {
             if (TryGetComponent(out BotCharacter character)) _character = character;
 
-            _botNavigation = new BotNavigation(GetComponent<NavMeshAgent>());
-            _retreatPositionFinder = new RetreatPositionFinder(GetComponent<NavMeshAgent>());
-            _targetOpponentFinder = new TargetOpponentSelector(gameObject.transform);
-            
-            _characterData = _character.CharacterData;
-            
+            BotBehaviorProvider botBehaviorProvider = new BotBehaviorProvider();
+            botBehaviorProvider.InitializeBehaviors(GetComponent<NavMeshAgent>());
 
-            StatesSelector statesSelector = new StatesSelector();
-            _states = statesSelector.GetStatesForType(BotType.Easy);
+            _botNavigation = botBehaviorProvider.GetBotNavigationForType(_botType);
+            _targetOpponentFinder = botBehaviorProvider.GetTargetSelectorForType(_botType);
+            _states = botBehaviorProvider.GetStatesForType(_botType);
+
+            _retreatPositionFinder = new RetreatPositionFinder(GetComponent<NavMeshAgent>());
+
+            _characterData = _character.CharacterData;
         }
         public void SetBombPosition(Vector3 position)
         {
