@@ -1,37 +1,164 @@
-using Interfaces;
+п»їusing Interfaces;
+using MonoBehaviours.GroundSectionSystem;
+using Runtime.MonoBehaviours;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using MonoBehaviours.GroundSectionSystem;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 namespace Interfaces
 {
-    public interface IBotEasyLogic
+    public interface IBotNavigation
     {
+        public void SetTarget(Vector3 target);
+        public float CheckDistance(Transform targetOpponent);
+        public void CheckPathToTarget(Transform targetOpponent);
+        public void SetSpeed(float speed);
+    }
+    public interface ITargetOpponentSelector
+    {
+        public void SetOpponentsList(List<GameObject> list);
+        public void SelectTargetOpponent();
+        public void UpdateOpponentsList(string name);
+        public void UpdatePlayerInOpponentsList();
+        public Transform GetCurrentOpponent();
+    }
+}
+public class BotNavigation : IBotNavigation
+{
+    private NavMeshAgent _agent;
+    private Vector3 _target;
+    public Vector3 Target => _target;
 
+    public BotNavigation(NavMeshAgent agent)
+    {
+        _agent = agent;
+    }
+    public void SetTarget(Vector3 target)
+    {
+        _target = target;
+        _agent.destination = target;
+    }
+    public float CheckDistance(Transform targetOpponent)
+    {
+        if (targetOpponent == null)
+        {
+            Debug.Log("CheckDistance: targetOpponent = null");
+        }
+
+        return Mathf.Min((_agent.transform.position - _target).magnitude,
+            (_agent.transform.position - targetOpponent.position).magnitude);
+    }
+
+    public void CheckPathToTarget(Transform targetOpponent)
+    {
+        NavMeshPath path = new NavMeshPath();
+        _agent.CalculatePath(targetOpponent.position, path);
+        if (path.status == NavMeshPathStatus.PathComplete)
+        {
+            SetTarget(targetOpponent.transform.position);
+        }
+        else
+        {
+            if (path.corners.Length > 0)
+            {
+                SetTarget(path.corners[path.corners.Length - 1]);
+            }
+            else
+            {
+                Debug.Log("CheckPath: have not corners of the path");
+                SetTarget(_target);
+            }
+        }
+    }
+    public void SetSpeed(float speed)
+    {
+        _agent.speed = speed;
+    }
+}
+public class TargetOpponentSelector : ITargetOpponentSelector
+{
+    private Transform _thisBot;
+    private Transform _targetOpponent;
+    private GameObject _currentPlayer;
+    private List<GameObject> _opponentsList;
+    public Transform TargetOpponent => _targetOpponent;
+
+    public TargetOpponentSelector(Transform thisBot)
+    {
+        _thisBot = thisBot;
+    }
+
+    public void SetOpponentsList(List<GameObject> opponentsList)
+    {
+        _opponentsList = opponentsList;
+        _opponentsList.Remove(_thisBot.gameObject);
+
+        _currentPlayer = Spawner.Instance.Player;
+    }
+    public void UpdateOpponentsList(string name)
+    {
+        _opponentsList.RemoveAll(opponent => opponent == null || opponent.name == name);
+        GameObject newBot = Spawner.Instance.GetOpponentByName(name);
+        _opponentsList.Add(newBot);
+    }
+    public void UpdatePlayerInOpponentsList()
+    {
+        _opponentsList.RemoveAll(opponents => opponents == null || opponents == _currentPlayer);
+
+        GameObject newPlayer = Spawner.Instance.Player;
+        _currentPlayer = newPlayer;
+
+        if (newPlayer != null && !_opponentsList.Contains(newPlayer))
+        {
+            _opponentsList.Add(newPlayer);
+        }
+    }
+    public void SelectTargetOpponent()
+    {
+        float minDistance = 10000f;
+        Transform target = null;
+
+        foreach (var opponent in _opponentsList)
+        {
+            if (opponent == null) continue;
+            if ((_thisBot.position - opponent.transform.position).magnitude < minDistance)
+            {
+                minDistance = (_thisBot.position - opponent.transform.position).magnitude;
+                target = opponent.transform;
+            }
+        }
+        if (target != null)
+        {
+            _targetOpponent = target;
+
+        }
+        else Debug.Log("SelectTargetPlayer: did not find target opponent");
+    }
+    public Transform GetCurrentOpponent()
+    {
+        return _targetOpponent;
     }
 }
 namespace Runtime.MonoBehaviours.Bot
 {
     public class BotLogicExecuter : MonoBehaviour
     {
+        private IBotNavigation _botNavigation;
+        private ITargetOpponentSelector _targetOpponentFinder;
+
         private BotCharacter _character;
-        private NavMeshAgent _agent;
-        private List<GameObject> _opponents;
-        private Transform _targetOpponent;
-        private Vector3 _target;
         private Dictionary<string, IState> _states;
         private ICharacterRuntimeData _characterData;
         private IState _currentState;
         private Vector3 _spawnedBombPos;
-        private GameObject _player;
         private RetreatPositionFinder _retreatPositionFinder;
 
-        public Transform TargetOpponent => _targetOpponent;
-        public Vector3 Target => _target;
         public Dictionary<string, IState> States => _states;
         public BotCharacter Character => _character;
         public ICharacterRuntimeData CharacterData => _characterData;
+        public IBotNavigation BotNavigation => _botNavigation;
+        public ITargetOpponentSelector TargetOpponentFinder => _targetOpponentFinder;
 
         private void Awake()
         {
@@ -40,157 +167,62 @@ namespace Runtime.MonoBehaviours.Bot
         
         private void Start()
         {
-            Spawner.Instance.OnBotSpawned += UpdateOpponentsList;
-            Spawner.Instance.OnPlayerSpawned += UpdatePlayerInList;
+            Spawner.Instance.OnBotSpawned += _targetOpponentFinder.UpdateOpponentsList;
+            Spawner.Instance.OnPlayerSpawned += _targetOpponentFinder.UpdatePlayerInOpponentsList;
 
-            GetOpponentsList();
-
-            _player = Spawner.Instance.Player;
+            _targetOpponentFinder.SetOpponentsList(Spawner.Instance.OpponentsList);
 
             SwitchState(_states["Agro"]);
-            SetTarget(_targetOpponent.position);
-            SetSpeed(3f);
+            _botNavigation.SetTarget(_targetOpponentFinder.GetCurrentOpponent().position);
+            _botNavigation.SetSpeed(3f);
         }
         private void OnDisable()
         {
-            Spawner.Instance.OnBotSpawned -= UpdateOpponentsList;
-            Spawner.Instance.OnPlayerSpawned -= UpdatePlayerInList;
+            Spawner.Instance.OnBotSpawned -= _targetOpponentFinder.UpdateOpponentsList;
+            Spawner.Instance.OnPlayerSpawned -= _targetOpponentFinder.UpdatePlayerInOpponentsList;
         }
 
         private void CollectRefs()
         {
             if (TryGetComponent(out BotCharacter character)) _character = character;
-            if (TryGetComponent(out NavMeshAgent agent)) _agent = agent;
-            _retreatPositionFinder = new RetreatPositionFinder();
+
+            _botNavigation = new BotNavigation(GetComponent<NavMeshAgent>());
+            _retreatPositionFinder = new RetreatPositionFinder(GetComponent<NavMeshAgent>());
+            _targetOpponentFinder = new TargetOpponentSelector(gameObject.transform);
             
-            _characterData = _character.CharacterRuntimeData;
+            _characterData = _character.CharacterData;
             
 
             StatesSelector statesSelector = new StatesSelector();
             _states = statesSelector.GetStatesForType(BotType.Easy);
-        }
-        public void GetOpponentsList()
-        {
-            _opponents = new List<GameObject>();
-            foreach (var opponent in Spawner.Instance.OpponentsList)
-            {
-                if (opponent != null && opponent != gameObject) _opponents.Add(opponent);
-            }
-        }
-        public float CheckDistance()
-        {
-            if (_target == null)
-            {
-                Debug.Log("CheckDistance: target = null");
-                return 0f;
-            }
-            if (_targetOpponent == null)
-            {
-                Debug.Log("CheckDistance: targetOpponent = null");
-                SelectTargetPlayer();
-            }
-
-            return Mathf.Min((transform.position - _target).magnitude, 
-                (transform.position - _targetOpponent.position).magnitude);
         }
         public void SetBombPosition(Vector3 position)
         {
             _spawnedBombPos = position;
         }
 
-        public void SetSpeed(float speed)
-        {
-            _agent.speed = speed;
-        }
-
-        public void SetTarget(Vector3 target)
-        {
-            _target = target;
-            _agent.destination = target;
-        }
-
-        public void CheckPath()
-        {
-            NavMeshPath path = new NavMeshPath();
-            _agent.CalculatePath(_targetOpponent.position, path);
-            if (path.status == NavMeshPathStatus.PathComplete)
-            {
-                SetTarget(_targetOpponent.transform.position);
-            }
-            else
-            {
-                if (path.corners.Length > 0)
-                {
-                    SetTarget(path.corners[path.corners.Length - 1]);
-                }
-                else
-                {
-                    Debug.Log("CheckPath: have not corners of the path");
-                    SelectTargetPlayer();
-                }
-            }
-        }
-        public void SelectTargetPlayer()
-        {
-            float minDistance = 10000f;
-            Transform target = null;
-
-            foreach (var opponent in _opponents)
-            {
-                if (opponent == null) continue;
-                if ((transform.position - opponent.transform.position).magnitude < minDistance)
-                {
-                    minDistance = (transform.position - opponent.transform.position).magnitude;
-                    target = opponent.transform;
-                }
-            }
-            if (target != null)
-            {
-                _targetOpponent = target;
-                
-            }
-            else Debug.Log("SelectTargetPlayer: не найдена цель преследования");
-        }
-
-        public void UpdateOpponentsList(string name)
-        {         
-            _opponents.RemoveAll(opponent => opponent == null || opponent.name == name);
-            GameObject newBot = Spawner.Instance.GetOpponentByName(name);
-            _opponents.Add(newBot);
-        }
-
-        public void UpdatePlayerInList()
-        {
-            _opponents.RemoveAll(opponents => opponents == null || opponents == _player);
-
-            GameObject newPlayer = Spawner.Instance.Player;
-            if (newPlayer != null && !_opponents.Contains(newPlayer))
-            {
-                _opponents.Add(newPlayer);
-                _player = newPlayer;
-            }
-        }
         public void RetreatFromBomb()
         {
             byte explosionRange = (byte)_characterData.BombsSpreading;
 
             var blacklistPositions = _retreatPositionFinder.GenerateBlacklistPositions(explosionRange, _character.BombDto.BombPosition);
             var possiblePositions = _retreatPositionFinder.GeneratePossiblePositions(explosionRange, blacklistPositions, _character.BombDto.BombPosition);
-            var availablePositions = _retreatPositionFinder.FindAvailablePosForRetreat(possiblePositions, blacklistPositions, _agent);
+            var availablePositions = _retreatPositionFinder.FindAvailablePosForRetreat(possiblePositions, blacklistPositions);
 
             if (availablePositions == null || availablePositions.Count == 0)
             {
                 Debug.LogWarning("No available positions for retreat, staying in place.");
-                SetTarget(transform.position);
+                _botNavigation.SetTarget(transform.position);
                 return;
             }
             else
             {
                 int randInt = UnityEngine.Random.Range(0, availablePositions.Count);
-                SetTarget(availablePositions[randInt]);
+                _botNavigation.SetTarget(availablePositions[randInt]);
             }
         }
         
+
         public void SwitchState(IState newState)
         {
             if (_currentState != null)

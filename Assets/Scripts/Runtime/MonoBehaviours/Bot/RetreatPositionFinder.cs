@@ -1,12 +1,28 @@
 using Core.ScriptableObjects;
+using Interfaces;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class RetreatPositionFinder 
+
+namespace Interfaces
 {
-    
+    public interface IRetreatPositionFinder
+    {
+        public List<Vector3> GenerateBlacklistPositions(byte explosionRange, Vector3 bombPos);
+        public List<Vector3> GeneratePossiblePositions(byte explosionRange, List<Vector3> blacklist, Vector3 spawnedBombPos);
+        public List<Vector3> FindAvailablePosForRetreat(List<Vector3> possiblePos, List<Vector3> blacklist);
+    }
+}
+public class RetreatPositionFinder : IRetreatPositionFinder
+{
+    private NavMeshAgent _agent;
+
+    public RetreatPositionFinder(NavMeshAgent agent)
+    {
+        _agent = agent;
+    } 
     private bool PointInBlackList(List<Vector3> blackList, Vector3 point)
     {
         Vector3 checkingPoint = new Vector3(point.x, 0, point.z);
@@ -58,14 +74,14 @@ public class RetreatPositionFinder
         else
         {
             Debug.LogError("GeneratePossiblePositions: list of possible positions is null");
-            return null;
+            return possiblePositions;
         }
     }
-    public List<Vector3> FindAvailablePosForRetreat(List<Vector3> possiblePos, List<Vector3> blacklist, NavMeshAgent agent)
+    public List<Vector3> FindAvailablePosForRetreat(List<Vector3> possiblePos, List<Vector3> blacklist)
     {
         if (possiblePos.Count == 0)
         {
-            Debug.LogError(agent.gameObject.name + " FindAvailablePosForRetreat: parametr 'possiblePos' is null");
+            Debug.LogError(_agent.gameObject.name + " FindAvailablePosForRetreat: parametr 'possiblePos' is null");
             return null;
         }
         Vector3[] sideOffsets = { new Vector3(1, 0, 0), new Vector3(-1, 0, 0) };
@@ -76,7 +92,7 @@ public class RetreatPositionFinder
             if (NavMesh.SamplePosition(point, out NavMeshHit hit, 0.5f, NavMesh.AllAreas))
             {
                 NavMeshPath path = new NavMeshPath();
-                agent.CalculatePath(hit.position, path);
+                _agent.CalculatePath(hit.position, path);
 
                 if (path.status == NavMeshPathStatus.PathComplete)
                 {
@@ -86,7 +102,7 @@ public class RetreatPositionFinder
                     foreach (var offset in sideOffsets)
                     {
                         var sidePos = hit.position + offset;
-                        agent.CalculatePath(sidePos, path);
+                        _agent.CalculatePath(sidePos, path);
                         if (path.status == NavMeshPathStatus.PathComplete && !PointInBlackList(blacklist, sidePos))
                         {
                             availablePositions.Add(sidePos);
@@ -102,8 +118,8 @@ public class RetreatPositionFinder
         }
         else
         {
-            Debug.LogError(agent.gameObject.name + " FindAvailablePosForRetreat: did not find available positions for retreat");
-            return null;
+            Debug.LogError(_agent.gameObject.name + " FindAvailablePosForRetreat: did not find available positions for retreat");
+            return availablePositions;
         }
     }
 }

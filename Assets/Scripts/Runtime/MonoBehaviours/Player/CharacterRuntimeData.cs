@@ -27,7 +27,7 @@ public class CharacterRuntimeData : ICharacterRuntimeData
     {
         CharacterHealth += healthToAdd;
     }
-    public void Initialize(CharacterData characterData)
+    public void Initialize(ICharacterData characterData)
     {
         CharacterHealth = characterData.Health;
         SpeedMultiplier = characterData.Speed;
