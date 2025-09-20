@@ -15,7 +15,7 @@ namespace Interfaces
 }
 
 
-namespace Runtime.MonoBehaviours.Bot
+namespace Runtime.MonoBehaviours.Bot.SimpleBotUtils
 {
     public class SimpleAgro : IState
     {
@@ -24,7 +24,9 @@ namespace Runtime.MonoBehaviours.Bot
         {
             manager.TargetOpponentFinder.SelectTargetOpponent();
             manager.Character.CharacterAnimator.PlayWalkAnimation();
-            
+            manager.BotNavigation.SetTarget(manager.TargetOpponentFinder.GetCurrentOpponent().position);
+            manager.BotNavigation.SetSpeed(3f);
+
             manager.BotNavigation.SetTarget(manager.TargetOpponentFinder.GetCurrentOpponent().position);
         }
 
@@ -83,36 +85,6 @@ namespace Runtime.MonoBehaviours.Bot
                 manager.SwitchState(manager.States["Agro"]);
                 timer = 0f;
             }
-        }
-    }
-    public class StandartAgro : IState
-    {
-        public void Enter(BotLogicExecuter manager)
-        {
-        }
-
-        public void Exit(BotLogicExecuter manager)
-        {
-
-        }
-
-        public void Update(BotLogicExecuter manager)
-        {
-        }
-    }
-    public class StandartDeployBomb : IState
-    {
-        public void Enter(BotLogicExecuter manager)
-        {
-        }
-
-        public void Exit(BotLogicExecuter manager)
-        {
-
-        }
-
-        public void Update(BotLogicExecuter manager)
-        {
         }
     }
 }

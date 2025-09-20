@@ -1,5 +1,7 @@
 using Interfaces;
 using Runtime.MonoBehaviours.Bot;
+using Runtime.MonoBehaviours.Bot.SimpleBotUtils;
+using Runtime.MonoBehaviours.Bot.StandartBotUtils;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -37,12 +39,14 @@ namespace Runtime.MonoBehaviours.Bot
 
             _targetSelectors = new Dictionary<BotType, ITargetOpponentSelector>
             {
-                {BotType.Easy, new TargetOpponentSelector(_agent) }
+                {BotType.Easy, new SimpleTargetOpponentSelector(_agent) },
+                {BotType.Standart, new StandartTargetOpponentSelector(_agent) }
             };
 
             _botNavigations = new Dictionary<BotType, IBotNavigation>
             {
-                {BotType.Easy, new BotNavigation(_agent) }
+                {BotType.Easy, new SimpleBotNavigation(_agent) },
+                {BotType.Standart, new StandartBotNavigation(_agent) }
             };
         }
         public Dictionary<string, IState> GetStatesForType(BotType type)
