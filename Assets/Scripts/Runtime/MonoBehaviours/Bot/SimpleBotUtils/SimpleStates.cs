@@ -15,17 +15,19 @@ namespace Interfaces
 }
 
 
-namespace Runtime.MonoBehaviours.Bot
+namespace Runtime.MonoBehaviours.Bot.SimpleBotUtils
 {
     public class SimpleAgro : IState
     {
         float timer = 0f;
         public void Enter(BotLogicExecuter manager)
         {
-            manager.SelectTargetPlayer();
+            manager.TargetOpponentFinder.SelectTargetOpponent();
             manager.Character.CharacterAnimator.PlayWalkAnimation();
-            
-            manager.SetTarget(manager.TargetOpponent.position);
+            manager.BotNavigation.SetTarget(manager.TargetOpponentFinder.GetCurrentOpponent().position);
+            manager.BotNavigation.SetSpeed(3f);
+
+            manager.BotNavigation.SetTarget(manager.TargetOpponentFinder.GetCurrentOpponent().position);
         }
 
         public void Exit(BotLogicExecuter manager)
@@ -35,38 +37,21 @@ namespace Runtime.MonoBehaviours.Bot
 
         public void Update(BotLogicExecuter manager)
         {
-            float distance = manager.CheckDistance();
+            float distance = manager.BotNavigation.CheckDistance(manager.TargetOpponentFinder.GetCurrentOpponent());
 
             timer += Time.deltaTime;
             
             if (timer >= 0.5f)
             {
-                manager.SelectTargetPlayer();
-                manager.SetTarget(manager.TargetOpponent.position);
+                manager.TargetOpponentFinder.SelectTargetOpponent();
+                manager.BotNavigation.SetTarget(manager.TargetOpponentFinder.GetCurrentOpponent().position);
                 timer = 0f;
             }
-            manager.CheckPath();
+            manager.BotNavigation.CheckPathToTarget(manager.TargetOpponentFinder.GetCurrentOpponent());
             if (distance <= 0.5f)
             {
                 manager.SwitchState(manager.States["Deploy Bomb"]);
             }
-        }
-    }
-    public class SimpleSearchShelter : IState
-    {
-        public void Enter(BotLogicExecuter manager)
-        {
-            
-        }
-
-        public void Exit(BotLogicExecuter manager)
-        {
-
-        }
-
-        public void Update(BotLogicExecuter manager)
-        {
-            
         }
     }
     public class SimpleDeployBomb : IState
@@ -86,7 +71,7 @@ namespace Runtime.MonoBehaviours.Bot
 
         public void Update(BotLogicExecuter manager)
         {
-            float distance = manager.CheckDistance();
+            float distance = manager.BotNavigation.CheckDistance(manager.TargetOpponentFinder.GetCurrentOpponent());
 
             if (distance <= 0.1f)
             {

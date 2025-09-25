@@ -94,7 +94,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3247314085717534856}
-  - component: {fileID: 6936494494555160789}
   - component: {fileID: -5096378723483305082}
   - component: {fileID: 4408188292803069902}
   - component: {fileID: 9082391657822552667}
@@ -121,22 +120,6 @@ Transform:
   - {fileID: 3537562256922783162}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6936494494555160789
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1961290817403870761}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a2e4521c0d71624381b03f9d69c0b80, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  baseParams: {fileID: 0}
-  ImmuneAfterGettingDamaged: 0
-  ImmunityTime: 0
-  StartingHealth: 1
 --- !u!114 &-5096378723483305082
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -149,7 +132,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4293531354
+  GlobalObjectIdHash: 3385659033
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -170,7 +153,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 424cbb82e8c018348a89de5931641546, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObstacleHealthComponent: {fileID: 6936494494555160789}
   TimedPowerUp: 0
   LifeTime: 0
   TimedEffect: 0

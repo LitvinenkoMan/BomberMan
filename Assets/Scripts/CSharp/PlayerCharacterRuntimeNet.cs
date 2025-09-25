@@ -53,7 +53,7 @@ namespace CSharp
             _kickForce.OnValueChanged -= OnKickForceChanged;
         }
 
-        public void Initialize(CharacterData  characterData)
+        public void Initialize(ICharacterData  characterData)
         {
             _characterHealth.Value = characterData.Health;
             _speedMultiplier.Value = characterData.Speed;

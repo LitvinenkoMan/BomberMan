@@ -54,13 +54,6 @@ namespace Runtime.NetworkBehaviours.Player
             name = $"P{GetComponent<NetworkObject>().OwnerClientId}";
             playerName.text = name;
 
-            if (IsOwner)
-            {
-                //GameplayUIEvents.Instance.Publish(new PlayerCharacterRuntimeNet());
-            }
-            _playerCharacterRuntimeNet.Initialize(characterData);
-            
-            //TODO: Initialize PlayerCharacterRuntimeDataNet
         }
 
         public override void OnNetworkDespawn()
@@ -93,6 +86,7 @@ namespace Runtime.NetworkBehaviours.Player
             }
             else
             {
+                Immune.ActivateImmunity();
                 StartDeathSequence();
             }
         }

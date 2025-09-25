@@ -14,6 +14,7 @@ namespace Interfaces
         public float KickForce { get; }
 
 
+        public void Initialize(ICharacterData characterData);
         public void AddHealth(int healthToAdd);
         public void SubtractHealth(int healthToSubtract);
         public void SetSpeedMultiplier(float speedMultiplier);

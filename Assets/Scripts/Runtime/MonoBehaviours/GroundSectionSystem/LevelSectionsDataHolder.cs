@@ -25,7 +25,7 @@ namespace MonoBehaviours.GroundSectionSystem
         {
             GroundSectionsUtils.Instance.SetNewDataHolder(this);
             PlayerSpawnerNet.Instance.SetUpCurrentDataHolder(this);
-            //PlayerSpawner.Instance.SetUpCurrentDataHolder(this);
+            Spawner.Instance.SetUpCurrentDataHolder(this);
         }
 
         void Update()

@@ -1,3 +1,5 @@
+using Core.ScriptableObjects;
+
 namespace Interfaces
 {
     public interface ICharacter
