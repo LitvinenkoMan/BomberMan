@@ -87,8 +87,6 @@ namespace Runtime.MonoBehaviours.Bot
         }
     }
 }
-
-
 public enum BotType
 {
     Easy,

@@ -1,4 +1,5 @@
 ﻿using Interfaces;
+using MonoBehaviours.GroundSectionSystem;
 using Runtime.MonoBehaviours.Bot.SimpleBotUtils;
 using Runtime.MonoBehaviours.Bot.StandartBotUtils;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ namespace Runtime.MonoBehaviours.Bot
     public class BotLogicExecuter : MonoBehaviour
     {
         [SerializeField] private BotType _botType;
+        [SerializeField] private bool _onAStar;
         private IBotNavigation _botNavigation;
         private ITargetOpponentSelector _targetOpponentFinder;
         private ICharacterRuntimeData _characterData;
@@ -26,6 +28,19 @@ namespace Runtime.MonoBehaviours.Bot
         public IBotNavigation BotNavigation => _botNavigation;
         public ITargetOpponentSelector TargetOpponentFinder => _targetOpponentFinder;
 
+        //-----for Debuging-----
+        private Queue<GroundSection> groundSections;
+        //----------------------
+
+        private void OnDrawGizmos()
+        {
+            if (groundSections == null) return;
+            foreach (var groundSection in groundSections)
+            {
+                Gizmos.DrawSphere(groundSection.transform.position + new Vector3(0, 1, 0), 0.3f);
+            }
+        }
+
         private void Awake()
         {
             CollectRefs();
@@ -39,7 +54,8 @@ namespace Runtime.MonoBehaviours.Bot
             _targetOpponentFinder.SetOpponentsList(Spawner.Instance.OpponentsList);
 
             SwitchState(_states["Agro"]);
-            
+
+
         }
         private void OnDisable()
         {
@@ -87,7 +103,7 @@ namespace Runtime.MonoBehaviours.Bot
                 _botNavigation.SetTarget(availablePositions[randInt]);
             }
         }
-        
+
 
         public void SwitchState(IState newState)
         {
@@ -102,7 +118,11 @@ namespace Runtime.MonoBehaviours.Bot
         private void Update()
         {
             _currentState.Update(this);
-            _botNavigation.SetTarget(Vector3.zero);
+            if (_onAStar)
+            {
+                _botNavigation.SetTarget(Vector3.zero);
+                groundSections = _botNavigation.DebugingGetList();
+            }
         }
     }
 }

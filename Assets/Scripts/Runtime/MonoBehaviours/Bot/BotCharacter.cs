@@ -52,6 +52,7 @@ namespace Runtime.MonoBehaviours.Bot
             }
             else
             {
+                Immune.ActivateImmunity();
                 BotDeath();
             }
         }
