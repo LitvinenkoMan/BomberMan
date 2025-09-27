@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Interfaces;
 
@@ -7,23 +6,51 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
 {
     public class StandartAgro : IState
     {
+        private Coroutine _coroutine;
         public void Enter(BotLogicExecuter manager)
         {
+            manager.Character.CharacterAnimator.PlayWalkAnimation();
+            manager.TargetOpponentFinder.SelectTargetOpponent();
+            manager.BotNavigation.SetSpeed(3f);
         }
 
         public void Exit(BotLogicExecuter manager)
         {
-
+            manager.StopAllCoroutines();
+            _coroutine = null;
         }
 
         public void Update(BotLogicExecuter manager)
         {
+            
+            if (_coroutine == null)
+            {
+                _coroutine = manager.StartCoroutine(corr(manager));
+            }
+            float distance = manager.BotNavigation.CheckDistance(manager.TargetOpponentFinder.GetCurrentOpponent());
+            if (distance <= 1f)
+            {
+                manager.SwitchState(manager.States["Deploy Bomb"]);
+            }
+        }
+        private IEnumerator corr(BotLogicExecuter manager)
+        {
+            manager.TargetOpponentFinder.SelectTargetOpponent();
+            manager.BotNavigation.CheckPathToTarget(manager.TargetOpponentFinder.GetCurrentOpponent());
+            yield return new WaitForSeconds(0.5f);
+            _coroutine = null;
+            manager.StopAllCoroutines();
         }
     }
+
     public class StandartDeployBomb : IState
     {
+        float timer = 0f;
         public void Enter(BotLogicExecuter manager)
         {
+            manager.Character.CharacterAnimator.PlayWalkAnimation();
+            manager.Character.DeployBomb();
+            manager.ShelterFinder.RetreatFromBomb(manager);
         }
 
         public void Exit(BotLogicExecuter manager)
@@ -33,6 +60,20 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
 
         public void Update(BotLogicExecuter manager)
         {
+            float distance = manager.BotNavigation.CheckDistance(manager.TargetOpponentFinder.GetCurrentOpponent());
+
+            if (distance <= 0.1f)
+            {
+                manager.Character.CharacterAnimator.PlayIdleAnimation();
+            }
+
+            timer += Time.deltaTime;
+
+            if (timer >= 3f)
+            {
+                manager.SwitchState(manager.States["Agro"]);
+                timer = 0f;
+            }
         }
     }
 }

@@ -12,8 +12,9 @@ namespace Runtime.MonoBehaviours.Bot
     public class BotBehaviorProvider
     {
         private Dictionary<BotType, Dictionary<string, IState>> _states;
-        private Dictionary<BotType, ITargetOpponentSelector> _targetSelectors;
-        private Dictionary<BotType, IBotNavigation> _botNavigations; 
+        private Dictionary<BotType, BaseTargetOpponentSelector> _targetSelectors;
+        private Dictionary<BotType, IBotNavigation> _botNavigations;
+        private Dictionary<BotType, IShelterFinder> _shelterFinder;
 
         public void InitializeBehaviors(NavMeshAgent _agent)
         {
@@ -37,7 +38,7 @@ namespace Runtime.MonoBehaviours.Bot
                 }
             };
 
-            _targetSelectors = new Dictionary<BotType, ITargetOpponentSelector>
+            _targetSelectors = new Dictionary<BotType, BaseTargetOpponentSelector>
             {
                 {BotType.Easy, new SimpleTargetOpponentSelector(_agent) },
                 {BotType.Standart, new StandartTargetOpponentSelector(_agent) }
@@ -47,6 +48,11 @@ namespace Runtime.MonoBehaviours.Bot
             {
                 {BotType.Easy, new SimpleBotNavigation(_agent) },
                 {BotType.Standart, new StandartBotNavigation(_agent) }
+            };
+            _shelterFinder = new Dictionary<BotType, IShelterFinder>
+            {
+                { BotType.Easy, new SimpleShelterFinder(_agent) },
+                { BotType.Standart, new StandartShelterFinder(_agent) }
             };
         }
         public Dictionary<string, IState> GetStatesForType(BotType type)
@@ -61,7 +67,7 @@ namespace Runtime.MonoBehaviours.Bot
                 return null;
             }
         }
-        public ITargetOpponentSelector GetTargetSelectorForType(BotType type) 
+        public BaseTargetOpponentSelector GetTargetSelectorForType(BotType type) 
         { 
             if (_targetSelectors.TryGetValue(type, out var targetSelector))
             {
@@ -82,6 +88,18 @@ namespace Runtime.MonoBehaviours.Bot
             else
             {
                 Debug.LogError($"No BotNavigation found for BotType: {type}");
+                return null;
+            }
+        }
+        public IShelterFinder GetShelterFinder(BotType type)
+        {
+            if (_shelterFinder.TryGetValue(type, out var shelterFinder))
+            {
+                return shelterFinder;
+            }
+            else
+            {
+                Debug.LogError($"No ShelterFinder found for BotType: {type}");
                 return null;
             }
         }

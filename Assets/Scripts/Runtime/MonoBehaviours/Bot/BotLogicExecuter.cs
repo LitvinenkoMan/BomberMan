@@ -2,6 +2,7 @@
 using MonoBehaviours.GroundSectionSystem;
 using Runtime.MonoBehaviours.Bot.SimpleBotUtils;
 using Runtime.MonoBehaviours.Bot.StandartBotUtils;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -13,33 +14,21 @@ namespace Runtime.MonoBehaviours.Bot
         [SerializeField] private BotType _botType;
         [SerializeField] private bool _onAStar;
         private IBotNavigation _botNavigation;
-        private ITargetOpponentSelector _targetOpponentFinder;
+        private IShelterFinder _shelterFinder;
         private ICharacterRuntimeData _characterData;
         private IState _currentState;
         private BotCharacter _character;
-        private SimpleShelterFinder _retreatPositionFinder;
+        private BaseTargetOpponentSelector _targetOpponentFinder;
 
         private Dictionary<string, IState> _states;
         private Vector3 _spawnedBombPos;
 
         public Dictionary<string, IState> States => _states;
         public BotCharacter Character => _character;
+        public BaseTargetOpponentSelector TargetOpponentFinder => _targetOpponentFinder;
         public ICharacterRuntimeData CharacterData => _characterData;
         public IBotNavigation BotNavigation => _botNavigation;
-        public ITargetOpponentSelector TargetOpponentFinder => _targetOpponentFinder;
-
-        //-----for Debuging-----
-        private Queue<GroundSection> groundSections;
-        //----------------------
-
-        private void OnDrawGizmos()
-        {
-            if (groundSections == null) return;
-            foreach (var groundSection in groundSections)
-            {
-                Gizmos.DrawSphere(groundSection.transform.position + new Vector3(0, 1, 0), 0.3f);
-            }
-        }
+        public IShelterFinder ShelterFinder => _shelterFinder;
 
         private void Awake()
         {
@@ -54,8 +43,6 @@ namespace Runtime.MonoBehaviours.Bot
             _targetOpponentFinder.SetOpponentsList(Spawner.Instance.OpponentsList);
 
             SwitchState(_states["Agro"]);
-
-
         }
         private void OnDisable()
         {
@@ -72,9 +59,8 @@ namespace Runtime.MonoBehaviours.Bot
 
             _botNavigation = botBehaviorProvider.GetBotNavigationForType(_botType);
             _targetOpponentFinder = botBehaviorProvider.GetTargetSelectorForType(_botType);
+            _shelterFinder = botBehaviorProvider.GetShelterFinder(_botType);
             _states = botBehaviorProvider.GetStatesForType(_botType);
-
-            _retreatPositionFinder = new SimpleShelterFinder(GetComponent<NavMeshAgent>());
 
             _characterData = _character.CharacterData;
         }
@@ -82,29 +68,6 @@ namespace Runtime.MonoBehaviours.Bot
         {
             _spawnedBombPos = position;
         }
-
-        public void RetreatFromBomb()
-        {
-            byte explosionRange = (byte)_characterData.BombsSpreading;
-
-            var blacklistPositions = _retreatPositionFinder.GenerateBlacklistPositions(explosionRange, _character.BombDto.BombPosition);
-            var possiblePositions = _retreatPositionFinder.GeneratePossiblePositions(explosionRange, blacklistPositions, _character.BombDto.BombPosition);
-            var availablePositions = _retreatPositionFinder.FindAvailablePosForRetreat(possiblePositions, blacklistPositions);
-
-            if (availablePositions == null || availablePositions.Count == 0)
-            {
-                Debug.LogWarning("No available positions for retreat, staying in place.");
-                _botNavigation.SetTarget(transform.position);
-                return;
-            }
-            else
-            {
-                int randInt = UnityEngine.Random.Range(0, availablePositions.Count);
-                _botNavigation.SetTarget(availablePositions[randInt]);
-            }
-        }
-
-
         public void SwitchState(IState newState)
         {
             if (_currentState != null)
@@ -114,15 +77,9 @@ namespace Runtime.MonoBehaviours.Bot
             _currentState = newState;
             _currentState.Enter(this);
         }
-
         private void Update()
         {
             _currentState.Update(this);
-            if (_onAStar)
-            {
-                _botNavigation.SetTarget(Vector3.zero);
-                groundSections = _botNavigation.DebugingGetList();
-            }
         }
-    }
+    }    
 }

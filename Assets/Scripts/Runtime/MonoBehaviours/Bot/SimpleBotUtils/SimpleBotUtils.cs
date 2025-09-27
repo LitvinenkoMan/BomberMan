@@ -1,8 +1,6 @@
-using Core.ScriptableObjects;
 using Interfaces;
-using MonoBehaviours.GroundSectionSystem;
 using Runtime.MonoBehaviours;
-using System.Collections;
+using Runtime.MonoBehaviours.Bot;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -10,11 +8,12 @@ using UnityEngine.AI;
 
 namespace Interfaces
 {
-    public interface IRetreatPositionFinder
+    public interface IShelterFinder
     {
         public List<Vector3> GenerateBlacklistPositions(byte explosionRange, Vector3 bombPos);
         public List<Vector3> GeneratePossiblePositions(byte explosionRange, List<Vector3> blacklist, Vector3 spawnedBombPos);
         public List<Vector3> FindAvailablePosForRetreat(List<Vector3> possiblePos, List<Vector3> blacklist);
+        public void RetreatFromBomb(BotLogicExecuter bot);
     }
     public interface IBotNavigation
     {
@@ -23,15 +22,49 @@ namespace Interfaces
         public void CheckPathToTarget(Transform targetOpponent);
         public void SetSpeed(float speed);
     }
-    public interface ITargetOpponentSelector
-    {
-        public void SetOpponentsList(List<GameObject> list);
-        public void SelectTargetOpponent();
-        public void UpdateOpponentsList(string name);
-        public void UpdatePlayerInOpponentsList();
-        public Transform GetCurrentOpponent();
-    }
+    
 }
+
+public abstract class BaseTargetOpponentSelector
+{
+    protected Transform _thisBot;
+    protected Transform _targetOpponent;
+    protected GameObject _currentPlayer;
+    protected List<GameObject> _opponentsList;
+    public Transform TargetOpponent => _targetOpponent;
+    public void SetOpponentsList(List<GameObject> opponentsList)
+    {
+        _opponentsList = opponentsList;
+        _opponentsList.Remove(_thisBot.gameObject);
+
+        _currentPlayer = Spawner.Instance.Player;
+    }
+    public void UpdateOpponentsList(string name)
+    {
+        _opponentsList.RemoveAll(opponent => opponent == null || opponent.name == name);
+        GameObject newBot = Spawner.Instance.GetOpponentByName(name);
+        _opponentsList.Add(newBot);
+    }
+    public void UpdatePlayerInOpponentsList()
+    {
+        _opponentsList.RemoveAll(opponents => opponents == null || opponents == _currentPlayer);
+
+        GameObject newPlayer = Spawner.Instance.Player;
+        _currentPlayer = newPlayer;
+
+        if (newPlayer != null && !_opponentsList.Contains(newPlayer))
+        {
+            _opponentsList.Add(newPlayer);
+        }
+    }
+    public Transform GetCurrentOpponent()
+    {
+        return _targetOpponent;
+    }
+    public abstract void SelectTargetOpponent();
+    
+}
+
 namespace Runtime.MonoBehaviours.Bot.SimpleBotUtils
 {
     public class SimpleBotNavigation : IBotNavigation
@@ -86,45 +119,13 @@ namespace Runtime.MonoBehaviours.Bot.SimpleBotUtils
             _agent.speed = speed;
         }
     }
-    public class SimpleTargetOpponentSelector : ITargetOpponentSelector
+    public class SimpleTargetOpponentSelector : BaseTargetOpponentSelector
     {
-        private Transform _thisBot;
-        private Transform _targetOpponent;
-        private GameObject _currentPlayer;
-        private List<GameObject> _opponentsList;
-        public Transform TargetOpponent => _targetOpponent;
-
         public SimpleTargetOpponentSelector(NavMeshAgent agent)
         {
             _thisBot = agent.transform;
         }
-
-        public void SetOpponentsList(List<GameObject> opponentsList)
-        {
-            _opponentsList = opponentsList;
-            _opponentsList.Remove(_thisBot.gameObject);
-
-            _currentPlayer = Spawner.Instance.Player;
-        }
-        public void UpdateOpponentsList(string name)
-        {
-            _opponentsList.RemoveAll(opponent => opponent == null || opponent.name == name);
-            GameObject newBot = Spawner.Instance.GetOpponentByName(name);
-            _opponentsList.Add(newBot);
-        }
-        public void UpdatePlayerInOpponentsList()
-        {
-            _opponentsList.RemoveAll(opponents => opponents == null || opponents == _currentPlayer);
-
-            GameObject newPlayer = Spawner.Instance.Player;
-            _currentPlayer = newPlayer;
-
-            if (newPlayer != null && !_opponentsList.Contains(newPlayer))
-            {
-                _opponentsList.Add(newPlayer);
-            }
-        }
-        public void SelectTargetOpponent()
+        public override void SelectTargetOpponent()
         {
             float minDistance = 10000f;
             Transform target = null;
@@ -145,12 +146,8 @@ namespace Runtime.MonoBehaviours.Bot.SimpleBotUtils
             }
             else Debug.Log("SelectTargetPlayer: did not find target opponent");
         }
-        public Transform GetCurrentOpponent()
-        {
-            return _targetOpponent;
-        }
     }
-    public class SimpleShelterFinder : IRetreatPositionFinder
+    public class SimpleShelterFinder : IShelterFinder
     {
         private NavMeshAgent _agent;
 
@@ -257,6 +254,25 @@ namespace Runtime.MonoBehaviours.Bot.SimpleBotUtils
                 return availablePositions;
             }
         }
-    }
+        public void RetreatFromBomb(BotLogicExecuter bot)
+        {
+            byte explosionRange = (byte)bot.CharacterData.BombsSpreading;
 
+            var blacklistPositions = GenerateBlacklistPositions(explosionRange, bot.Character.BombDto.BombPosition);
+            var possiblePositions = GeneratePossiblePositions(explosionRange, blacklistPositions, bot.Character.BombDto.BombPosition);
+            var availablePositions = FindAvailablePosForRetreat(possiblePositions, blacklistPositions);
+
+            if (availablePositions == null || availablePositions.Count == 0)
+            {
+                Debug.Log("No available positions for retreat, staying in place.");
+                bot.BotNavigation.SetTarget(bot.transform.position);
+                return;
+            }
+            else
+            {
+                int randInt = UnityEngine.Random.Range(0, availablePositions.Count);
+                bot.BotNavigation.SetTarget(availablePositions[randInt]);
+            }
+        }
+    }
 }

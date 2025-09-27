@@ -15,10 +15,9 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
         private NavMeshAgent _agent;
         private List<GroundSection> _sections;
         private GroundSection[,] _sectionsPositions;
-        public GroundSection _currentSection;
-        private GroundSection _target;
-        private Queue<GroundSection> path;
-        public GroundSection Target => _target;
+        private GroundSection _currentSection;
+        private Vector3 _target;
+        private Queue<GroundSection> _path;
 
         public StandartBotNavigation(NavMeshAgent agent)
         {
@@ -36,47 +35,51 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
                 Debug.Log("CheckDistance: targetOpponent = null");
             }
 
-            return Mathf.Min((_agent.transform.position - _target.transform.position).magnitude,
+            return Mathf.Min((_agent.transform.position - _target).magnitude,
                 (_agent.transform.position - targetOpponent.position).magnitude);
         }
 
         public void CheckPathToTarget(Transform targetOpponent)
         {
-            NavMeshPath path = new NavMeshPath();
-            _agent.CalculatePath(targetOpponent.position, path);
-            if (path.status == NavMeshPathStatus.PathComplete)
+            GridAPathFind(targetOpponent);
+            GroundSection targetSection = null;
+            foreach (var sectionFormPath in _path)
             {
-                SetTarget(targetOpponent.transform.position);
+                if (sectionFormPath.PlacedObstacle != null)
+                {
+                    targetSection = sectionFormPath;
+                    break;
+                }
+                targetSection = sectionFormPath;
             }
-            else
-            {
-                // метод нахождения кратчайшего пути до цели Grid A*
-            }
+            SetTarget(targetSection.transform.position);
         }
 
         public void SetSpeed(float speed)
         {
+            _agent.speed = speed;
         }
 
         public void SetTarget(Vector3 target)
         {
-            GridAPathFind();
+            _agent.destination = target;
+            _target = target;
         }
-        private void GridAPathFind()
+        private void GridAPathFind(Transform target)
         {
             int x = Mathf.FloorToInt(_agent.transform.position.x + 0.5f);
             int z = Mathf.FloorToInt(_agent.transform.position.z + 0.5f);
 
+            int targetX = Mathf.FloorToInt(target.position.x + 0.5f);
+            int targetZ = Mathf.FloorToInt(target.position.z + 0.5f);
+
             _currentSection = _sectionsPositions[x, z];
-            GroundSection _goalSection = _sectionsPositions[1, 10];
-            path = new Queue<GroundSection>();
-            path = CalculateNextSection(_currentSection, _goalSection);
+            GroundSection _goalSection = _sectionsPositions[targetX, targetZ];
+
+            _path = new Queue<GroundSection>();
+            _path = CalculatePath(_currentSection, _goalSection);
         }
-        public Queue<GroundSection> DebugingGetList()
-        {
-            return path;
-        }
-        private Queue<GroundSection> CalculateNextSection(GroundSection startSection, GroundSection goalSection)
+        private Queue<GroundSection> CalculatePath(GroundSection startSection, GroundSection goalSection)
         {
             if (startSection == goalSection) // if bot is already on target section, return it
             {
@@ -91,7 +94,9 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
             var parents = new Dictionary<GroundSection, GroundSection>(); // dictionary with section (key) and its parent (value). Needed to backtrack the path
             var sectionCost = new Dictionary<GroundSection, int>(); // section costs, total path cost to reach each section
 
-            openList.Add(startSection, (startSection.transform.position - goalSection.transform.position).magnitude);
+            float distance = (startSection.transform.position - goalSection.transform.position).magnitude;
+
+            openList.Add(startSection, distance);
             sectionCost.Add(startSection, 0);
 
             GroundSection currentSection = startSection;
@@ -144,8 +149,9 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
                     //-----------------------------------------------------------------------
                     //-----------------------CALCULATE neighbourF------------------------------
 
+                    float h = (neighbor.transform.position - goalSection.transform.position).magnitude;
                     // neighbor's path length equals its section cost + current cost
-                    float neighborF = sectionCost[neighbor] + (neighbor.transform.position - goalSection.transform.position).magnitude;
+                    float neighborF = sectionCost[neighbor] + h;
 
                     // IMPORTANT! if neighbor's F is greater than current F, we assign the minimum. This finds the shortest path
                     if (openList.ContainsKey(neighbor) && openList[neighbor] > neighborF)
@@ -198,31 +204,60 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
             }
         }
     }
-    public class StandartTargetOpponentSelector : ITargetOpponentSelector
+    public class StandartTargetOpponentSelector : BaseTargetOpponentSelector
     {
-        public StandartTargetOpponentSelector(NavMeshAgent agent) 
+        public StandartTargetOpponentSelector(NavMeshAgent agent)
         {
-            
+            _thisBot = agent.transform;
         }
-        public Transform GetCurrentOpponent()
+        public override void SelectTargetOpponent()
         {
-            return null;
+            float minDistance = 1000000f;
+            Transform target = null;
+
+            foreach (var opponent in _opponentsList)
+            {
+                if (opponent == null) continue;
+                float distance = (_thisBot.position - opponent.transform.position).sqrMagnitude;
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    target = opponent.transform;
+                }
+            }
+            if (target != null)
+            {
+                Debug.Log(target.name);
+                _targetOpponent = target;
+            }
+            else Debug.Log("SelectTargetPlayer: did not find target opponent");
+        }
+    }
+    public class StandartShelterFinder : IShelterFinder
+    {
+        private NavMeshAgent _agent;
+        public StandartShelterFinder(NavMeshAgent agent)
+        {
+            _agent = agent;
+        }
+        public List<Vector3> FindAvailablePosForRetreat(List<Vector3> possiblePos, List<Vector3> blacklist)
+        {
+            throw new System.NotImplementedException();
         }
 
-        public void SelectTargetOpponent()
+        public List<Vector3> GenerateBlacklistPositions(byte explosionRange, Vector3 bombPos)
         {
+            throw new System.NotImplementedException();
         }
 
-        public void SetOpponentsList(List<GameObject> list)
+        public List<Vector3> GeneratePossiblePositions(byte explosionRange, List<Vector3> blacklist, Vector3 spawnedBombPos)
         {
+            throw new System.NotImplementedException();
         }
 
-        public void UpdateOpponentsList(string name)
+        public void RetreatFromBomb(BotLogicExecuter bot)
         {
-        }
-
-        public void UpdatePlayerInOpponentsList()
-        {
+            throw new System.NotImplementedException();
         }
     }
 }

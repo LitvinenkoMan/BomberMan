@@ -59,7 +59,7 @@ namespace Runtime.MonoBehaviours.Bot.SimpleBotUtils
         {
             manager.Character.CharacterAnimator.PlayWalkAnimation();
             manager.Character.DeployBomb();
-            manager.RetreatFromBomb();
+            manager.ShelterFinder.RetreatFromBomb(manager);
         }
 
         public void Exit(BotLogicExecuter manager)
