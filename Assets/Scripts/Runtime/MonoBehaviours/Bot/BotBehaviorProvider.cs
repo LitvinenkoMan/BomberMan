@@ -2,6 +2,7 @@ using Interfaces;
 using Runtime.MonoBehaviours.Bot;
 using Runtime.MonoBehaviours.Bot.SimpleBotUtils;
 using Runtime.MonoBehaviours.Bot.StandartBotUtils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,7 +13,8 @@ namespace Runtime.MonoBehaviours.Bot
     public class BotBehaviorProvider
     {
         private Dictionary<BotType, Dictionary<string, IState>> _states;
-        private Dictionary<BotType, BaseTargetOpponentSelector> _targetSelectors;
+        // Since we need to return new instances of BaseTargetOpponentSelector, delegates are used.
+        private Dictionary<BotType, Func<BaseTargetOpponentSelector>> _targetSelectors; 
         private Dictionary<BotType, IBotNavigation> _botNavigations;
         private Dictionary<BotType, IShelterFinder> _shelterFinder;
 
@@ -38,10 +40,10 @@ namespace Runtime.MonoBehaviours.Bot
                 }
             };
 
-            _targetSelectors = new Dictionary<BotType, BaseTargetOpponentSelector>
+            _targetSelectors = new Dictionary<BotType, Func<BaseTargetOpponentSelector>> 
             {
-                {BotType.Easy, new SimpleTargetOpponentSelector(_agent) },
-                {BotType.Standart, new StandartTargetOpponentSelector(_agent) }
+                {BotType.Easy, () => new SimpleTargetOpponentSelector(_agent) },
+                {BotType.Standart, () => new StandartTargetOpponentSelector(_agent) }
             };
 
             _botNavigations = new Dictionary<BotType, IBotNavigation>
@@ -71,7 +73,7 @@ namespace Runtime.MonoBehaviours.Bot
         { 
             if (_targetSelectors.TryGetValue(type, out var targetSelector))
             {
-                return targetSelector;
+                return targetSelector();
             }
             else
             {

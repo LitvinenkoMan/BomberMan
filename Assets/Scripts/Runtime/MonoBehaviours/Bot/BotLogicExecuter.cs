@@ -1,8 +1,5 @@
 ﻿using Interfaces;
-using MonoBehaviours.GroundSectionSystem;
-using Runtime.MonoBehaviours.Bot.SimpleBotUtils;
-using Runtime.MonoBehaviours.Bot.StandartBotUtils;
-using System.Collections;
+using Runtime.MonoBehaviours.Player;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -12,16 +9,13 @@ namespace Runtime.MonoBehaviours.Bot
     public class BotLogicExecuter : MonoBehaviour
     {
         [SerializeField] private BotType _botType;
-        [SerializeField] private bool _onAStar;
         private IBotNavigation _botNavigation;
         private IShelterFinder _shelterFinder;
         private ICharacterRuntimeData _characterData;
         private IState _currentState;
         private BotCharacter _character;
         private BaseTargetOpponentSelector _targetOpponentFinder;
-
         private Dictionary<string, IState> _states;
-        private Vector3 _spawnedBombPos;
 
         public Dictionary<string, IState> States => _states;
         public BotCharacter Character => _character;
@@ -64,10 +58,7 @@ namespace Runtime.MonoBehaviours.Bot
 
             _characterData = _character.CharacterData;
         }
-        public void SetBombPosition(Vector3 position)
-        {
-            _spawnedBombPos = position;
-        }
+        
         public void SwitchState(IState newState)
         {
             if (_currentState != null)

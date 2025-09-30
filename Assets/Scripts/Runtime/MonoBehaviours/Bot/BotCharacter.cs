@@ -1,9 +1,6 @@
 using Core.ScriptableObjects;
 using Interfaces;
-using Runtime.MonoBehaviours.Player;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using Core.DataTransferObjects;
@@ -13,7 +10,6 @@ namespace Runtime.MonoBehaviours.Bot
     public class BotCharacter : MonoBehaviour, ICharacter
     {
         [SerializeField] private CharacterData _characterData;
-        [SerializeField] private PlayerBombDeployer _concreteBombDeployer;
         public ICharacterRuntimeData CharacterRuntimeData { get; private set; }
         public IImmune Immune { get; private set; }
         public IBombDeployer BombDeployer { get; private set; }
@@ -25,9 +21,9 @@ namespace Runtime.MonoBehaviours.Bot
 
         public BombDto BombDto => _bombDto;
         public CharacterRuntimeData CharacterData => _characterRuntimeData;
-        public PlayerBombDeployer PlayerBombDeployer => _concreteBombDeployer;
 
         public event Action<string> OnBotDeath;
+        public event Action<BombDto> OnBombDeployed;
 
         private void Awake()
         {
@@ -59,8 +55,8 @@ namespace Runtime.MonoBehaviours.Bot
 
         public void DeployBomb()
         {
-            
             BombDeployer.DeployBomb(_bombDto);
+            OnBombDeployed.Invoke(_bombDto);
         }
 
         public void Heal(int healAmount)
@@ -70,7 +66,7 @@ namespace Runtime.MonoBehaviours.Bot
         {
             if (_characterRuntimeData == null)
             {
-                Debug.LogWarning("PlayerCharacter: have not CharacterRuntimeData");
+                Debug.LogWarning("BotCharacter: have not CharacterRuntimeData");
                 return;
             }
             _characterRuntimeData.Initialize(_characterData);
@@ -88,29 +84,22 @@ namespace Runtime.MonoBehaviours.Bot
 
         private void BotDeath()
         {
-            Debug.Log("бот умер: " + gameObject.name);
             OnBotDeath?.Invoke(gameObject.name);
             CharacterAnimator.PlayDeathAnimation();
             SetBombDeployAbility(false);
             SetMoveAbility(false);
         }
-
-
         private void CollectRefs()
         {
             if (TryGetComponent(out IImmune immune)) Immune = immune;
             if (TryGetComponent(out IMovable playerMovement)) CharacterMovement = playerMovement;
             if (TryGetComponent(out ICharacterAnimator characterAnimator)) CharacterAnimator = characterAnimator;
-
-            BombDeployer = _concreteBombDeployer;
+            if (TryGetComponent(out IBombDeployer bombDeployer)) BombDeployer = bombDeployer;
 
             _characterRuntimeData = new CharacterRuntimeData();
-
             _characterRuntimeData.Initialize(_characterData);
 
             _bombDto = new BombDto(_characterRuntimeData.BombsCountdown, _characterRuntimeData.BombsAtTime, _characterRuntimeData.BombsSpreading, _characterRuntimeData.BombsDamage);
-
-
             
             CharacterRuntimeData = _characterRuntimeData;
         }

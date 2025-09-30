@@ -22,7 +22,6 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
 
         public void Update(BotLogicExecuter manager)
         {
-            
             if (_coroutine == null)
             {
                 _coroutine = manager.StartCoroutine(corr(manager));
@@ -37,9 +36,11 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
         {
             manager.TargetOpponentFinder.SelectTargetOpponent();
             manager.BotNavigation.CheckPathToTarget(manager.TargetOpponentFinder.GetCurrentOpponent());
+
             yield return new WaitForSeconds(0.5f);
-            _coroutine = null;
-            manager.StopAllCoroutines();
+
+            manager.StopCoroutine(_coroutine);
+            _coroutine = null;            
         }
     }
 
@@ -50,7 +51,7 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
         {
             manager.Character.CharacterAnimator.PlayWalkAnimation();
             manager.Character.DeployBomb();
-            manager.ShelterFinder.RetreatFromBomb(manager);
+            
         }
 
         public void Exit(BotLogicExecuter manager)
@@ -60,6 +61,8 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
 
         public void Update(BotLogicExecuter manager)
         {
+            manager.ShelterFinder.RetreatFromBomb(manager);
+
             float distance = manager.BotNavigation.CheckDistance(manager.TargetOpponentFinder.GetCurrentOpponent());
 
             if (distance <= 0.1f)

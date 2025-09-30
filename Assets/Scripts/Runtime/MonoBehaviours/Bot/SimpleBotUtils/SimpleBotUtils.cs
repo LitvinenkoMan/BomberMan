@@ -1,6 +1,8 @@
+using Core.DataTransferObjects;
 using Interfaces;
 using Runtime.MonoBehaviours;
 using Runtime.MonoBehaviours.Bot;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -10,7 +12,7 @@ namespace Interfaces
 {
     public interface IShelterFinder
     {
-        public List<Vector3> GenerateBlacklistPositions(byte explosionRange, Vector3 bombPos);
+        public void GenerateBlacklistPositions(BombDto bombDto);
         public List<Vector3> GeneratePossiblePositions(byte explosionRange, List<Vector3> blacklist, Vector3 spawnedBombPos);
         public List<Vector3> FindAvailablePosForRetreat(List<Vector3> possiblePos, List<Vector3> blacklist);
         public void RetreatFromBomb(BotLogicExecuter bot);
@@ -34,7 +36,7 @@ public abstract class BaseTargetOpponentSelector
     public Transform TargetOpponent => _targetOpponent;
     public void SetOpponentsList(List<GameObject> opponentsList)
     {
-        _opponentsList = opponentsList;
+        _opponentsList = new List<GameObject>(opponentsList);
         _opponentsList.Remove(_thisBot.gameObject);
 
         _currentPlayer = Spawner.Instance.Player;
@@ -57,10 +59,8 @@ public abstract class BaseTargetOpponentSelector
             _opponentsList.Add(newPlayer);
         }
     }
-    public Transform GetCurrentOpponent()
-    {
-        return _targetOpponent;
-    }
+    public Transform GetCurrentOpponent() => _targetOpponent;
+    public List<GameObject> GetOpponentsList() => _opponentsList;
     public abstract void SelectTargetOpponent();
     
 }
@@ -129,7 +129,6 @@ namespace Runtime.MonoBehaviours.Bot.SimpleBotUtils
         {
             float minDistance = 10000f;
             Transform target = null;
-
             foreach (var opponent in _opponentsList)
             {
                 if (opponent == null) continue;
@@ -150,10 +149,12 @@ namespace Runtime.MonoBehaviours.Bot.SimpleBotUtils
     public class SimpleShelterFinder : IShelterFinder
     {
         private NavMeshAgent _agent;
+        private List<Vector3> _blackListPos;
 
         public SimpleShelterFinder(NavMeshAgent agent)
         {
             _agent = agent;
+            _blackListPos = new List<Vector3>();
         }
         private bool PointInBlackList(List<Vector3> blackList, Vector3 point)
         {
@@ -168,17 +169,18 @@ namespace Runtime.MonoBehaviours.Bot.SimpleBotUtils
             return false;
         }
 
-        public List<Vector3> GenerateBlacklistPositions(byte explosionRange, Vector3 bombPos)
+        public void GenerateBlacklistPositions(BombDto bombDto)
         {
-            var blacklist = new List<Vector3> { bombPos };
-            for (int i = 1; i <= explosionRange; i++)
+            Vector3 bombPos = bombDto.BombPosition;
+            _blackListPos.Clear();
+            _blackListPos.Add(bombPos);
+            for (int i = 1; i <= bombDto.BombsSpreading; i++)
             {
-                blacklist.Add(bombPos + new Vector3(i, 0, 0));
-                blacklist.Add(bombPos + new Vector3(-i, 0, 0));
-                blacklist.Add(bombPos + new Vector3(0, 0, i));
-                blacklist.Add(bombPos + new Vector3(0, 0, -i));
+                _blackListPos.Add(bombPos + new Vector3(i, 0, 0));
+                _blackListPos.Add(bombPos + new Vector3(-i, 0, 0));
+                _blackListPos.Add(bombPos + new Vector3(0, 0, i));
+                _blackListPos.Add(bombPos + new Vector3(0, 0, -i));
             }
-            return blacklist;
         }
 
         public List<Vector3> GeneratePossiblePositions(byte explosionRange, List<Vector3> blacklist, Vector3 spawnedBombPos)
@@ -221,28 +223,25 @@ namespace Runtime.MonoBehaviours.Bot.SimpleBotUtils
 
             foreach (Vector3 point in possiblePos)
             {
-                if (NavMesh.SamplePosition(point, out NavMeshHit hit, 0.5f, NavMesh.AllAreas))
+                NavMeshPath path = new NavMeshPath();
+                _agent.CalculatePath(point, path);
+
+                if (path.status == NavMeshPathStatus.PathComplete)
                 {
-                    NavMeshPath path = new NavMeshPath();
-                    _agent.CalculatePath(hit.position, path);
+                    availablePositions.Add(point);
 
-                    if (path.status == NavMeshPathStatus.PathComplete)
+                    // проверяем боковую секцию чтобы сразу уйти с поля поражения бомбы
+                    foreach (var offset in sideOffsets)
                     {
-                        availablePositions.Add(hit.position);
-
-                        // проверяем боковую секцию чтобы сразу уйти с поля поражения бомбы
-                        foreach (var offset in sideOffsets)
+                        var sidePos = point + offset;
+                        _agent.CalculatePath(sidePos, path);
+                        if (path.status == NavMeshPathStatus.PathComplete && !PointInBlackList(blacklist, sidePos))
                         {
-                            var sidePos = hit.position + offset;
-                            _agent.CalculatePath(sidePos, path);
-                            if (path.status == NavMeshPathStatus.PathComplete && !PointInBlackList(blacklist, sidePos))
-                            {
-                                availablePositions.Add(sidePos);
-                            }
+                            availablePositions.Add(sidePos);
                         }
                     }
-                    else continue;
                 }
+                else continue;
             }
             if (availablePositions.Count > 0)
             {
@@ -258,9 +257,9 @@ namespace Runtime.MonoBehaviours.Bot.SimpleBotUtils
         {
             byte explosionRange = (byte)bot.CharacterData.BombsSpreading;
 
-            var blacklistPositions = GenerateBlacklistPositions(explosionRange, bot.Character.BombDto.BombPosition);
-            var possiblePositions = GeneratePossiblePositions(explosionRange, blacklistPositions, bot.Character.BombDto.BombPosition);
-            var availablePositions = FindAvailablePosForRetreat(possiblePositions, blacklistPositions);
+            GenerateBlacklistPositions(bot.Character.BombDto);
+            var possiblePositions = GeneratePossiblePositions(explosionRange, _blackListPos, bot.Character.BombDto.BombPosition);
+            var availablePositions = FindAvailablePosForRetreat(possiblePositions, _blackListPos);
 
             if (availablePositions == null || availablePositions.Count == 0)
             {
