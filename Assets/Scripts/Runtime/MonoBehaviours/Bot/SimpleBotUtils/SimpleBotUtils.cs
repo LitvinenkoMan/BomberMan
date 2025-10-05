@@ -1,11 +1,14 @@
 using Core.DataTransferObjects;
 using Interfaces;
+using MonoBehaviours.GroundSectionSystem;
 using Runtime.MonoBehaviours;
 using Runtime.MonoBehaviours.Bot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UIElements;
 
 
 namespace Interfaces
@@ -13,9 +16,16 @@ namespace Interfaces
     public interface IShelterFinder
     {
         public void GenerateBlacklistPositions(BombDto bombDto);
-        public List<Vector3> GeneratePossiblePositions(byte explosionRange, List<Vector3> blacklist, Vector3 spawnedBombPos);
-        public List<Vector3> FindAvailablePosForRetreat(List<Vector3> possiblePos, List<Vector3> blacklist);
+        public HashSet<Vector2Int> GeneratePossiblePositions(byte explosionRange, HashSet<Vector2Int> blacklist, Vector3 spawnedBombPos);
+        public HashSet<Vector2Int> FindAvailablePosForRetreat(HashSet<Vector2Int> possiblePos, HashSet<Vector2Int> blacklist);
         public void RetreatFromBomb(BotLogicExecuter bot);
+        /*--------For Debugging---------*/
+        public HashSet<Vector2Int> GetBlacklist();
+        //--------------------------------
+        public static Vector2Int ConvertToVector2Int(Vector3 vector)
+        {
+            return new Vector2Int(Mathf.RoundToInt(vector.x), Mathf.RoundToInt(vector.z));
+        }
     }
     public interface IBotNavigation
     {
@@ -23,6 +33,7 @@ namespace Interfaces
         public float CheckDistance(Transform targetOpponent);
         public void CheckPathToTarget(Transform targetOpponent);
         public void SetSpeed(float speed);
+        public Queue<GroundSection> GetPath();
     }
     
 }
@@ -118,6 +129,11 @@ namespace Runtime.MonoBehaviours.Bot.SimpleBotUtils
         {
             _agent.speed = speed;
         }
+
+        public Queue<GroundSection> GetPath()
+        {
+            throw new NotImplementedException();
+        }
     }
     public class SimpleTargetOpponentSelector : BaseTargetOpponentSelector
     {
@@ -148,52 +164,52 @@ namespace Runtime.MonoBehaviours.Bot.SimpleBotUtils
     }
     public class SimpleShelterFinder : IShelterFinder
     {
-        private NavMeshAgent _agent;
-        private List<Vector3> _blackListPos;
+        private readonly NavMeshAgent _agent;
+        private readonly HashSet<Vector2Int> _blackListPos;
 
         public SimpleShelterFinder(NavMeshAgent agent)
         {
             _agent = agent;
-            _blackListPos = new List<Vector3>();
+            _blackListPos = new HashSet<Vector2Int>();
         }
-        private bool PointInBlackList(List<Vector3> blackList, Vector3 point)
+        private bool PointInBlackList(HashSet<Vector2Int> blackList, Vector2Int point)
         {
-            Vector3 checkingPoint = new Vector3(point.x, 0, point.z);
+            Vector2Int checkingPoint = point;
 
-            foreach (Vector3 blackListPoint in blackList)
-            {
-                Vector3 blackPoint = new Vector3(blackListPoint.x, 0, blackListPoint.z);
+            if (blackList.Contains(checkingPoint)) return true;
 
-                if (checkingPoint == blackPoint) return true;
-            }
             return false;
         }
 
         public void GenerateBlacklistPositions(BombDto bombDto)
         {
-            Vector3 bombPos = bombDto.BombPosition;
+            Vector2Int bombPos = ConvertToVector2Int(bombDto.BombPosition);
             _blackListPos.Clear();
             _blackListPos.Add(bombPos);
             for (int i = 1; i <= bombDto.BombsSpreading; i++)
             {
-                _blackListPos.Add(bombPos + new Vector3(i, 0, 0));
-                _blackListPos.Add(bombPos + new Vector3(-i, 0, 0));
-                _blackListPos.Add(bombPos + new Vector3(0, 0, i));
-                _blackListPos.Add(bombPos + new Vector3(0, 0, -i));
+                _blackListPos.Add(bombPos + new Vector2Int(i, 0));
+                _blackListPos.Add(bombPos + new Vector2Int(-i, 0));
+                _blackListPos.Add(bombPos + new Vector2Int(0, i));
+                _blackListPos.Add(bombPos + new Vector2Int(0, -i));
             }
         }
 
-        public List<Vector3> GeneratePossiblePositions(byte explosionRange, List<Vector3> blacklist, Vector3 spawnedBombPos)
+        public static Vector2Int ConvertToVector2Int(Vector3 vector)
         {
-            var possiblePositions = new List<Vector3>();
-            float centerX = spawnedBombPos.x;
-            float centerZ = spawnedBombPos.z;
+            return new Vector2Int(Mathf.FloorToInt(vector.x + 0.5f), Mathf.FloorToInt(vector.z + 0.5f));
+        }
+
+        public HashSet<Vector2Int> GeneratePossiblePositions(byte explosionRange, HashSet<Vector2Int> blacklist, Vector3 spawnedBombPos)
+        {
+            var possiblePositions = new HashSet<Vector2Int>();
+            Vector2Int bombPos = ConvertToVector2Int(spawnedBombPos);
 
             for (int x = -explosionRange - 1; x <= explosionRange + 1; x++)
             {
                 for (int z = -explosionRange - 1; z <= explosionRange + 1; z++)
                 {
-                    Vector3 point = new Vector3(centerX + x, 0, centerZ + z);
+                    Vector2Int point = new Vector2Int(bombPos.x + x, bombPos.y + z);
 
                     if (!PointInBlackList(blacklist, point))
                     {
@@ -211,37 +227,40 @@ namespace Runtime.MonoBehaviours.Bot.SimpleBotUtils
                 return possiblePositions;
             }
         }
-        public List<Vector3> FindAvailablePosForRetreat(List<Vector3> possiblePos, List<Vector3> blacklist)
+        public HashSet<Vector2Int> FindAvailablePosForRetreat(HashSet<Vector2Int> possiblePos, HashSet<Vector2Int> blacklist)
         {
             if (possiblePos.Count == 0)
             {
                 Debug.LogError(_agent.gameObject.name + " FindAvailablePosForRetreat: parametr 'possiblePos' is null");
                 return null;
             }
-            Vector3[] sideOffsets = { new Vector3(1, 0, 0), new Vector3(-1, 0, 0) };
-            var availablePositions = new List<Vector3>();
+            Vector2Int[] sideOffsets = { new Vector2Int(1, 0), new Vector2Int(-1, 0) };
+            var availablePositions = new HashSet<Vector2Int>();
 
-            foreach (Vector3 point in possiblePos)
+            foreach (Vector2Int point in possiblePos)
             {
-                NavMeshPath path = new NavMeshPath();
-                _agent.CalculatePath(point, path);
-
-                if (path.status == NavMeshPathStatus.PathComplete)
+                if (NavMesh.SamplePosition(new Vector3(point.x, 0, point.y), out NavMeshHit hit, 0.5f, NavMesh.AllAreas))
                 {
-                    availablePositions.Add(point);
+                    NavMeshPath path = new NavMeshPath();
+                    Vector2Int hitVector2Int = ConvertToVector2Int(hit.position);
+                    _agent.CalculatePath(hit.position, path);
 
-                    // проверяем боковую секцию чтобы сразу уйти с поля поражения бомбы
-                    foreach (var offset in sideOffsets)
+                    if (path.status == NavMeshPathStatus.PathComplete)
                     {
-                        var sidePos = point + offset;
-                        _agent.CalculatePath(sidePos, path);
-                        if (path.status == NavMeshPathStatus.PathComplete && !PointInBlackList(blacklist, sidePos))
+                        availablePositions.Add(hitVector2Int);
+
+                        // проверяем боковую секцию чтобы сразу уйти с поля поражения бомбы
+                        foreach (var offset in sideOffsets)
                         {
-                            availablePositions.Add(sidePos);
+                            Vector2Int sidePos = hitVector2Int + offset;
+                            _agent.CalculatePath(new Vector3(sidePos.x, 0, sidePos.y), path);
+                            if (path.status == NavMeshPathStatus.PathComplete && !PointInBlackList(blacklist, sidePos))
+                            {
+                                availablePositions.Add(sidePos);
+                            }
                         }
                     }
                 }
-                else continue;
             }
             if (availablePositions.Count > 0)
             {
@@ -265,13 +284,18 @@ namespace Runtime.MonoBehaviours.Bot.SimpleBotUtils
             {
                 Debug.Log("No available positions for retreat, staying in place.");
                 bot.BotNavigation.SetTarget(bot.transform.position);
-                return;
             }
             else
             {
                 int randInt = UnityEngine.Random.Range(0, availablePositions.Count);
-                bot.BotNavigation.SetTarget(availablePositions[randInt]);
+                Vector2Int randomPos = availablePositions.ElementAt(randInt);
+                bot.BotNavigation.SetTarget(new Vector3(randomPos.x, 0, randomPos.y));
             }
         }
+
+        public HashSet<Vector2Int> GetBlacklist()
+        {
+            return _blackListPos;
+        }   
     }
 }

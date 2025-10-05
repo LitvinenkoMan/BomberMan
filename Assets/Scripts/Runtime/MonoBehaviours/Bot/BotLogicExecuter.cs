@@ -1,5 +1,6 @@
 ﻿using Interfaces;
-using Runtime.MonoBehaviours.Player;
+using MonoBehaviours.GroundSectionSystem;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -24,9 +25,27 @@ namespace Runtime.MonoBehaviours.Bot
         public IBotNavigation BotNavigation => _botNavigation;
         public IShelterFinder ShelterFinder => _shelterFinder;
 
+        /*------------Debugging--------------*/
+        private HashSet<Vector2Int> blacklist;
+        private Queue<GroundSection> queue;
+
         private void Awake()
         {
             CollectRefs();
+        }
+
+        private void OnDrawGizmos()
+        {
+            foreach (var b in blacklist)
+            {
+                Gizmos.color = Color.black;
+                Gizmos.DrawSphere(new Vector3(b.x, 0, b.y) + new Vector3(0, 0.5f, 0), 0.3f);
+            }
+            foreach (var b in queue)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawSphere(b.transform.position + new Vector3(0, 0.5f, 0), 0.3f);
+            }
         }
 
         private void Start()
@@ -43,11 +62,12 @@ namespace Runtime.MonoBehaviours.Bot
             Spawner.Instance.OnBotSpawned -= _targetOpponentFinder.UpdateOpponentsList;
             Spawner.Instance.OnPlayerSpawned -= _targetOpponentFinder.UpdatePlayerInOpponentsList;
         }
+        
 
         private void CollectRefs()
         {
             if (TryGetComponent(out BotCharacter character)) _character = character;
-
+                
             BotBehaviorProvider botBehaviorProvider = new BotBehaviorProvider();
             botBehaviorProvider.InitializeBehaviors(GetComponent<NavMeshAgent>());
 
@@ -57,8 +77,9 @@ namespace Runtime.MonoBehaviours.Bot
             _states = botBehaviorProvider.GetStatesForType(_botType);
 
             _characterData = _character.CharacterData;
+
         }
-        
+
         public void SwitchState(IState newState)
         {
             if (_currentState != null)
@@ -70,7 +91,9 @@ namespace Runtime.MonoBehaviours.Bot
         }
         private void Update()
         {
+            queue = _botNavigation.GetPath();  
+            blacklist = _shelterFinder.GetBlacklist();
             _currentState.Update(this);
         }
-    }    
+    }
 }

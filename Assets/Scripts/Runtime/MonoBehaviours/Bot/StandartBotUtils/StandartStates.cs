@@ -16,8 +16,11 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
 
         public void Exit(BotLogicExecuter manager)
         {
-            manager.StopAllCoroutines();
-            _coroutine = null;
+            if (_coroutine != null)
+            {
+                manager.StopCoroutine(_coroutine);
+                _coroutine = null;
+            }
         }
 
         public void Update(BotLogicExecuter manager)
@@ -36,11 +39,13 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
         {
             manager.TargetOpponentFinder.SelectTargetOpponent();
             manager.BotNavigation.CheckPathToTarget(manager.TargetOpponentFinder.GetCurrentOpponent());
+            Debug.Log("Set path to: " + manager.TargetOpponentFinder.GetCurrentOpponent().name);
 
             yield return new WaitForSeconds(0.5f);
 
             manager.StopCoroutine(_coroutine);
-            _coroutine = null;            
+            _coroutine = null;      
+            
         }
     }
 

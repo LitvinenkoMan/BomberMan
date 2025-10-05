@@ -25,7 +25,7 @@ namespace Runtime.MonoBehaviours.Bot.SimpleBotUtils
             manager.TargetOpponentFinder.SelectTargetOpponent();
             manager.Character.CharacterAnimator.PlayWalkAnimation();
             manager.BotNavigation.SetTarget(manager.TargetOpponentFinder.GetCurrentOpponent().position);
-            manager.BotNavigation.SetSpeed(3f);
+            manager.BotNavigation.SetSpeed(3f);            
         }
 
         public void Exit(BotLogicExecuter manager)

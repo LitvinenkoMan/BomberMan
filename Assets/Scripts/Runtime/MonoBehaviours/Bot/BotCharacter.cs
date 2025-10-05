@@ -56,7 +56,7 @@ namespace Runtime.MonoBehaviours.Bot
         public void DeployBomb()
         {
             BombDeployer.DeployBomb(_bombDto);
-            OnBombDeployed.Invoke(_bombDto);
+            OnBombDeployed?.Invoke(_bombDto);
         }
 
         public void Heal(int healAmount)

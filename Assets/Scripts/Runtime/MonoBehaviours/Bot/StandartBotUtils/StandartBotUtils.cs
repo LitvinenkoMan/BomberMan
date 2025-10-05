@@ -16,10 +16,15 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
     {
         private NavMeshAgent _agent;
         private List<GroundSection> _sections;
-        private GroundSection[,] _sectionsPositions;
+        private readonly GroundSection[,] _sectionsPositions;
         private GroundSection _currentSection;
         private Vector3 _target;
         private Queue<GroundSection> _path;
+
+        public Queue<GroundSection> GetPath()
+        {
+            return _path;
+        }
 
         public StandartBotNavigation(NavMeshAgent agent)
         {
@@ -37,8 +42,8 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
                 Debug.Log("CheckDistance: targetOpponent = null");
             }
 
-            return Mathf.Min((_agent.transform.position - _target).magnitude,
-                (_agent.transform.position - targetOpponent.position).magnitude);
+            return Mathf.Min((_agent.transform.position - _target).sqrMagnitude,
+                (_agent.transform.position - targetOpponent.position).sqrMagnitude);
         }
 
         public void CheckPathToTarget(Transform targetOpponent)
@@ -47,6 +52,7 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
             GroundSection targetSection = null;
             foreach (var sectionFormPath in _path)
             {
+                _path.Dequeue();
                 if (sectionFormPath.PlacedObstacle != null)
                 {
                     targetSection = sectionFormPath;
@@ -238,18 +244,22 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
     {
         private NavMeshAgent _agent;
         private BotLogicExecuter _botLogicExecuter;
-        private List<Vector3> _blackListPos;
+        private HashSet<Vector2Int> _blackListPos;
 
         public StandartShelterFinder(NavMeshAgent agent)
         {
             _agent = agent;
             _botLogicExecuter = agent.gameObject.GetComponent<BotLogicExecuter>();
-            _blackListPos = new List<Vector3>();
+            _blackListPos = new HashSet<Vector2Int>();
 
             if (_botLogicExecuter == null) Debug.LogError("StandartShelterFinder: did not find BotLogicExecuter");
             if (agent == null) Debug.LogError("StandartShelterFinder: did not find NavMeshAgent");
 
             SubcribeToEvents();
+        }
+        public HashSet<Vector2Int> GetBlacklist()
+        {
+            return _blackListPos;
         }
         private void SubcribeToEvents()
         {            
@@ -269,106 +279,90 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
                 else Debug.Log("SubscribeToEvents: Неизвестный оппонент");
             }
         }
-        private bool PointInBlackList(List<Vector3> blackList, Vector3 point)
+        private bool PointInBlackList(HashSet<Vector2Int> blackList, Vector2Int point)
         {
-            Vector3 checkingPoint = new Vector3(point.x, 0, point.z);
+            Vector2Int checkingPoint = point;
 
-            foreach (Vector3 blackListPoint in blackList)
-            {
-                Vector3 blackPoint = new Vector3(blackListPoint.x, 0, blackListPoint.z);
+            if (blackList.Contains(checkingPoint)) return true;
 
-                if (checkingPoint == blackPoint) return true;
-            }
             return false;
         }
 
         public void GenerateBlacklistPositions(BombDto bombDto)
         {
             _botLogicExecuter.StartCoroutine(GeneratorBlacklistPositions(bombDto));
-            
-        }     
+        }
         private IEnumerator GeneratorBlacklistPositions(BombDto bombDto)
         {
-            Vector3 bombPos = bombDto.BombPosition;
-            _blackListPos.Add(bombPos);
+            Vector2Int bombPos = IShelterFinder.ConvertToVector2Int(bombDto.BombPosition);
+
+            var bombs = new HashSet<Vector2Int>() { bombPos };
+
             for (int i = 1; i <= bombDto.BombsSpreading; i++)
             {
-                _blackListPos.Add(bombPos + new Vector3(i, 0, 0));
-                _blackListPos.Add(bombPos + new Vector3(-i, 0, 0));
-                _blackListPos.Add(bombPos + new Vector3(0, 0, i));
-                _blackListPos.Add(bombPos + new Vector3(0, 0, -i));
+                bombs.Add(bombPos + new Vector2Int(i, 0));
+                bombs.Add(bombPos + new Vector2Int(-i, 0));
+                bombs.Add(bombPos + new Vector2Int(0, i));
+                bombs.Add(bombPos + new Vector2Int(0, -i));
             }
+            _blackListPos.UnionWith(bombs); 
 
             yield return new WaitForSeconds(bombDto.BombCountdown);
 
-            _blackListPos.Remove(bombPos);
-            for (int i = 1; i <= bombDto.BombsSpreading; i++)
-            {
-                _blackListPos.Remove(bombPos + new Vector3(i, 0, 0));
-                _blackListPos.Remove(bombPos + new Vector3(-i, 0, 0));
-                _blackListPos.Remove(bombPos + new Vector3(0, 0, i));
-                _blackListPos.Remove(bombPos + new Vector3(0, 0, -i));
-            }
+            _blackListPos.ExceptWith(bombs); 
         }
 
-        public List<Vector3> GeneratePossiblePositions(byte explosionRange, List<Vector3> blacklist, Vector3 spawnedBombPos)
+        public HashSet<Vector2Int> GeneratePossiblePositions(byte explosionRange, HashSet<Vector2Int> blacklist, Vector3 spawnedBombPos)
         {
-            var possiblePositions = new List<Vector3>();
-            float centerX = spawnedBombPos.x;
-            float centerZ = spawnedBombPos.z;
+            var possiblePositions = new HashSet<Vector2Int>();
+            Vector2Int bombPos = IShelterFinder.ConvertToVector2Int(spawnedBombPos);
 
             for (int x = -explosionRange - 1; x <= explosionRange + 1; x++)
             {
                 for (int z = -explosionRange - 1; z <= explosionRange + 1; z++)
                 {
-                    Vector3 point = new Vector3(centerX + x, 0, centerZ + z);
+                    Vector2Int point = new Vector2Int(bombPos.x + x, bombPos.y + z);
 
-                    if (!PointInBlackList(blacklist, point)) possiblePositions.Add(point);
+                    if (!PointInBlackList(blacklist, point))
+                    {
+                        possiblePositions.Add(point);
+                    }
                 }
             }
-            if (possiblePositions.Count > 0) return possiblePositions;
+            if (possiblePositions.Count > 0)
+            {
+                return possiblePositions;
+            }
             else
             {
                 Debug.LogError("GeneratePossiblePositions: list of possible positions is null");
                 return possiblePositions;
             }
         }
-        public List<Vector3> FindAvailablePosForRetreat(List<Vector3> possiblePos, List<Vector3> blacklist)
+        public HashSet<Vector2Int> FindAvailablePosForRetreat(HashSet<Vector2Int> possiblePos, HashSet<Vector2Int> blacklist)
         {
             if (possiblePos.Count == 0)
             {
                 Debug.LogError(_agent.gameObject.name + " FindAvailablePosForRetreat: parametr 'possiblePos' is null");
                 return null;
             }
-            Vector3[] sideOffsets = { new Vector3(1, 0, 0), new Vector3(-1, 0, 0) };
-            var availablePositions = new List<Vector3>();
+            var availablePositions = new HashSet<Vector2Int>();
 
-            foreach (Vector3 point in possiblePos)
+            foreach (Vector2Int point in possiblePos)
             {
-                NavMeshPath path = new NavMeshPath();
-                _agent.CalculatePath(point, path);
-
-                if (path.status == NavMeshPathStatus.PathComplete)
+                if (NavMesh.SamplePosition(new Vector3(point.x, 0, point.y), out NavMeshHit hit, 0.5f, NavMesh.AllAreas))
                 {
-                    availablePositions.Add(point);
+                    NavMeshPath path = new NavMeshPath();
+                    Vector2Int hitVector2Int = IShelterFinder.ConvertToVector2Int(hit.position);
+                    _agent.CalculatePath(hit.position, path);
 
-                    // проверяем боковую секцию чтобы сразу уйти с поля поражения бомбы
-                    foreach (var offset in sideOffsets)
-                    {
-                        var sidePos = point + offset;
-                        _agent.CalculatePath(sidePos, path);
-                        if (path.status == NavMeshPathStatus.PathComplete && !PointInBlackList(blacklist, sidePos))
-                        {
-                            availablePositions.Add(sidePos);
-                        }
-                    }
+                    if (path.status == NavMeshPathStatus.PathComplete && !PointInBlackList(blacklist, point)) availablePositions.Add(hitVector2Int);
                 }
-                else continue;
             }
             if (availablePositions.Count > 0) return availablePositions;
             else
             {
-                Debug.Log(_agent.gameObject.name + " FindAvailablePosForRetreat: did not find available positions for retreat");
+                Debug.LogError(_agent.gameObject.name + " FindAvailablePosForRetreat: did not find available positions for retreat");
                 return availablePositions;
             }
         }
@@ -381,21 +375,22 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
             {
                 Debug.Log("RetreatFromBomb: No available positions for retreat, staying in place.");
                 bot.BotNavigation.SetTarget(bot.transform.position);
-                return;
             }
             else
             {
                 Vector3 target = Vector3.zero;
                 float closestDist = float.MaxValue;
-                for (int i = 0; i < availablePositions.Count; i++)
+                foreach (var position in availablePositions) 
                 {
-                    float currentDist = (availablePositions[i] - _agent.transform.position).sqrMagnitude;
+                    Vector3 position3D = new Vector3(position.x, 0, position.y); 
+                    float currentDist = (position3D - _agent.transform.position).sqrMagnitude;
+
                     if (currentDist < closestDist)
                     {
                         closestDist = currentDist;
-                        target = availablePositions[i];
+                        target = position3D;
                     }
-                }                
+                }
                 bot.BotNavigation.SetTarget(target);
             }
         }

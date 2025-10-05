@@ -16,7 +16,7 @@ namespace Runtime.MonoBehaviours.Bot
         // Since we need to return new instances of BaseTargetOpponentSelector, delegates are used.
         private Dictionary<BotType, Func<BaseTargetOpponentSelector>> _targetSelectors; 
         private Dictionary<BotType, IBotNavigation> _botNavigations;
-        private Dictionary<BotType, IShelterFinder> _shelterFinder;
+        private Dictionary<BotType, Func<IShelterFinder>> _shelterFinder;
 
         public void InitializeBehaviors(NavMeshAgent _agent)
         {
@@ -51,10 +51,10 @@ namespace Runtime.MonoBehaviours.Bot
                 {BotType.Easy, new SimpleBotNavigation(_agent) },
                 {BotType.Standart, new StandartBotNavigation(_agent) }
             };
-            _shelterFinder = new Dictionary<BotType, IShelterFinder>
+            _shelterFinder = new Dictionary<BotType, Func<IShelterFinder>>
             {
-                { BotType.Easy, new SimpleShelterFinder(_agent) },
-                { BotType.Standart, new StandartShelterFinder(_agent) }
+                { BotType.Easy, () => new SimpleShelterFinder(_agent) },
+                { BotType.Standart,() =>  new StandartShelterFinder(_agent) }
             };
         }
         public Dictionary<string, IState> GetStatesForType(BotType type)
@@ -97,7 +97,7 @@ namespace Runtime.MonoBehaviours.Bot
         {
             if (_shelterFinder.TryGetValue(type, out var shelterFinder))
             {
-                return shelterFinder;
+                return shelterFinder();
             }
             else
             {
