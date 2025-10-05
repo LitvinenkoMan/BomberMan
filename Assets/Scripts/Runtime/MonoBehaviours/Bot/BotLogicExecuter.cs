@@ -1,6 +1,6 @@
-﻿using Interfaces;
+﻿using AbstractClasses;
+using Interfaces;
 using MonoBehaviours.GroundSectionSystem;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -10,20 +10,20 @@ namespace Runtime.MonoBehaviours.Bot
     public class BotLogicExecuter : MonoBehaviour
     {
         [SerializeField] private BotType _botType;
-        private IBotNavigation _botNavigation;
-        private IShelterFinder _shelterFinder;
         private ICharacterRuntimeData _characterData;
         private IState _currentState;
-        private BotCharacter _character;
+        private BaseBotNavigation _botNavigation;
+        private BaseShelterFinder _shelterFinder;        
         private BaseTargetOpponentSelector _targetOpponentFinder;
+        private BotCharacter _character;
         private Dictionary<string, IState> _states;
 
         public Dictionary<string, IState> States => _states;
         public BotCharacter Character => _character;
         public BaseTargetOpponentSelector TargetOpponentFinder => _targetOpponentFinder;
         public ICharacterRuntimeData CharacterData => _characterData;
-        public IBotNavigation BotNavigation => _botNavigation;
-        public IShelterFinder ShelterFinder => _shelterFinder;
+        public BaseBotNavigation BotNavigation => _botNavigation;
+        public BaseShelterFinder ShelterFinder => _shelterFinder;
 
         /*------------Debugging--------------*/
         private HashSet<Vector2Int> blacklist;
@@ -41,6 +41,7 @@ namespace Runtime.MonoBehaviours.Bot
                 Gizmos.color = Color.black;
                 Gizmos.DrawSphere(new Vector3(b.x, 0, b.y) + new Vector3(0, 0.5f, 0), 0.3f);
             }
+            if (queue == null) return;  
             foreach (var b in queue)
             {
                 Gizmos.color = Color.red;

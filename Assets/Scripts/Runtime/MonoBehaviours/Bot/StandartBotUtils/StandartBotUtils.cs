@@ -1,27 +1,24 @@
 using Core.DataTransferObjects;
 using Interfaces;
+using AbstractClasses;
 using MonoBehaviours.GroundSectionSystem;
 using Runtime.MonoBehaviours.Player;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
 namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
 {
-    public class StandartBotNavigation : IBotNavigation
+    public class StandartBotNavigation : BaseBotNavigation
     {
-        private NavMeshAgent _agent;
-        private List<GroundSection> _sections;
+        private readonly List<GroundSection> _sections;
         private readonly GroundSection[,] _sectionsPositions;
         private GroundSection _currentSection;
-        private Vector3 _target;
         private Queue<GroundSection> _path;
 
-        public Queue<GroundSection> GetPath()
+        public override Queue<GroundSection> GetPath()
         {
             return _path;
         }
@@ -34,19 +31,7 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
             _sectionsPositions = new GroundSection[16, 16];
             CreateGrid();
         }
-
-        public float CheckDistance(Transform targetOpponent)
-        {
-            if (targetOpponent == null)
-            {
-                Debug.Log("CheckDistance: targetOpponent = null");
-            }
-
-            return Mathf.Min((_agent.transform.position - _target).sqrMagnitude,
-                (_agent.transform.position - targetOpponent.position).sqrMagnitude);
-        }
-
-        public void CheckPathToTarget(Transform targetOpponent)
+        public override void CheckPathToTarget(Transform targetOpponent)
         {
             GridAPathFind(targetOpponent);
             GroundSection targetSection = null;
@@ -61,17 +46,6 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
                 targetSection = sectionFormPath;
             }
             SetTarget(targetSection.transform.position);
-        }
-
-        public void SetSpeed(float speed)
-        {
-            _agent.speed = speed;
-        }
-
-        public void SetTarget(Vector3 target)
-        {
-            _agent.destination = target;
-            _target = target;
         }
         private void GridAPathFind(Transform target)
         {
@@ -192,7 +166,6 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
             currentSection = goalSection;
             while (currentSection != startSection)
             {
-                path.Enqueue(currentSection);
                 currentSection = parents[currentSection];
             }
             path.Enqueue(startSection);
@@ -200,7 +173,6 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
 
             return new Queue<GroundSection>(path.Reverse());
         }
-
         private void CreateGrid()
         {
             foreach(var section in _sections)
@@ -240,11 +212,9 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
         }
         
     }
-    public class StandartShelterFinder : IShelterFinder
+    public class StandartShelterFinder : BaseShelterFinder
     {
-        private NavMeshAgent _agent;
-        private BotLogicExecuter _botLogicExecuter;
-        private HashSet<Vector2Int> _blackListPos;
+        private readonly BotLogicExecuter _botLogicExecuter;
 
         public StandartShelterFinder(NavMeshAgent agent)
         {
@@ -256,10 +226,6 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
             if (agent == null) Debug.LogError("StandartShelterFinder: did not find NavMeshAgent");
 
             SubcribeToEvents();
-        }
-        public HashSet<Vector2Int> GetBlacklist()
-        {
-            return _blackListPos;
         }
         private void SubcribeToEvents()
         {            
@@ -279,22 +245,14 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
                 else Debug.Log("SubscribeToEvents: Неизвестный оппонент");
             }
         }
-        private bool PointInBlackList(HashSet<Vector2Int> blackList, Vector2Int point)
-        {
-            Vector2Int checkingPoint = point;
 
-            if (blackList.Contains(checkingPoint)) return true;
-
-            return false;
-        }
-
-        public void GenerateBlacklistPositions(BombDto bombDto)
+        public override void GenerateBlacklistPositions(BombDto bombDto)
         {
             _botLogicExecuter.StartCoroutine(GeneratorBlacklistPositions(bombDto));
         }
         private IEnumerator GeneratorBlacklistPositions(BombDto bombDto)
         {
-            Vector2Int bombPos = IShelterFinder.ConvertToVector2Int(bombDto.BombPosition);
+            Vector2Int bombPos = ConvertToVector2Int(bombDto.BombPosition);
 
             var bombs = new HashSet<Vector2Int>() { bombPos };
 
@@ -311,35 +269,7 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
 
             _blackListPos.ExceptWith(bombs); 
         }
-
-        public HashSet<Vector2Int> GeneratePossiblePositions(byte explosionRange, HashSet<Vector2Int> blacklist, Vector3 spawnedBombPos)
-        {
-            var possiblePositions = new HashSet<Vector2Int>();
-            Vector2Int bombPos = IShelterFinder.ConvertToVector2Int(spawnedBombPos);
-
-            for (int x = -explosionRange - 1; x <= explosionRange + 1; x++)
-            {
-                for (int z = -explosionRange - 1; z <= explosionRange + 1; z++)
-                {
-                    Vector2Int point = new Vector2Int(bombPos.x + x, bombPos.y + z);
-
-                    if (!PointInBlackList(blacklist, point))
-                    {
-                        possiblePositions.Add(point);
-                    }
-                }
-            }
-            if (possiblePositions.Count > 0)
-            {
-                return possiblePositions;
-            }
-            else
-            {
-                Debug.LogError("GeneratePossiblePositions: list of possible positions is null");
-                return possiblePositions;
-            }
-        }
-        public HashSet<Vector2Int> FindAvailablePosForRetreat(HashSet<Vector2Int> possiblePos, HashSet<Vector2Int> blacklist)
+        public override HashSet<Vector2Int> FindAvailablePosForRetreat(HashSet<Vector2Int> possiblePos, HashSet<Vector2Int> blacklist)
         {
             if (possiblePos.Count == 0)
             {
@@ -353,7 +283,7 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
                 if (NavMesh.SamplePosition(new Vector3(point.x, 0, point.y), out NavMeshHit hit, 0.5f, NavMesh.AllAreas))
                 {
                     NavMeshPath path = new NavMeshPath();
-                    Vector2Int hitVector2Int = IShelterFinder.ConvertToVector2Int(hit.position);
+                    Vector2Int hitVector2Int = ConvertToVector2Int(hit.position);
                     _agent.CalculatePath(hit.position, path);
 
                     if (path.status == NavMeshPathStatus.PathComplete && !PointInBlackList(blacklist, point)) availablePositions.Add(hitVector2Int);
@@ -366,7 +296,7 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
                 return availablePositions;
             }
         }
-        public void RetreatFromBomb(BotLogicExecuter bot)
+        public override void RetreatFromBomb(BotLogicExecuter bot)
         {
             var possiblePositions = GeneratePossiblePositions((byte)bot.Character.BombDto.BombsSpreading, _blackListPos, bot.Character.BombDto.BombPosition);
             var availablePositions = FindAvailablePosForRetreat(possiblePositions, _blackListPos);

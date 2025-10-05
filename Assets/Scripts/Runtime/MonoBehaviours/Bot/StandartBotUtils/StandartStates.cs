@@ -56,7 +56,6 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
         {
             manager.Character.CharacterAnimator.PlayWalkAnimation();
             manager.Character.DeployBomb();
-            
         }
 
         public void Exit(BotLogicExecuter manager)

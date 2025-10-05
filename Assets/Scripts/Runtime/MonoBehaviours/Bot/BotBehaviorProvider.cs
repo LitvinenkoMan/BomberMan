@@ -1,9 +1,8 @@
 using Interfaces;
-using Runtime.MonoBehaviours.Bot;
+using AbstractClasses;
 using Runtime.MonoBehaviours.Bot.SimpleBotUtils;
 using Runtime.MonoBehaviours.Bot.StandartBotUtils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -13,10 +12,9 @@ namespace Runtime.MonoBehaviours.Bot
     public class BotBehaviorProvider
     {
         private Dictionary<BotType, Dictionary<string, IState>> _states;
-        // Since we need to return new instances of BaseTargetOpponentSelector, delegates are used.
-        private Dictionary<BotType, Func<BaseTargetOpponentSelector>> _targetSelectors; 
-        private Dictionary<BotType, IBotNavigation> _botNavigations;
-        private Dictionary<BotType, Func<IShelterFinder>> _shelterFinder;
+        private Dictionary<BotType, BaseTargetOpponentSelector> _targetSelectors; 
+        private Dictionary<BotType, BaseBotNavigation> _botNavigations;
+        private Dictionary<BotType, BaseShelterFinder> _shelterFinder;
 
         public void InitializeBehaviors(NavMeshAgent _agent)
         {
@@ -40,21 +38,21 @@ namespace Runtime.MonoBehaviours.Bot
                 }
             };
 
-            _targetSelectors = new Dictionary<BotType, Func<BaseTargetOpponentSelector>> 
+            _targetSelectors = new Dictionary<BotType, BaseTargetOpponentSelector> 
             {
-                {BotType.Easy, () => new SimpleTargetOpponentSelector(_agent) },
-                {BotType.Standart, () => new StandartTargetOpponentSelector(_agent) }
+                {BotType.Easy, new SimpleTargetOpponentSelector(_agent) },
+                {BotType.Standart, new StandartTargetOpponentSelector(_agent) }
             };
 
-            _botNavigations = new Dictionary<BotType, IBotNavigation>
+            _botNavigations = new Dictionary<BotType, BaseBotNavigation>
             {
                 {BotType.Easy, new SimpleBotNavigation(_agent) },
                 {BotType.Standart, new StandartBotNavigation(_agent) }
             };
-            _shelterFinder = new Dictionary<BotType, Func<IShelterFinder>>
+            _shelterFinder = new Dictionary<BotType, BaseShelterFinder>
             {
-                { BotType.Easy, () => new SimpleShelterFinder(_agent) },
-                { BotType.Standart,() =>  new StandartShelterFinder(_agent) }
+                { BotType.Easy, new SimpleShelterFinder(_agent) },
+                { BotType.Standart, new StandartShelterFinder(_agent) }
             };
         }
         public Dictionary<string, IState> GetStatesForType(BotType type)
@@ -73,7 +71,7 @@ namespace Runtime.MonoBehaviours.Bot
         { 
             if (_targetSelectors.TryGetValue(type, out var targetSelector))
             {
-                return targetSelector();
+                return targetSelector;
             }
             else
             {
@@ -81,7 +79,7 @@ namespace Runtime.MonoBehaviours.Bot
                 return null;
             }
         }
-        public IBotNavigation GetBotNavigationForType(BotType type)
+        public BaseBotNavigation GetBotNavigationForType(BotType type)
         {
             if ( _botNavigations.TryGetValue(type,out var botNavigation))
             {
@@ -93,11 +91,11 @@ namespace Runtime.MonoBehaviours.Bot
                 return null;
             }
         }
-        public IShelterFinder GetShelterFinder(BotType type)
+        public BaseShelterFinder GetShelterFinder(BotType type)
         {
             if (_shelterFinder.TryGetValue(type, out var shelterFinder))
             {
-                return shelterFinder();
+                return shelterFinder;
             }
             else
             {
