@@ -78064,6 +78064,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -6428623917918515631, guid: d37d1aa34278b0b439d4db8702fa2001,
+        type: 3}
+      propertyPath: startingCount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -6428623917918515631, guid: d37d1aa34278b0b439d4db8702fa2001,
+        type: 3}
+      propertyPath: useReparenting
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3996468417301818720, guid: d37d1aa34278b0b439d4db8702fa2001,
         type: 3}
       propertyPath: TimePerSpawn
@@ -78073,6 +78083,11 @@ PrefabInstance:
         type: 3}
       propertyPath: SpawnPlaces.Array.size
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3996468417301818720, guid: d37d1aa34278b0b439d4db8702fa2001,
+        type: 3}
+      propertyPath: AmountOfPreparedPowerUps
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 3996468417301818720, guid: d37d1aa34278b0b439d4db8702fa2001,
         type: 3}

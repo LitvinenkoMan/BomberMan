@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Interfaces;
 using UnityEngine;
@@ -78,6 +79,16 @@ namespace Core
                 : Instantiate(objectExample, Vector3.zero, new Quaternion(0, 0, 0, 0));
             newObject.SetActive(activeFromStart);
             return newObject;
+        }
+
+        public IEnumerator<GameObject> GetEnumerator()
+        {
+            return _queue.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

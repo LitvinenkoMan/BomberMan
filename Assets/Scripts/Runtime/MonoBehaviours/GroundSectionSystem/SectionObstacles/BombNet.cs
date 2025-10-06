@@ -103,8 +103,9 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
             
             GroundSection startSection = GroundSectionsUtils.Instance.GetNearestSectionFromPosition(transform.position);
             startSection.RemoveObstacle();
-
-            TryDamageActorsOrPlayer(startSection.ObstaclePlacementPosition, bombDamage);
+            
+            if (IsServer)
+                TryDamageActorsOrPlayer(startSection.ObstaclePlacementPosition, bombDamage);
 
             PlaceExplosionEffect(startSection.ObstaclePlacementPosition);
 
@@ -137,9 +138,10 @@ namespace MonoBehaviours.GroundSectionSystem.SectionObstacles
 
             PlaceExplosionEffect(currentSection.ObstaclePlacementPosition);
 
-            TryDamageActorsOrPlayer(currentSection.ObstaclePlacementPosition, damage);
-            
-            
+            if (IsServer)
+                TryDamageActorsOrPlayer(currentSection.ObstaclePlacementPosition, damage);
+
+
             if (depth <= 0 )
             {
                 return;

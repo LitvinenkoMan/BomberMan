@@ -3,7 +3,6 @@ using Core.DataTransferObjects;
 using Core.EventBuses;
 using Core.SaveSystem;
 using Core.ScriptableObjects;
-using CSharp;
 using Interfaces;
 using TMPro;
 using Unity.Netcode;
@@ -14,8 +13,6 @@ namespace Runtime.NetworkBehaviours.Player
 {
     public class PlayerCharacterNet : NetworkBehaviour, ICharacter, InputActions.IPlayerMapActions
     {
-        [SerializeField]
-        private CharacterData characterData;
         [SerializeField]
         private TMP_Text playerName;
         [SerializeField]
@@ -50,10 +47,17 @@ namespace Runtime.NetworkBehaviours.Player
 
         public override void OnNetworkSpawn()
         {
-            Initialize();
+            if (IsOwner)
+            {
+                SendInitializeRequestRpc(SaveManager.Instance.PlayerData.SelectedCharacterData.CharacterName);
+                _input ??= new InputActions();
+                _input.PlayerMap.AddCallbacks(this);
+                _input.Enable();
+            }
+            
+            
             name = $"P{GetComponent<NetworkObject>().OwnerClientId}";
             playerName.text = name;
-
         }
 
         public override void OnNetworkDespawn()
@@ -61,18 +65,15 @@ namespace Runtime.NetworkBehaviours.Player
             
         }
 
-        public void Initialize()
+        public void Initialize(ICharacterData characterData)
         {
-            if (IsOwner)
-            {
-                _input ??= new InputActions();
-                _input.PlayerMap.AddCallbacks(this);
-                _input.Enable();
-                playerVisuals.SetActive(true);
-                playerName.enabled = true;
-            }
-            //CharacterRuntimeData.
+            _playerCharacterRuntimeNet.Initialize(characterData);
+            playerVisuals.SetActive(true);
+            playerName.enabled = true;
+            _characterController.enabled = true;
+
             CharacterAnimator.Initialize();
+            Debug.Log($"Initialized player on server with {characterData.CharacterName}");
         }
 
         public void Damage(int damageAmount)
@@ -93,7 +94,7 @@ namespace Runtime.NetworkBehaviours.Player
 
         public void Heal(int healAmount)
         {
-            CharacterRuntimeData.AddHealth(healAmount);
+            HealRpc(healAmount);
         }
 
         public void ActivateSpecial()
@@ -118,7 +119,7 @@ namespace Runtime.NetworkBehaviours.Player
 
         public void Reset()
         {
-            ResetPlayerRpc(RpcTarget.Single(NetworkObject.OwnerClientId, RpcTargetUse.Temp));
+            //ResetPlayerRpc(RpcTarget.Single(NetworkObject.OwnerClientId, RpcTargetUse.Temp));
         }
 
         private void StartDeathSequence()
@@ -126,12 +127,13 @@ namespace Runtime.NetworkBehaviours.Player
             if (IsOwner)
             { 
                 SetMoveAbility(false);
-                SetBombDeployAbility(false);      
+                SetBombDeployAbility(false);
                 _input.PlayerMap.RemoveCallbacks(this);
                 _input.Disable();
             }
             _characterController.enabled = false;
             CharacterAnimator.PlayDeathAnimation();
+            BombDeployer.ClearBombs();
 
             GameplayUIEvents.Instance.RiseOnHealthRunOutEvent(NetworkManager.Singleton.LocalClientId, _playerCharacterRuntimeNet.CharacterHealth);
             OnPlayerDeath?.Invoke(OwnerClientId);
@@ -169,8 +171,6 @@ namespace Runtime.NetworkBehaviours.Player
 
         private void CollectRefs()
         {
-            characterData = SaveManager.Instance.PlayerData.SelectedCharacterData;
-            
             if (TryGetComponent(out IImmune immune)) Immune = immune;
             if (TryGetComponent(out IBombDeployer bombDeployer)) BombDeployer = bombDeployer;
             if (TryGetComponent(out IMovable playerMovement)) CharacterMovement = playerMovement;
@@ -191,10 +191,22 @@ namespace Runtime.NetworkBehaviours.Player
 		}
 
         [Rpc(SendTo.SpecifiedInParams)]
-        private void ResetPlayerRpc(RpcParams rpcParams)
+        private void ResetPlayerRpc(string characterName, RpcParams rpcParams)
         {
-            _playerCharacterRuntimeNet.Initialize(characterData);
+            _playerCharacterRuntimeNet.Initialize(Resources.Load<CharacterData>($"SOInstances/CharactersData/{characterName}Character"));
             _characterController.enabled = true;
+        }
+
+        [Rpc(SendTo.Server)]
+        private void SendInitializeRequestRpc(string characterName)
+        {
+            Initialize(Resources.Load<CharacterData>($"SOInstances/CharactersData/{characterName}Character"));
+        }
+
+        [Rpc(SendTo.Server)]
+        private void HealRpc(int healAmount)
+        {
+            CharacterRuntimeData.AddHealth(healAmount);
         }
     }
 }

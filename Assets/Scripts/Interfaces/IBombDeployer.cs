@@ -7,5 +7,6 @@ namespace Interfaces
         public void Initialize();  
         public void SetAbilityToDeployBombs(bool canIt);
         public void DeployBomb(BombDto bombDto);
+        public void ClearBombs();
     }
 }

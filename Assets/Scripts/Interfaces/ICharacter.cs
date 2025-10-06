@@ -10,7 +10,7 @@ namespace Interfaces
         public IMovable CharacterMovement { get; }
         public ICharacterAnimator CharacterAnimator { get; }
 
-        public void Initialize();
+        public void Initialize(ICharacterData characterData);
 
         public void Damage(int damageAmount);
 

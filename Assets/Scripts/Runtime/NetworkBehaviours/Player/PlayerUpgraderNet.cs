@@ -1,7 +1,5 @@
-using Core.ScriptableObjects;
 using Interfaces;
 using Unity.Netcode;
-using UnityEngine;
 
 namespace Runtime.NetworkBehaviours.Player
 {
@@ -28,7 +26,7 @@ namespace Runtime.NetworkBehaviours.Player
         {
             if (IsOwner)
             {
-                _characterRuntimeData.SetBombsAtTime(_characterRuntimeData.BombsAtTime + (int)increaseAmount);
+                IncreaseBombsPerTimeRpc(increaseAmount);
             }
         }
 
@@ -36,7 +34,7 @@ namespace Runtime.NetworkBehaviours.Player
         {
             if (IsOwner)
             {
-                _characterRuntimeData.SetBombsDamage(_characterRuntimeData.BombsDamage + (int)increaseAmount);
+                IncreaseBombsDamageRpc(increaseAmount);
             }
         }
 
@@ -44,7 +42,7 @@ namespace Runtime.NetworkBehaviours.Player
         {
             if (IsOwner)
             {
-                _characterRuntimeData.SetSpeedMultiplier(_characterRuntimeData.SpeedMultiplier + increaseAmount);
+                IncreaseMovementSpeedRpc(increaseAmount);
             }
         }
 
@@ -52,8 +50,39 @@ namespace Runtime.NetworkBehaviours.Player
         {
             if (IsOwner)
             {
-                _characterRuntimeData.SetBombsSpreading(_characterRuntimeData.BombsSpreading + (int)increaseAmount);
+                IncreaseBombsSpreadingRpc(increaseAmount);
             }
+        }
+
+        [Rpc(SendTo.Server)]
+        private void IncreaseHealthRpc(float increaseAmount)
+        {
+            _playerCharacter.Heal((int)increaseAmount);
+        }
+
+        [Rpc(SendTo.Server)]
+        private void IncreaseBombsPerTimeRpc(float increaseAmount)
+        {
+            _characterRuntimeData.SetBombsAtTime(_characterRuntimeData.BombsAtTime + (int)increaseAmount);
+        }
+
+        [Rpc(SendTo.Server)]
+        private void IncreaseBombsDamageRpc(float increaseAmount)
+        {
+            _characterRuntimeData.SetBombsDamage(_characterRuntimeData.BombsDamage + (int)increaseAmount);
+            
+        }
+
+        [Rpc(SendTo.Server)]
+        private void IncreaseMovementSpeedRpc(float increaseAmount)
+        {
+            _characterRuntimeData.SetSpeedMultiplier(_characterRuntimeData.SpeedMultiplier + increaseAmount);
+        }
+
+        [Rpc(SendTo.Server)]
+        private void IncreaseBombsSpreadingRpc(float increaseAmount)
+        {
+            _characterRuntimeData.SetBombsSpreading(_characterRuntimeData.BombsSpreading + (int)increaseAmount);
         }
     }
 }

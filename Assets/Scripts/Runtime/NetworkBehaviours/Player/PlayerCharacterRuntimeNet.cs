@@ -4,18 +4,18 @@ using Core.ScriptableObjects;
 using Interfaces;
 using Unity.Netcode;
 
-namespace CSharp
+namespace Runtime.NetworkBehaviours.Player
 {
     [Serializable]
     public class PlayerCharacterRuntimeNet : NetworkBehaviour, ICharacterRuntimeData
     {
-        private NetworkVariable<int> _characterHealth = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private NetworkVariable<float> _speedMultiplier = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private NetworkVariable<float> _bombsCountdown = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private NetworkVariable<int> _bombsAtTime = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private NetworkVariable<int> _bombsSpreading = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private NetworkVariable<int> _bombsDamage = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private NetworkVariable<float> _kickForce = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private NetworkVariable<int> _characterHealth = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        private NetworkVariable<float> _speedMultiplier = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        private NetworkVariable<float> _bombsCountdown = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        private NetworkVariable<int> _bombsAtTime = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        private NetworkVariable<int> _bombsSpreading = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        private NetworkVariable<int> _bombsDamage = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        private NetworkVariable<float> _kickForce = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
         public int CharacterHealth => _characterHealth.Value;
 
@@ -53,7 +53,7 @@ namespace CSharp
             _kickForce.OnValueChanged -= OnKickForceChanged;
         }
 
-        public void Initialize(ICharacterData  characterData)
+        public void Initialize(ICharacterData characterData)
         {
             _characterHealth.Value = characterData.Health;
             _speedMultiplier.Value = characterData.Speed;
@@ -108,14 +108,14 @@ namespace CSharp
             _kickForce.Value = kickForce;
         }
         
-        public void OnHealthChanged(int prev, int current) => GameplayUIEvents.Instance.RiseOnHealthChangedEvent(NetworkManager.Singleton.LocalClientId, prev, current);
-        public void OnSpeedMultiplierChanged(float prev, float current) => GameplayUIEvents.Instance.RiseOnSpeedMultiplierChangedEvent(NetworkManager.Singleton.LocalClientId, prev, current);
-        public void OnBombsCountdownChanged(float prev, float current) => GameplayUIEvents.Instance.RiseOnBombsCountdownChangedEvent(NetworkManager.Singleton.LocalClientId, prev, current);
-        public void OnBombsAtTimeChanged(int prev, int current) => GameplayUIEvents.Instance.RiseOnBombsAtTimeChangedEvent(NetworkManager.Singleton.LocalClientId, prev, current);
-        public void OnBombsSpreadingChanged(int prev, int current) => GameplayUIEvents.Instance.RiseOnBombsSpreadingChangedEvent(NetworkManager.Singleton.LocalClientId, prev, current);
-        public void OnBombsDamageChanged(int prev, int current) => GameplayUIEvents.Instance.RiseOnBombsDamageChangedEvent(NetworkManager.Singleton.LocalClientId, prev, current);
-        public void OnKickForceChanged(float prev, float current) => GameplayUIEvents.Instance.RiseOnKickForceChangedEvent(NetworkManager.Singleton.LocalClientId, prev, current);
+        private void OnHealthChanged(int prev, int current) => GameplayUIEvents.Instance.RiseOnHealthChangedEvent(NetworkManager.Singleton.LocalClientId, prev, current);
+        private void OnSpeedMultiplierChanged(float prev, float current) => GameplayUIEvents.Instance.RiseOnSpeedMultiplierChangedEvent(NetworkManager.Singleton.LocalClientId, prev, current);
+        private void OnBombsCountdownChanged(float prev, float current) => GameplayUIEvents.Instance.RiseOnBombsCountdownChangedEvent(NetworkManager.Singleton.LocalClientId, prev, current);
+        private void OnBombsAtTimeChanged(int prev, int current) => GameplayUIEvents.Instance.RiseOnBombsAtTimeChangedEvent(NetworkManager.Singleton.LocalClientId, prev, current);
+        private void OnBombsSpreadingChanged(int prev, int current) => GameplayUIEvents.Instance.RiseOnBombsSpreadingChangedEvent(NetworkManager.Singleton.LocalClientId, prev, current);
+        private void OnBombsDamageChanged(int prev, int current) => GameplayUIEvents.Instance.RiseOnBombsDamageChangedEvent(NetworkManager.Singleton.LocalClientId, prev, current);
+        private void OnKickForceChanged(float prev, float current) => GameplayUIEvents.Instance.RiseOnKickForceChangedEvent(NetworkManager.Singleton.LocalClientId, prev, current);
         
-        public void OnHealthRunOut(int current) => GameplayUIEvents.Instance.RiseOnHealthRunOutEvent(NetworkManager.Singleton.LocalClientId, current);
+        private void OnHealthRunOut(int current) => GameplayUIEvents.Instance.RiseOnHealthRunOutEvent(NetworkManager.Singleton.LocalClientId, current);
     }
 }
