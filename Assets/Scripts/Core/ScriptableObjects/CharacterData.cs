@@ -14,6 +14,8 @@ namespace Core.ScriptableObjects
         private GameObject _bomb;
         [SerializeField]
         private RuntimeAnimatorController  _animatorController;
+        [SerializeField]
+        private Avatar  _animatorAvatar;
         
         [Header("Values:")]
         [SerializeField]
@@ -35,6 +37,7 @@ namespace Core.ScriptableObjects
         public GameObject Visuals => _visuals;
         public GameObject Bomb => _bomb;
         public RuntimeAnimatorController AnimatorController => _animatorController;
+        public Avatar Avatar => _animatorAvatar;
 
         public int Health => _characterHealth;
         public float Speed => _speedMultiplier;
@@ -51,6 +54,7 @@ namespace Core.ScriptableObjects
         public GameObject Visuals { get; }
         public GameObject Bomb { get; }
         public RuntimeAnimatorController AnimatorController { get; }
+        public Avatar Avatar { get; }
 
         public int Health { get; }
         public float Speed { get; }
