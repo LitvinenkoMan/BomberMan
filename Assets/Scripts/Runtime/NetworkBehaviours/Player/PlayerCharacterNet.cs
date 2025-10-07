@@ -47,17 +47,8 @@ namespace Runtime.NetworkBehaviours.Player
 
         public override void OnNetworkSpawn()
         {
-            if (IsOwner)
-            {
-                SendInitializeRequestRpc(SaveManager.Instance.PlayerData.SelectedCharacterData.CharacterName);
-                _input ??= new InputActions();
-                _input.PlayerMap.AddCallbacks(this);
-                _input.Enable();
-            }
-            
-            
-            name = $"P{GetComponent<NetworkObject>().OwnerClientId}";
-            playerName.text = name;
+            Initialize(SaveManager.Instance.PlayerData.SelectedCharacterData);
+            SendInitializeRequestRpc(SaveManager.Instance.PlayerData.SelectedCharacterData.CharacterName);
         }
 
         public override void OnNetworkDespawn()
@@ -67,13 +58,32 @@ namespace Runtime.NetworkBehaviours.Player
 
         public void Initialize(ICharacterData characterData)
         {
-            _playerCharacterRuntimeNet.Initialize(characterData);
-            playerVisuals.SetActive(true);
+            if (IsOwner)
+            {
+                _input ??= new InputActions();
+                _input.PlayerMap.AddCallbacks(this);
+                _input.Enable();
+            }
+
+            if (IsServer)
+            {
+                _playerCharacterRuntimeNet.Initialize(characterData);
+            }
+            
+            name = $"P{GetComponent<NetworkObject>().OwnerClientId}";
+            playerName.text = name;
+            
             playerName.enabled = true;
             _characterController.enabled = true;
 
-            CharacterAnimator.Initialize();
+            CharacterAnimator.Initialize(characterData);
+            playerVisuals.SetActive(true);
             Debug.Log($"Initialized player on server with {characterData.CharacterName}");
+        }
+
+        private void InitLocalServices()
+        {
+            
         }
 
         public void Damage(int damageAmount)

@@ -16,6 +16,7 @@ MonoBehaviour:
   _visuals: {fileID: 919132149155446097, guid: f1b1d959bd1ba77478e61e20b96136b1, type: 3}
   _bomb: {fileID: 6260933269128134215, guid: a19dc95892433e948a0a89d9befe479e, type: 3}
   _animatorController: {fileID: 9100000, guid: 729359b26d5e70b41809c355bdf1bfc1, type: 2}
+  _animatorAvatar: {fileID: 9000000, guid: f1b1d959bd1ba77478e61e20b96136b1, type: 3}
   _characterHealth: 2
   _speedMultiplier: 1.5
   _bombsCountdown: 3

@@ -1,3 +1,4 @@
+using Core.ScriptableObjects;
 using Interfaces;
 using Unity.Netcode;
 using UnityEngine;
@@ -26,10 +27,14 @@ namespace Runtime.NetworkBehaviours.Player
             pawnAnimator.SetFloat(MoveValue, _currentSpeedValue);
         }
 
-        public void Initialize()
+        public void Initialize(ICharacterData characterData)
         {
             _currentSpeedValue = 0;
             _endSpeedValue = 0;
+            
+            pawnAnimator.runtimeAnimatorController = characterData.AnimatorController;
+            pawnAnimator.avatar = characterData.Avatar;
+            
             pawnAnimator.SetBool(Dead, false);
         }
 

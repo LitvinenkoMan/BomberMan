@@ -1,8 +1,10 @@
+using Core.ScriptableObjects;
+
 namespace Interfaces
 {
     public interface ICharacterAnimator
     {
-        public void Initialize();
+        public void Initialize(ICharacterData characterData);
         public void PlayWalkAnimation();
         public void PlayDeathAnimation();
         public void PlayIdleAnimation();
