@@ -2,7 +2,6 @@ using Interfaces;
 using AbstractClasses;
 using Runtime.MonoBehaviours.Bot.SimpleBotUtils;
 using Runtime.MonoBehaviours.Bot.StandartBotUtils;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -16,7 +15,7 @@ namespace Runtime.MonoBehaviours.Bot
         private Dictionary<BotType, BaseBotNavigation> _botNavigations;
         private Dictionary<BotType, BaseShelterFinder> _shelterFinder;
 
-        public void InitializeBehaviors(NavMeshAgent _agent)
+        public void InitializeBehaviors(NavMeshAgent _agent, List<Canvas> canvas)
         {
             _states = new Dictionary<BotType, Dictionary<string, IState>>
             {
@@ -47,7 +46,7 @@ namespace Runtime.MonoBehaviours.Bot
             _botNavigations = new Dictionary<BotType, BaseBotNavigation>
             {
                 {BotType.Easy, new SimpleBotNavigation(_agent) },
-                {BotType.Standart, new StandartBotNavigation(_agent) }
+                {BotType.Standart, new StandartBotNavigation(_agent, canvas) }
             };
             _shelterFinder = new Dictionary<BotType, BaseShelterFinder>
             {

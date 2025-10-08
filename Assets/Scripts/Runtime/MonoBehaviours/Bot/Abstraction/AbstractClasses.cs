@@ -11,16 +11,13 @@ namespace AbstractClasses
     public abstract class BaseShelterFinder
     {
         protected NavMeshAgent _agent;
-        protected HashSet<Vector2Int> _blackListPos;
         
         public abstract void GenerateBlacklistPositions(BombDto bombDto);
         public abstract HashSet<Vector2Int> FindAvailablePosForRetreat(HashSet<Vector2Int> possiblePos, HashSet<Vector2Int> blacklist);
         public abstract void RetreatFromBomb(BotLogicExecuter bot);
         public bool PointInBlackList(HashSet<Vector2Int> blackList, Vector2Int point)
         {
-            Vector2Int checkingPoint = point;
-
-            if (blackList.Contains(checkingPoint)) return true;
+            if (blackList.Contains(point)) return true;
 
             return false;
         }
@@ -51,11 +48,10 @@ namespace AbstractClasses
                 return possiblePositions;
             }
         }
-        protected Vector2Int ConvertToVector2Int(Vector3 vector)
+        public static Vector2Int ConvertToVector2Int(Vector3 vector)
         {
-            return new Vector2Int(Mathf.FloorToInt(vector.x + 0.5f), Mathf.FloorToInt(vector.z + 0.5f));
+            return new Vector2Int(Mathf.RoundToInt(vector.x), Mathf.RoundToInt(vector.z));
         }
-        public HashSet<Vector2Int> GetBlacklist() => _blackListPos;
     }
     public abstract class BaseBotNavigation
     {
@@ -69,9 +65,15 @@ namespace AbstractClasses
         }
         public float CheckDistance(Transform targetOpponent)
         {
+            if (_target == null)
+            {
+                Debug.Log(_agent.name + " CheckDistance: target = null");
+                return Mathf.Infinity;
+            }
             if (targetOpponent == null)
             {
-                Debug.Log("CheckDistance: targetOpponent = null");
+                Debug.Log(_agent.name + " CheckDistance: targetOpponent = null");
+                return (_agent.transform.position - _target).magnitude;
             }
 
             return Mathf.Min((_agent.transform.position - _target).magnitude,
@@ -116,7 +118,14 @@ namespace AbstractClasses
                 _opponentsList.Add(newPlayer);
             }
         }
-        public Transform GetCurrentOpponent() => _targetOpponent;
+        public Transform GetCurrentOpponent()
+        {
+            if (_targetOpponent == null)
+            {
+                SelectTargetOpponent();
+            }
+            return _targetOpponent;
+        }
         public List<GameObject> GetOpponentsList() => _opponentsList;
         public abstract void SelectTargetOpponent();
 

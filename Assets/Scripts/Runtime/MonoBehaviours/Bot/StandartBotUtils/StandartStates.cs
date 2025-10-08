@@ -30,8 +30,10 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
                 _coroutine = manager.StartCoroutine(corr(manager));
             }
             float distance = manager.BotNavigation.CheckDistance(manager.TargetOpponentFinder.GetCurrentOpponent());
-            if (distance <= 1f)
+
+            if (distance <= 0.8f)
             {
+                //Debug.Log("Switch to Deploy Bomb");
                 manager.SwitchState(manager.States["Deploy Bomb"]);
             }
         }
@@ -39,7 +41,6 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
         {
             manager.TargetOpponentFinder.SelectTargetOpponent();
             manager.BotNavigation.CheckPathToTarget(manager.TargetOpponentFinder.GetCurrentOpponent());
-            Debug.Log("Set path to: " + manager.TargetOpponentFinder.GetCurrentOpponent().name);
 
             yield return new WaitForSeconds(0.5f);
 
@@ -76,7 +77,7 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
 
             timer += Time.deltaTime;
 
-            if (timer >= 3f)
+            if (timer >= manager.CharacterData.BombsCountdown)
             {
                 manager.SwitchState(manager.States["Agro"]);
                 timer = 0f;

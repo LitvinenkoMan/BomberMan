@@ -1,6 +1,7 @@
 ﻿using AbstractClasses;
 using Interfaces;
 using MonoBehaviours.GroundSectionSystem;
+using Runtime.MonoBehaviours.Player;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -10,6 +11,7 @@ namespace Runtime.MonoBehaviours.Bot
     public class BotLogicExecuter : MonoBehaviour
     {
         [SerializeField] private BotType _botType;
+        [SerializeField] private Canvas canvasObj;
         private ICharacterRuntimeData _characterData;
         private IState _currentState;
         private BaseBotNavigation _botNavigation;
@@ -29,58 +31,58 @@ namespace Runtime.MonoBehaviours.Bot
         private HashSet<Vector2Int> blacklist;
         private Queue<GroundSection> queue;
 
-        private void Awake()
-        {
-            CollectRefs();
-        }
-
         private void OnDrawGizmos()
         {
-            foreach (var b in blacklist)
+            if (blacklist != null)
             {
-                Gizmos.color = Color.black;
-                Gizmos.DrawSphere(new Vector3(b.x, 0, b.y) + new Vector3(0, 0.5f, 0), 0.3f);
+                foreach (var b in blacklist)
+                {
+                    Gizmos.color = Color.black;
+                    Gizmos.DrawSphere(new Vector3(b.x, 0, b.y) + new Vector3(0, 1f, 0), 0.3f);
+                }
             }
-            if (queue == null) return;  
-            foreach (var b in queue)
-            {
-                Gizmos.color = Color.red;
-                Gizmos.DrawSphere(b.transform.position + new Vector3(0, 0.5f, 0), 0.3f);
-            }
+            //if (queue == null) return;  
+            //foreach (var b in queue)
+            //{
+            //    Gizmos.color = Color.red;
+            //    Gizmos.DrawSphere(b.transform.position + new Vector3(0, 0.5f, 0), 0.3f);
+            //}
         }
-
-        private void Start()
-        {
-            Spawner.Instance.OnBotSpawned += _targetOpponentFinder.UpdateOpponentsList;
-            Spawner.Instance.OnPlayerSpawned += _targetOpponentFinder.UpdatePlayerInOpponentsList;
-
-            _targetOpponentFinder.SetOpponentsList(Spawner.Instance.OpponentsList);
-
-            SwitchState(_states["Agro"]);
-        }
-        private void OnDisable()
+        public void UnsubscribeFromEvent()
         {
             Spawner.Instance.OnBotSpawned -= _targetOpponentFinder.UpdateOpponentsList;
             Spawner.Instance.OnPlayerSpawned -= _targetOpponentFinder.UpdatePlayerInOpponentsList;
-        }
-        
 
-        private void CollectRefs()
+            _character.OnBombDeployed -= ShelterFinder.GenerateBlacklistPositions;
+        }
+        public void Initialize(BotCharacter botCharacter) // call in Start
         {
-            if (TryGetComponent(out BotCharacter character)) _character = character;
-                
+            _character = GetComponent<BotCharacter>();
+            _characterData = _character.CharacterData;
+
             BotBehaviorProvider botBehaviorProvider = new BotBehaviorProvider();
-            botBehaviorProvider.InitializeBehaviors(GetComponent<NavMeshAgent>());
+            botBehaviorProvider.InitializeBehaviors(GetComponent<NavMeshAgent>(), null);
 
             _botNavigation = botBehaviorProvider.GetBotNavigationForType(_botType);
             _targetOpponentFinder = botBehaviorProvider.GetTargetSelectorForType(_botType);
             _shelterFinder = botBehaviorProvider.GetShelterFinder(_botType);
             _states = botBehaviorProvider.GetStatesForType(_botType);
 
-            _characterData = _character.CharacterData;
+            Spawner.Instance.OnBotSpawned += _targetOpponentFinder.UpdateOpponentsList;
+            Spawner.Instance.OnPlayerSpawned += _targetOpponentFinder.UpdatePlayerInOpponentsList;
 
+            _targetOpponentFinder.SetOpponentsList(Spawner.Instance.OpponentsList);
+
+            SwitchState(_states["Agro"]);
+
+            //List<Canvas> canvas = new List<Canvas>();
+            //for (int i = 0; i < 100; i++)
+            //{
+            //    var newCanvas = Instantiate(canvasObj);
+            //    newCanvas.gameObject.SetActive(false);
+            //    canvas.Add(newCanvas);
+            //}
         }
-
         public void SwitchState(IState newState)
         {
             if (_currentState != null)
@@ -93,7 +95,7 @@ namespace Runtime.MonoBehaviours.Bot
         private void Update()
         {
             queue = _botNavigation.GetPath();  
-            blacklist = _shelterFinder.GetBlacklist();
+            blacklist = BombPositions.GetAllBombPositions();
             _currentState.Update(this);
         }
     }

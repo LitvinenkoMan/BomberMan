@@ -69,6 +69,7 @@ namespace Runtime.MonoBehaviours.Bot.SimpleBotUtils
     }
     public class SimpleShelterFinder : BaseShelterFinder
     {
+        HashSet<Vector2Int> _blackListPos;
         public SimpleShelterFinder(NavMeshAgent agent)
         {
             _agent = agent;

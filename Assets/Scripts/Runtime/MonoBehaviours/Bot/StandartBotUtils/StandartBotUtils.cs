@@ -1,11 +1,9 @@
-using Core.DataTransferObjects;
-using Interfaces;
 using AbstractClasses;
+using Core.DataTransferObjects;
 using MonoBehaviours.GroundSectionSystem;
-using Runtime.MonoBehaviours.Player;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -17,19 +15,20 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
         private readonly GroundSection[,] _sectionsPositions;
         private GroundSection _currentSection;
         private Queue<GroundSection> _path;
+        private List<Canvas> canvas;
 
         public override Queue<GroundSection> GetPath()
         {
             return _path;
         }
 
-        public StandartBotNavigation(NavMeshAgent agent)
+        public StandartBotNavigation(NavMeshAgent agent, List<Canvas> canvas)
         {
             _agent = agent;
-            GroundSectionsUtils.Instance.GetCurrentSectionDataHolder().SetGroundSectionsCousts();
             _sections = GroundSectionsUtils.Instance.GetCurrentSectionDataHolder().sections;
             _sectionsPositions = new GroundSection[16, 16];
             CreateGrid();
+            this.canvas = canvas;
         }
         public override void CheckPathToTarget(Transform targetOpponent)
         {
@@ -37,7 +36,6 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
             GroundSection targetSection = null;
             foreach (var sectionFormPath in _path)
             {
-                _path.Dequeue();
                 if (sectionFormPath.PlacedObstacle != null)
                 {
                     targetSection = sectionFormPath;
@@ -63,6 +61,13 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
         }
         private Queue<GroundSection> CalculatePath(GroundSection startSection, GroundSection goalSection)
         {
+            if (canvas != null)
+            {
+                foreach (var c in canvas)
+                {
+                    c.gameObject.SetActive(false);
+                }
+            }            
             if (startSection == goalSection) // if bot is already on target section, return it
             {
                 var queue = new Queue<GroundSection>();
@@ -146,6 +151,25 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
                     if (!openList.ContainsKey(neighbor)) openList.Add(neighbor, neighborF);
                 }
                 // after checking all neighbors, add processed section to closed list
+                if (canvas != null)
+                {
+                    foreach (Canvas currCanvas in canvas)
+                    {
+                        if (!currCanvas.gameObject.activeInHierarchy)
+                        {
+                            bool obst = false;
+                            if (currentSection.PlacedObstacle != null)
+                            {
+                                obst = true;
+                            }
+                            currCanvas.gameObject.SetActive(true);
+                            currCanvas.transform.position = currentSection.transform.position + new Vector3(0, 1.3f, 0);
+                            currCanvas.GetComponentInChildren<TextMeshProUGUI>().text = "Cost: " + sectionCost[currentSection].ToString() + "\n"
+                                + "Obstacle: " + obst.ToString();
+                            break;
+                        }
+                    }
+                }                
                 closeList.Add(currentSection);
                 openList.Remove(currentSection);
 
@@ -166,11 +190,14 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
             currentSection = goalSection;
             while (currentSection != startSection)
             {
+                path.Enqueue(currentSection);
                 currentSection = parents[currentSection];
             }
             path.Enqueue(startSection);
             //-----End bulding path------
 
+            //Debug.Log("ЗАкончен A*");
+            
             return new Queue<GroundSection>(path.Reverse());
         }
         private void CreateGrid()
@@ -210,7 +237,6 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
             }
             else Debug.Log("SelectTargetPlayer: did not find target opponent");
         }
-        
     }
     public class StandartShelterFinder : BaseShelterFinder
     {
@@ -220,54 +246,15 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
         {
             _agent = agent;
             _botLogicExecuter = agent.gameObject.GetComponent<BotLogicExecuter>();
-            _blackListPos = new HashSet<Vector2Int>();
 
             if (_botLogicExecuter == null) Debug.LogError("StandartShelterFinder: did not find BotLogicExecuter");
             if (agent == null) Debug.LogError("StandartShelterFinder: did not find NavMeshAgent");
 
-            SubcribeToEvents();
-        }
-        private void SubcribeToEvents()
-        {            
-            var list = new List<GameObject>(Spawner.Instance.OpponentsList);
-            list.Add(_agent.gameObject);
-            foreach (GameObject opponent in list)
-            {
-                if (opponent == null) continue;
-                if (opponent.TryGetComponent(out BotCharacter character))
-                {
-                    character.OnBombDeployed += GenerateBlacklistPositions;
-                }
-                else if (opponent.TryGetComponent(out PlayerCharacter playerCharacter))
-                {
-                    playerCharacter.OnBombDeployed += GenerateBlacklistPositions;
-                }
-                else Debug.Log("SubscribeToEvents: Неизвестный оппонент");
-            }
-        }
+        }        
 
         public override void GenerateBlacklistPositions(BombDto bombDto)
         {
-            _botLogicExecuter.StartCoroutine(GeneratorBlacklistPositions(bombDto));
-        }
-        private IEnumerator GeneratorBlacklistPositions(BombDto bombDto)
-        {
-            Vector2Int bombPos = ConvertToVector2Int(bombDto.BombPosition);
-
-            var bombs = new HashSet<Vector2Int>() { bombPos };
-
-            for (int i = 1; i <= bombDto.BombsSpreading; i++)
-            {
-                bombs.Add(bombPos + new Vector2Int(i, 0));
-                bombs.Add(bombPos + new Vector2Int(-i, 0));
-                bombs.Add(bombPos + new Vector2Int(0, i));
-                bombs.Add(bombPos + new Vector2Int(0, -i));
-            }
-            _blackListPos.UnionWith(bombs); 
-
-            yield return new WaitForSeconds(bombDto.BombCountdown);
-
-            _blackListPos.ExceptWith(bombs); 
+            BombPositions.InsertBombPosition(bombDto, _botLogicExecuter);
         }
         public override HashSet<Vector2Int> FindAvailablePosForRetreat(HashSet<Vector2Int> possiblePos, HashSet<Vector2Int> blacklist)
         {
@@ -292,18 +279,18 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
             if (availablePositions.Count > 0) return availablePositions;
             else
             {
-                Debug.LogError(_agent.gameObject.name + " FindAvailablePosForRetreat: did not find available positions for retreat");
+                Debug.Log(_agent.gameObject.name + " FindAvailablePosForRetreat: did not find available positions for retreat");
                 return availablePositions;
             }
         }
         public override void RetreatFromBomb(BotLogicExecuter bot)
         {
-            var possiblePositions = GeneratePossiblePositions((byte)bot.Character.BombDto.BombsSpreading, _blackListPos, bot.Character.BombDto.BombPosition);
-            var availablePositions = FindAvailablePosForRetreat(possiblePositions, _blackListPos);
+            HashSet<Vector2Int> bombPositions = BombPositions.GetAllBombPositions();
+            var possiblePositions = GeneratePossiblePositions((byte)bot.Character.BombDto.BombsSpreading, bombPositions, bot.Character.BombDto.BombPosition);
+            var availablePositions = FindAvailablePosForRetreat(possiblePositions, bombPositions);
 
             if (availablePositions == null || availablePositions.Count == 0)
             {
-                Debug.Log("RetreatFromBomb: No available positions for retreat, staying in place.");
                 bot.BotNavigation.SetTarget(bot.transform.position);
             }
             else

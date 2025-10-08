@@ -1,6 +1,7 @@
 using Core.DataTransferObjects;
 using Core.ScriptableObjects;
 using Interfaces;
+using Runtime.MonoBehaviours.Bot;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -49,7 +50,7 @@ namespace Runtime.MonoBehaviours.Player
             _input.PlayerMap.AddCallbacks(this);
             _input.Enable();
             //CharacterAnimator.Initialize();
-            SetBombDeployAbility(true);
+            SetBombDeployAbility(true);            
         }
         public void ActivateSpecial()
         {
@@ -73,6 +74,7 @@ namespace Runtime.MonoBehaviours.Player
         public void DeployBomb()
         {
             BombDeployer.DeployBomb(_bombDto);
+            BombPositions.InsertBombPosition(_bombDto, this);
         }
 
         public void Heal(int healAmount)

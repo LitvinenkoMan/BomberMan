@@ -1,13 +1,8 @@
 using Interfaces;
 using MonoBehaviours.GroundSectionSystem;
-using Runtime.MonoBehaviours.Bot;
-using Runtime.NetworkBehaviours;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Unity.VisualScripting;
-using UnityEditor.PackageManager;
 using UnityEngine;
 
 namespace Runtime.MonoBehaviours
@@ -59,7 +54,7 @@ namespace Runtime.MonoBehaviours
 
             for (int i = 0; i < _opponents.Count; i++)
             {
-                if (_opponents[i] == _player)
+                if (_opponents[i] == Player)
                 {
                     _opponents[i] = null;
                 }
@@ -139,10 +134,10 @@ namespace Runtime.MonoBehaviours
 
                     numberOfBot++;
 
-                    if (spawnedBot.TryGetComponent(out ICharacter playerCharacter))
-                    {                        
-                        playerCharacter.Reset();
-                        playerCharacter.SetBombDeployAbility(true);
+                    if (spawnedBot.TryGetComponent(out ICharacter botCharacter))
+                    {
+                        botCharacter.Reset();
+                        botCharacter.SetBombDeployAbility(true);
                     }
 
                     OnBotSpawned?.Invoke(spawnedBot.name);
@@ -171,10 +166,10 @@ namespace Runtime.MonoBehaviours
             newBot.name = name;
             _opponents.Add(newBot);
 
-            if (newBot.TryGetComponent(out ICharacter playerCharacter))
+            if (newBot.TryGetComponent(out ICharacter botCharacter))
             {
-                playerCharacter.Reset();
-                playerCharacter.SetBombDeployAbility(true);
+                botCharacter.Reset();
+                botCharacter.SetBombDeployAbility(true);
             }
 
             OnBotSpawned?.Invoke(name);
@@ -192,20 +187,14 @@ namespace Runtime.MonoBehaviours
                     return _opponents[i];
                 }
             }
-            Debug.LogError("GetOpponentByName: did not find bot");
+            Debug.LogError("GetOpponentByName: did not find bot by name " + name);
             return null;
         }
 
         public List<GameObject> GetAllOpponents()
         {
             _opponents.RemoveAll(item => item == null);
-            List<GameObject> allPlayers = new List<GameObject>();
-            foreach (var bot in _opponents)
-            {
-                allPlayers.Add(bot);
-            }
-            allPlayers.Add(Player);
-            return allPlayers;
+            return _opponents;
         }
 
         public struct AssociatedSpawn
