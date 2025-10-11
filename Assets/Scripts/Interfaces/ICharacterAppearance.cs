@@ -1,4 +1,5 @@
 
+using Core.ScriptableObjects;
 using UnityEngine;
 
 namespace Interfaces
@@ -7,7 +8,7 @@ namespace Interfaces
     {
         public MeshRenderer MeshRenderer { get; }
         
-        public void SetNewAppearance(ICharacterRuntimeData characterRuntimeData);
+        public void SetNewAppearance(ICharacterData characterData);
         public void ClearAppearance();
     }
 }

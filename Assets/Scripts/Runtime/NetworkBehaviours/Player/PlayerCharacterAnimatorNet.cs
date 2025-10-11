@@ -7,14 +7,14 @@ namespace Runtime.NetworkBehaviours.Player
 {
     public class PlayerCharacterAnimatorNet : NetworkBehaviour, ICharacterAnimator
     {
-        [SerializeField] 
-        private Animator pawnAnimator;
         [SerializeField]
         private float transitionSmoothness = 1;
 
         private static readonly int Speed = Animator.StringToHash("Speed");
         private static readonly int MoveValue = Animator.StringToHash("MoveValue");
         private static readonly int Dead = Animator.StringToHash("Dead");
+        
+        private Animator _pawnAnimator;
 
         private float _currentSpeedValue;
         private float _endSpeedValue;
@@ -24,7 +24,7 @@ namespace Runtime.NetworkBehaviours.Player
             if (_currentSpeedValue == _endSpeedValue) return;
             _currentSpeedValue = Mathf.Lerp(_currentSpeedValue, _endSpeedValue, Time.deltaTime * transitionSmoothness);
             
-            pawnAnimator.SetFloat(MoveValue, _currentSpeedValue);
+            _pawnAnimator.SetFloat(MoveValue, _currentSpeedValue);
         }
 
         public void Initialize(ICharacterData characterData)
@@ -32,10 +32,12 @@ namespace Runtime.NetworkBehaviours.Player
             _currentSpeedValue = 0;
             _endSpeedValue = 0;
             
-            pawnAnimator.runtimeAnimatorController = characterData.AnimatorController;
-            pawnAnimator.avatar = characterData.Avatar;
+            _pawnAnimator = GetComponentInChildren<Animator>();
             
-            pawnAnimator.SetBool(Dead, false);
+            _pawnAnimator.runtimeAnimatorController = characterData.AnimatorController;
+            _pawnAnimator.avatar = characterData.Avatar;
+            
+            _pawnAnimator.SetBool(Dead, false);
         }
 
         public void PlayWalkAnimation()
@@ -78,7 +80,7 @@ namespace Runtime.NetworkBehaviours.Player
         [Rpc(SendTo.Everyone)]
         private void PlayDeathAnimationRpc()
         {
-            pawnAnimator.SetBool(Dead, true);
+            _pawnAnimator.SetBool(Dead, true);
         }
     }
 }

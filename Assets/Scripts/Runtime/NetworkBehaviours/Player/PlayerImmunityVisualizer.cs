@@ -7,8 +7,7 @@ namespace Runtime.NetworkBehaviours.Player
 {
     public class PlayerImmunityVisualizer : MonoBehaviour, IImmuneVisualizer
     {
-        [SerializeField] private GameObject _playerVisuals;
-        
+        private GameObject _playerVisuals;
         private Renderer _playerRenderer;
         private float _targetAlpha = 0.5f;
         
@@ -16,6 +15,7 @@ namespace Runtime.NetworkBehaviours.Player
 
         private void Start()
         {
+            _playerVisuals = GetComponentInChildren<Animator>().gameObject;
             _playerRenderer = _playerVisuals.GetComponentInChildren<Renderer>();
             
             if (_playerRenderer == null)

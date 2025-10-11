@@ -14,20 +14,20 @@ namespace Runtime.NetworkBehaviours.Player
     public class PlayerCharacterNet : NetworkBehaviour, ICharacter, InputActions.IPlayerMapActions
     {
         [SerializeField]
-        private TMP_Text playerName;
-        [SerializeField]
-        private GameObject playerVisuals;   
+        private TMP_Text playerName;   
         
         public ICharacterRuntimeData CharacterRuntimeData { get; private set; }
         public IImmune Immune { get; private set; }
         public IBombDeployer BombDeployer { get; private set; }
         public IMovable CharacterMovement { get; private set; }
         public ICharacterAnimator CharacterAnimator { get; private set; }
+        public ICharacterAppearance CharacterAppearance { get; private set; }
 
         private InputActions _input;
         private CharacterController _characterController;
         private PlayerCharacterRuntimeNet _playerCharacterRuntimeNet;
-
+        private GameObject _playerVisuals;
+        
         public event Action<ulong> OnPlayerDeath;
 
         private void Awake()
@@ -48,7 +48,10 @@ namespace Runtime.NetworkBehaviours.Player
         public override void OnNetworkSpawn()
         {
             Initialize(SaveManager.Instance.PlayerData.SelectedCharacterData);
-            SendInitializeRequestRpc(SaveManager.Instance.PlayerData.SelectedCharacterData.CharacterName);
+            // if (!IsServer)
+            // {
+            //     SendInitializeRequestRpc(SaveManager.Instance.PlayerData.SelectedCharacterData.CharacterName);
+            // }
         }
 
         public override void OnNetworkDespawn()
@@ -69,6 +72,9 @@ namespace Runtime.NetworkBehaviours.Player
             {
                 _playerCharacterRuntimeNet.Initialize(characterData);
             }
+            CharacterAppearance.SetNewAppearance(characterData);
+            _playerVisuals = GetComponentInChildren<Animator>().gameObject;
+            CharacterAnimator.Initialize(characterData);
             
             name = $"P{GetComponent<NetworkObject>().OwnerClientId}";
             playerName.text = name;
@@ -76,8 +82,7 @@ namespace Runtime.NetworkBehaviours.Player
             playerName.enabled = true;
             _characterController.enabled = true;
 
-            CharacterAnimator.Initialize(characterData);
-            playerVisuals.SetActive(true);
+            _playerVisuals.SetActive(true);
             Debug.Log($"Initialized player on server with {characterData.CharacterName}");
         }
 
@@ -186,6 +191,7 @@ namespace Runtime.NetworkBehaviours.Player
             if (TryGetComponent(out IMovable playerMovement)) CharacterMovement = playerMovement;
             if (TryGetComponent(out ICharacterAnimator characterAnimator)) CharacterAnimator = characterAnimator;
             if (TryGetComponent(out CharacterController characterController)) _characterController = characterController;
+            if (TryGetComponent(out ICharacterAppearance characterAppearance)) CharacterAppearance = characterAppearance;
 
             if (TryGetComponent(out ICharacterRuntimeData characterRuntimeData))
             {
