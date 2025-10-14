@@ -1,12 +1,14 @@
 using System.Collections;
 using UnityEngine;
 using Interfaces;
+using UnityEngine.AI;
 
 namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
 {
     public class StandartAgro : IState
     {
-        private Coroutine _coroutine;
+        private Coroutine _pathFindCoroutine;
+        private Coroutine _stayInTargetCoroutine;
         public void Enter(BotLogicExecuter manager)
         {
             manager.Character.CharacterAnimator.PlayWalkAnimation();
@@ -16,37 +18,43 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
 
         public void Exit(BotLogicExecuter manager)
         {
-            if (_coroutine != null)
+            if (_pathFindCoroutine != null)
             {
-                manager.StopCoroutine(_coroutine);
-                _coroutine = null;
+                manager.StopCoroutine(_pathFindCoroutine);
+                _pathFindCoroutine = null;
             }
         }
 
         public void Update(BotLogicExecuter manager)
         {
-            if (_coroutine == null)
+            if (_stayInTargetCoroutine != null) return;
+            if (_pathFindCoroutine == null)
             {
-                _coroutine = manager.StartCoroutine(corr(manager));
+                _pathFindCoroutine = manager.StartCoroutine(PathFind(manager));
             }
             float distance = manager.BotNavigation.CheckDistance(manager.TargetOpponentFinder.GetCurrentOpponent());
 
-            if (distance <= 0.8f)
+
+            if (distance <= 0.6f)
             {
-                //Debug.Log("Switch to Deploy Bomb");
+                _stayInTargetCoroutine = manager.StartCoroutine(StayInTarget(manager.BotNavigation.StayInTarget));
                 manager.SwitchState(manager.States["Deploy Bomb"]);
             }
         }
-        private IEnumerator corr(BotLogicExecuter manager)
+        private IEnumerator PathFind(BotLogicExecuter manager)
         {
             manager.TargetOpponentFinder.SelectTargetOpponent();
             manager.BotNavigation.CheckPathToTarget(manager.TargetOpponentFinder.GetCurrentOpponent());
 
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.2f);
 
-            manager.StopCoroutine(_coroutine);
-            _coroutine = null;      
-            
+            manager.StopCoroutine(_pathFindCoroutine);
+            _pathFindCoroutine = null;           
+        }
+        private IEnumerator StayInTarget(float waitingTime)
+        {
+            yield return new WaitForSeconds(waitingTime);
+            _stayInTargetCoroutine = null;
         }
     }
 

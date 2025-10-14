@@ -57,11 +57,12 @@ namespace AbstractClasses
     {
         protected NavMeshAgent _agent;
         protected Vector3 _target;
+        public float StayInTarget { get; protected set; }
         public Vector3 Target => _target;
         public void SetTarget(Vector3 target)
         {
             _target = target;
-            _agent.destination = target;
+            _agent.destination = target;            
         }
         public float CheckDistance(Transform targetOpponent)
         {
@@ -73,11 +74,11 @@ namespace AbstractClasses
             if (targetOpponent == null)
             {
                 Debug.Log(_agent.name + " CheckDistance: targetOpponent = null");
-                return (_agent.transform.position - _target).magnitude;
+                return (_agent.transform.position - _target).sqrMagnitude;
             }
 
-            return Mathf.Min((_agent.transform.position - _target).magnitude,
-                (_agent.transform.position - targetOpponent.position).magnitude);
+            return Mathf.Min((_agent.transform.position - _target).sqrMagnitude,
+                (_agent.transform.position - targetOpponent.position).sqrMagnitude);
         }
         public void SetSpeed(float speed)
         {

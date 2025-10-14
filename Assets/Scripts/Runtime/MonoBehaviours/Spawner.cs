@@ -1,5 +1,6 @@
 using Interfaces;
 using MonoBehaviours.GroundSectionSystem;
+using Runtime.MonoBehaviours.Bot;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -26,6 +27,7 @@ namespace Runtime.MonoBehaviours
 
         private void Awake()
         {
+            
             if (Instance == null)
             {
                 Instance = this;
@@ -35,6 +37,10 @@ namespace Runtime.MonoBehaviours
             {
                 Destroy(gameObject);
             }
+        }
+        private void Start()
+        {
+            BombPositions.CreateGrid();
         }
 
         public void SetUpCurrentDataHolder(LevelSectionsDataHolder dataHolder)

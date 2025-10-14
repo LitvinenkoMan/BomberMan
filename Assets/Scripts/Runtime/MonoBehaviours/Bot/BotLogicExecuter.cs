@@ -33,15 +33,17 @@ namespace Runtime.MonoBehaviours.Bot
 
         private void OnDrawGizmos()
         {
-            if (blacklist != null)
-            {
-                foreach (var b in blacklist)
-                {
-                    Gizmos.color = Color.black;
-                    Gizmos.DrawSphere(new Vector3(b.x, 0, b.y) + new Vector3(0, 1f, 0), 0.3f);
-                }
-            }
-            //if (queue == null) return;  
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawSphere(GetComponent<NavMeshAgent>().destination, 0.3f);
+            //if (blacklist != null)
+            //{
+            //    foreach (var b in blacklist)
+            //    {
+            //        Gizmos.color = Color.black;
+            //        Gizmos.DrawSphere(new Vector3(b.x, 0, b.y) + new Vector3(0, 1f, 0), 0.3f);
+            //    }
+            //}
+            //if (queue == null) return;
             //foreach (var b in queue)
             //{
             //    Gizmos.color = Color.red;
@@ -60,8 +62,16 @@ namespace Runtime.MonoBehaviours.Bot
             _character = GetComponent<BotCharacter>();
             _characterData = _character.CharacterData;
 
+            List<Canvas> canvas = new List<Canvas>();
+            for (int i = 0; i < 100; i++)
+            {
+                var newCanvas = Instantiate(canvasObj);
+                newCanvas.gameObject.SetActive(false);
+                canvas.Add(newCanvas);
+            }
+
             BotBehaviorProvider botBehaviorProvider = new BotBehaviorProvider();
-            botBehaviorProvider.InitializeBehaviors(GetComponent<NavMeshAgent>(), null);
+            botBehaviorProvider.InitializeBehaviors(GetComponent<NavMeshAgent>(), canvas);
 
             _botNavigation = botBehaviorProvider.GetBotNavigationForType(_botType);
             _targetOpponentFinder = botBehaviorProvider.GetTargetSelectorForType(_botType);
@@ -74,14 +84,6 @@ namespace Runtime.MonoBehaviours.Bot
             _targetOpponentFinder.SetOpponentsList(Spawner.Instance.OpponentsList);
 
             SwitchState(_states["Agro"]);
-
-            //List<Canvas> canvas = new List<Canvas>();
-            //for (int i = 0; i < 100; i++)
-            //{
-            //    var newCanvas = Instantiate(canvasObj);
-            //    newCanvas.gameObject.SetActive(false);
-            //    canvas.Add(newCanvas);
-            //}
         }
         public void SwitchState(IState newState)
         {

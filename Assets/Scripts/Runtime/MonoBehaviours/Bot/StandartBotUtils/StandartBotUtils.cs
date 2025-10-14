@@ -6,17 +6,18 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
 {
     public class StandartBotNavigation : BaseBotNavigation
     {
-        private readonly List<GroundSection> _sections;
-        private readonly GroundSection[,] _sectionsPositions;
+        
         private GroundSection _currentSection;
         private Queue<GroundSection> _path;
         private List<Canvas> canvas;
-
+        private HashSet<GroundSection> _dangerSection = new HashSet<GroundSection>();
+        
         public override Queue<GroundSection> GetPath()
         {
             return _path;
@@ -25,27 +26,44 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
         public StandartBotNavigation(NavMeshAgent agent, List<Canvas> canvas)
         {
             _agent = agent;
-            _sections = GroundSectionsUtils.Instance.GetCurrentSectionDataHolder().sections;
-            _sectionsPositions = new GroundSection[16, 16];
-            CreateGrid();
+            
             this.canvas = canvas;
         }
         public override void CheckPathToTarget(Transform targetOpponent)
         {
-            GridAPathFind(targetOpponent);
-            GroundSection targetSection = null;
-            foreach (var sectionFormPath in _path)
+            AStarPathFind(targetOpponent);
+            var x = _agent.transform.position.x;
+            var y = _agent.transform.position.y;
+
+            GroundSection targetSection = BombPositions.SectionsPositions[Mathf.RoundToInt(x), Mathf.RoundToInt(y)];
+            foreach (var sectionFromPath in _path)
             {
-                if (sectionFormPath.PlacedObstacle != null)
+                if (_dangerSection.Contains(sectionFromPath))
                 {
-                    targetSection = sectionFormPath;
-                    break;
+                    SetTarget(targetSection.transform.position);
+                    StayInTarget = 1f;
                 }
-                targetSection = sectionFormPath;
-            }
-            SetTarget(targetSection.transform.position);
+                else if (sectionFromPath.PlacedObstacle != null)
+                {
+                    if (BombPositions.OnExplosionSections.ContainsKey(sectionFromPath))
+                    {
+                        SetTarget(targetSection.transform.position);
+                        StayInTarget = BombPositions.OnExplosionSections[sectionFromPath] + 0.5f;
+                        break;
+                    }
+                    else
+                    {
+                        SetTarget(targetSection.transform.position);
+                        _dangerSection.Clear();
+                        break;
+                    }                        
+                }                
+                targetSection = sectionFromPath;
+                SetTarget(targetSection.transform.position);
+                _dangerSection.Clear();
+            }            
         }
-        private void GridAPathFind(Transform target)
+        private void AStarPathFind(Transform target)
         {
             int x = Mathf.FloorToInt(_agent.transform.position.x + 0.5f);
             int z = Mathf.FloorToInt(_agent.transform.position.z + 0.5f);
@@ -53,8 +71,8 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
             int targetX = Mathf.FloorToInt(target.position.x + 0.5f);
             int targetZ = Mathf.FloorToInt(target.position.z + 0.5f);
 
-            _currentSection = _sectionsPositions[x, z];
-            GroundSection _goalSection = _sectionsPositions[targetX, targetZ];
+            _currentSection = BombPositions.SectionsPositions[x, z];
+            GroundSection _goalSection = BombPositions.SectionsPositions[targetX, targetZ];
 
             _path = new Queue<GroundSection>();
             _path = CalculatePath(_currentSection, _goalSection);
@@ -74,12 +92,12 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
                 queue.Enqueue(startSection);
                 return queue;
             }
-
             var path = new Queue<GroundSection>(); // path calculated by the algorithm
             var closeList = new HashSet<GroundSection>(); // closed list, sections that have had all neighbors checked
             var openList = new Dictionary<GroundSection, float>(); // open list, sections waiting for neighbor checking
             var parents = new Dictionary<GroundSection, GroundSection>(); // dictionary with section (key) and its parent (value). Needed to backtrack the path
             var sectionCost = new Dictionary<GroundSection, int>(); // section costs, total path cost to reach each section
+            
 
             float distance = (startSection.transform.position - goalSection.transform.position).magnitude;
 
@@ -91,7 +109,7 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
             while (openList.Count > 0)
             {
                 List<GroundSection> neighbours = new List<GroundSection>(); // neighbors of current section being checked
-
+                
                 // TODO: instead of checking, we could add a list of connected sections to the section itself
                 if (currentSection.ConnectedSections.rightSection != null) neighbours.Add(currentSection.ConnectedSections.rightSection);
                 if (currentSection.ConnectedSections.leftSection != null) neighbours.Add(currentSection.ConnectedSections.leftSection);
@@ -119,13 +137,25 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
                     //-----------------------CALCULATE tentetiveG-----------------------------
                     int tentetiveG = sectionCost[currentSection] + neighbor.cost;
 
+                    if (BombPositions.OnExplosion(neighbor))
+                    {
+                        var explodeTime = BombPositions.OnExplosionSections[neighbor];
+                        var convertedTime = Mathf.InverseLerp(0, 3, explodeTime);
+                        //Debug.Log($"ExplodeTime: {explodeTime} | G: {Mathf.FloorToInt(13 * a)}");
+                        //Debug.Log(neighbor.gameObject.name + " | " + tentetiveG + " " + Mathf.RoundToInt((13 * a) + 0.5f));
+                        var convertedToG = Mathf.FloorToInt(13 * convertedTime);
+                        if (tentetiveG <= convertedToG + 1 && tentetiveG >= convertedToG - 1)
+                        {
+                            _dangerSection.Add(neighbor);
+                        }
+                    }
+
                     // if we encounter neighbor for the first time, add it to G list
                     if (!sectionCost.ContainsKey(neighbor))
                     {
-                        sectionCost.Add(neighbor, sectionCost[currentSection] + neighbor.cost);
+                        sectionCost.Add(neighbor, tentetiveG);
                         parents.Add(neighbor, currentSection);
                     }
-
                     // if we've already checked this neighbor and found a better cost, update with the better cost
                     if (sectionCost.ContainsKey(neighbor) && sectionCost[neighbor] > tentetiveG)
                     {
@@ -133,7 +163,6 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
                         parents[neighbor] = currentSection;
                     }
 
-                    //-----------------------------------------------------------------------
                     //-----------------------CALCULATE neighbourF------------------------------
 
                     float h = (neighbor.transform.position - goalSection.transform.position).magnitude;
@@ -151,25 +180,26 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
                     if (!openList.ContainsKey(neighbor)) openList.Add(neighbor, neighborF);
                 }
                 // after checking all neighbors, add processed section to closed list
-                if (canvas != null)
-                {
-                    foreach (Canvas currCanvas in canvas)
-                    {
-                        if (!currCanvas.gameObject.activeInHierarchy)
-                        {
-                            bool obst = false;
-                            if (currentSection.PlacedObstacle != null)
-                            {
-                                obst = true;
-                            }
-                            currCanvas.gameObject.SetActive(true);
-                            currCanvas.transform.position = currentSection.transform.position + new Vector3(0, 1.3f, 0);
-                            currCanvas.GetComponentInChildren<TextMeshProUGUI>().text = "Cost: " + sectionCost[currentSection].ToString() + "\n"
-                                + "Obstacle: " + obst.ToString();
-                            break;
-                        }
-                    }
-                }                
+                //if (canvas != null)
+                //{
+                //    foreach (Canvas currCanvas in canvas)
+                //    {
+                //        if (!currCanvas.gameObject.activeInHierarchy)
+                //        {
+                //            bool obst = false;
+                //            float cost = sectionCost[currentSection];
+                //            if (currentSection.PlacedObstacle != null)
+                //            {
+                //                obst = true;
+                //            }
+                //            currCanvas.gameObject.SetActive(true);
+                //            currCanvas.transform.position = currentSection.transform.position + new Vector3(0, 1.3f, 0);
+                //            currCanvas.GetComponentInChildren<TextMeshProUGUI>().text = "Cost: " + cost.ToString() + "\n"
+                //                + "Obstacle: " + obst.ToString();                            
+                //            break;
+                //        }
+                //    }
+                //}
                 closeList.Add(currentSection);
                 openList.Remove(currentSection);
 
@@ -186,6 +216,10 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
                 currentSection = nextSection;
                 neighbours.Clear();
             }
+            foreach(var a in _dangerSection)
+            {
+                Debug.Log(a);
+            }
             //----building a path--------
             currentSection = goalSection;
             while (currentSection != startSection)
@@ -194,21 +228,9 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
                 currentSection = parents[currentSection];
             }
             path.Enqueue(startSection);
+            Debug.Log("Закончен A");
             //-----End bulding path------
-
-            //Debug.Log("ЗАкончен A*");
-            
             return new Queue<GroundSection>(path.Reverse());
-        }
-        private void CreateGrid()
-        {
-            foreach(var section in _sections)
-            {
-                int x = Mathf.FloorToInt(section.transform.position.x);
-                int z = Mathf.FloorToInt(section.transform.position.z);
-
-                _sectionsPositions[x,z] = section;
-            }
         }
     }
     public class StandartTargetOpponentSelector : BaseTargetOpponentSelector

@@ -46,7 +46,7 @@ namespace Runtime.MonoBehaviours.Bot.SimpleBotUtils
                 timer = 0f;
             }
             manager.BotNavigation.CheckPathToTarget(manager.TargetOpponentFinder.GetCurrentOpponent());
-            if (distance <= 0.5f)
+            if (distance <= 0.8f)
             {
                 manager.SwitchState(manager.States["Deploy Bomb"]);
             }
