@@ -34,6 +34,7 @@ namespace Runtime.MonoBehaviours.Bot
             CollectRefs();
             _characterRuntimeData = new CharacterRuntimeData();
             _characterRuntimeData.Initialize(_characterData);
+            CharacterRuntimeData = _characterRuntimeData;
         }
         private void Start()
         {
@@ -45,7 +46,6 @@ namespace Runtime.MonoBehaviours.Bot
 
             _bombDto = new BombDto(_characterRuntimeData.BombsCountdown, _characterRuntimeData.BombsAtTime, _characterRuntimeData.BombsSpreading, _characterRuntimeData.BombsDamage);
 
-            CharacterRuntimeData = _characterRuntimeData;
 
             _botLogic.Initialize(this);
             OnBombDeployed += _botLogic.ShelterFinder.GenerateBlacklistPositions;

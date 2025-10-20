@@ -8,6 +8,13 @@ using UnityEngine.AI;
 
 namespace AbstractClasses 
 {
+    public static class MethodExtansion
+    {
+        public static Vector2Int ConvertToVector2Int(this Vector3 vector)
+        {
+            return new Vector2Int(Mathf.RoundToInt(vector.x), Mathf.RoundToInt(vector.z));
+        }
+    }
     public abstract class BaseShelterFinder
     {
         protected NavMeshAgent _agent;
@@ -24,7 +31,7 @@ namespace AbstractClasses
         public HashSet<Vector2Int> GeneratePossiblePositions(byte explosionRange, HashSet<Vector2Int> blacklist, Vector3 spawnedBombPos)
         {
             var possiblePositions = new HashSet<Vector2Int>();
-            Vector2Int bombPos = ConvertToVector2Int(spawnedBombPos);
+            Vector2Int bombPos = spawnedBombPos.ConvertToVector2Int();
 
             for (int x = -explosionRange - 1; x <= explosionRange + 1; x++)
             {
@@ -48,10 +55,6 @@ namespace AbstractClasses
                 return possiblePositions;
             }
         }
-        public static Vector2Int ConvertToVector2Int(Vector3 vector)
-        {
-            return new Vector2Int(Mathf.RoundToInt(vector.x), Mathf.RoundToInt(vector.z));
-        }
     }
     public abstract class BaseBotNavigation
     {
@@ -59,6 +62,10 @@ namespace AbstractClasses
         protected Vector3 _target;
         public float StayInTarget { get; protected set; }
         public Vector3 Target => _target;
+        public void ResetStayInTarget()
+        {
+            StayInTarget = 0;
+        }
         public void SetTarget(Vector3 target)
         {
             _target = target;

@@ -96,7 +96,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _characterData: {fileID: 11400000, guid: 445abc726b0cad241b2225285cbf8427, type: 2}
-  _concreteBombDeployer: {fileID: -7695382096048317198}
 --- !u!114 &1253752500629601659
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -238,7 +237,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1664731d37a7b04a88a43fa05953739, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _botType: 0
+  _botType: 1
+  canvasObj: {fileID: 6612604635948251204, guid: 515361616f061014ebd6875c645b652b,
+    type: 3}
 --- !u!1 &176990980487758069
 GameObject:
   m_ObjectHideFlags: 0

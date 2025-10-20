@@ -77,7 +77,7 @@ namespace Runtime.MonoBehaviours.Bot.SimpleBotUtils
         }
         public override void GenerateBlacklistPositions(BombDto bombDto)
         {
-            Vector2Int bombPos = ConvertToVector2Int(bombDto.BombPosition);
+            Vector2Int bombPos = bombDto.BombPosition.ConvertToVector2Int();
             _blackListPos.Clear();
             _blackListPos.Add(bombPos);
             for (int i = 1; i <= bombDto.BombsSpreading; i++)
@@ -103,7 +103,7 @@ namespace Runtime.MonoBehaviours.Bot.SimpleBotUtils
                 if (NavMesh.SamplePosition(new Vector3(point.x, 0, point.y), out NavMeshHit hit, 0.5f, NavMesh.AllAreas))
                 {
                     NavMeshPath path = new NavMeshPath();
-                    Vector2Int hitVector2Int = ConvertToVector2Int(hit.position);
+                    Vector2Int hitVector2Int = hit.position.ConvertToVector2Int();
                     _agent.CalculatePath(hit.position, path);
 
                     if (path.status == NavMeshPathStatus.PathComplete)

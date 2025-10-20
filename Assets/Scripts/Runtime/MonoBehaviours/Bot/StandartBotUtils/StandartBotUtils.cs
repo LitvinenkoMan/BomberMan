@@ -3,10 +3,8 @@ using Core.DataTransferObjects;
 using MonoBehaviours.GroundSectionSystem;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.UI;
 
 namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
 {
@@ -32,37 +30,50 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
         public override void CheckPathToTarget(Transform targetOpponent)
         {
             AStarPathFind(targetOpponent);
+
+            SelectTargetAccordingToPath();
+        }
+        private void SelectTargetAccordingToPath()
+        {
             var x = _agent.transform.position.x;
             var y = _agent.transform.position.y;
-
             GroundSection targetSection = BombPositions.SectionsPositions[Mathf.RoundToInt(x), Mathf.RoundToInt(y)];
+            List<GroundSection> checkedPath = new List<GroundSection>();
+
             foreach (var sectionFromPath in _path)
             {
                 if (_dangerSection.Contains(sectionFromPath))
                 {
+                    Debug.Log("Опасная зона");
                     SetTarget(targetSection.transform.position);
-                    StayInTarget = 1f;
+                    StayInTarget = 0.3f;
+                    return;
                 }
-                else if (sectionFromPath.PlacedObstacle != null)
+                
+                if (sectionFromPath.PlacedObstacle != null)
                 {
                     if (BombPositions.OnExplosionSections.ContainsKey(sectionFromPath))
                     {
-                        SetTarget(targetSection.transform.position);
-                        StayInTarget = BombPositions.OnExplosionSections[sectionFromPath] + 0.5f;
-                        break;
+                        for (int i = checkedPath.Count - 1; i > 0; i--)
+                        {
+                            if (!BombPositions.OnExplosionSections.ContainsKey(checkedPath[i]))
+                            {
+                                Debug.Log("Бомба на пути");
+                                SetTarget(checkedPath[i].transform.position);
+                                StayInTarget = BombPositions.OnExplosionSections[sectionFromPath] + 0.2f;
+                                return;
+                            }
+                        }
                     }
-                    else
-                    {
-                        SetTarget(targetSection.transform.position);
-                        _dangerSection.Clear();
-                        break;
-                    }                        
-                }                
+                    SetTarget(targetSection.transform.position);
+                    return;
+                }
+                checkedPath.Add(sectionFromPath);
                 targetSection = sectionFromPath;
-                SetTarget(targetSection.transform.position);
-                _dangerSection.Clear();
-            }            
+            }
+            SetTarget(targetSection.transform.position);            
         }
+
         private void AStarPathFind(Transform target)
         {
             int x = Mathf.FloorToInt(_agent.transform.position.x + 0.5f);
@@ -90,8 +101,9 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
             {
                 var queue = new Queue<GroundSection>();
                 queue.Enqueue(startSection);
-                return queue;
+                return queue;   
             }
+            _dangerSection.Clear();
             var path = new Queue<GroundSection>(); // path calculated by the algorithm
             var closeList = new HashSet<GroundSection>(); // closed list, sections that have had all neighbors checked
             var openList = new Dictionary<GroundSection, float>(); // open list, sections waiting for neighbor checking
@@ -135,16 +147,20 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
                     if (neighbor == null || closeList.Contains(neighbor)) continue;
 
                     //-----------------------CALCULATE tentetiveG-----------------------------
-                    int tentetiveG = sectionCost[currentSection] + neighbor.cost;
+                    int tentetiveG; 
+                    //if (BombPositions.OnExplosionSections.ContainsKey(neighbor))
+                    //{
+                    //    tentetiveG = sectionCost[currentSection] + 1;
+                    //}
+                    //else tentetiveG = sectionCost[currentSection] + neighbor.cost;
+                    tentetiveG = sectionCost[currentSection] + neighbor.cost;
 
                     if (BombPositions.OnExplosion(neighbor))
                     {
                         var explodeTime = BombPositions.OnExplosionSections[neighbor];
                         var convertedTime = Mathf.InverseLerp(0, 3, explodeTime);
-                        //Debug.Log($"ExplodeTime: {explodeTime} | G: {Mathf.FloorToInt(13 * a)}");
-                        //Debug.Log(neighbor.gameObject.name + " | " + tentetiveG + " " + Mathf.RoundToInt((13 * a) + 0.5f));
-                        var convertedToG = Mathf.FloorToInt(13 * convertedTime);
-                        if (tentetiveG <= convertedToG + 1 && tentetiveG >= convertedToG - 1)
+                        var convertedToG = Mathf.FloorToInt(13 * convertedTime);                        
+                        if (tentetiveG <= convertedToG + 1 && tentetiveG >= convertedToG - 2)
                         {
                             _dangerSection.Add(neighbor);
                         }
@@ -175,7 +191,7 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
                         openList[neighbor] = neighborF;
                         continue; // break to avoid adding neighbor to open list again
                     }
-                    //-----------------------------------------------------------------------
+
                     // if neighbor hasn't been checked before, add it to open list
                     if (!openList.ContainsKey(neighbor)) openList.Add(neighbor, neighborF);
                 }
@@ -195,7 +211,7 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
                 //            currCanvas.gameObject.SetActive(true);
                 //            currCanvas.transform.position = currentSection.transform.position + new Vector3(0, 1.3f, 0);
                 //            currCanvas.GetComponentInChildren<TextMeshProUGUI>().text = "Cost: " + cost.ToString() + "\n"
-                //                + "Obstacle: " + obst.ToString();                            
+                //                + "Obstacle: " + obst.ToString();
                 //            break;
                 //        }
                 //    }
@@ -218,7 +234,7 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
             }
             foreach(var a in _dangerSection)
             {
-                Debug.Log(a);
+                //Debug.Log(a);
             }
             //----building a path--------
             currentSection = goalSection;
@@ -228,7 +244,7 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
                 currentSection = parents[currentSection];
             }
             path.Enqueue(startSection);
-            Debug.Log("Закончен A");
+            //Debug.Log("Закончен A");
             //-----End bulding path------
             return new Queue<GroundSection>(path.Reverse());
         }
@@ -292,7 +308,7 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
                 if (NavMesh.SamplePosition(new Vector3(point.x, 0, point.y), out NavMeshHit hit, 0.5f, NavMesh.AllAreas))
                 {
                     NavMeshPath path = new NavMeshPath();
-                    Vector2Int hitVector2Int = ConvertToVector2Int(hit.position);
+                    Vector2Int hitVector2Int = hit.position.ConvertToVector2Int();
                     _agent.CalculatePath(hit.position, path);
 
                     if (path.status == NavMeshPathStatus.PathComplete && !PointInBlackList(blacklist, point)) availablePositions.Add(hitVector2Int);
@@ -334,5 +350,27 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
             }
         }
     }
+
+    public class PowerUpEvaluator 
+    {
+        public readonly static HashSet<PowerUpNotNet> SpawnedPowerUps = new HashSet<PowerUpNotNet>();
+
+        public static void AddPowerUp(PowerUpNotNet powerUp)
+        {
+            if (SpawnedPowerUps.Contains(powerUp)) return;
+            SpawnedPowerUps.Add(powerUp);
+        }
+        public static void RemovePowerUp(PowerUpNotNet powerUp)
+        {
+            if (!SpawnedPowerUps.Contains(powerUp)) return;
+            SpawnedPowerUps.Remove(powerUp);
+        }
+        public static HashSet<PowerUpNotNet> GetSpawnedPowerUps()
+        {
+            return SpawnedPowerUps;
+        }
+
+    }
+
 }
 

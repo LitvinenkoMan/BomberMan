@@ -1,6 +1,7 @@
+using Interfaces;
+using System;
 using System.Collections;
 using UnityEngine;
-using Interfaces;
 using UnityEngine.AI;
 
 namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
@@ -8,7 +9,6 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
     public class StandartAgro : IState
     {
         private Coroutine _pathFindCoroutine;
-        private Coroutine _stayInTargetCoroutine;
         public void Enter(BotLogicExecuter manager)
         {
             manager.Character.CharacterAnimator.PlayWalkAnimation();
@@ -27,17 +27,26 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
 
         public void Update(BotLogicExecuter manager)
         {
-            if (_stayInTargetCoroutine != null) return;
+            manager.TargetOpponentFinder.SelectTargetOpponent();
+            for (int i = 0; i <= 50;  i++)
+            {
+                manager.BotNavigation.CheckPathToTarget(manager.TargetOpponentFinder.GetCurrentOpponent());
+            }
+            
             if (_pathFindCoroutine == null)
             {
-                _pathFindCoroutine = manager.StartCoroutine(PathFind(manager));
+                //_pathFindCoroutine = manager.StartCoroutine(PathFind(manager));
             }
             float distance = manager.BotNavigation.CheckDistance(manager.TargetOpponentFinder.GetCurrentOpponent());
-
-
-            if (distance <= 0.6f)
+                        
+            if (distance <= 0.2f)
             {
-                _stayInTargetCoroutine = manager.StartCoroutine(StayInTarget(manager.BotNavigation.StayInTarget));
+                if (manager.BotNavigation.StayInTarget != 0)
+                {
+                    manager.SwitchState(manager.States["Stay In Place"]);
+                    return;
+                }
+                
                 manager.SwitchState(manager.States["Deploy Bomb"]);
             }
         }
@@ -51,12 +60,36 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
             manager.StopCoroutine(_pathFindCoroutine);
             _pathFindCoroutine = null;           
         }
-        private IEnumerator StayInTarget(float waitingTime)
+    }
+    public class StayInPlace : IState
+    {
+        float stateTime = 0f;
+        public void Enter(BotLogicExecuter manager)
         {
-            yield return new WaitForSeconds(waitingTime);
-            _stayInTargetCoroutine = null;
+            manager.Character.CharacterAnimator.PlayIdleAnimation();
+            stateTime = manager.BotNavigation.StayInTarget;
+        }
+
+        public void Exit(BotLogicExecuter manager)
+        {
+            manager.Character.CharacterAnimator.PlayWalkAnimation();
+        }
+
+        public void Update(BotLogicExecuter manager)
+        {
+            if (stateTime > 0f)
+            {
+                stateTime -= Time.deltaTime;
+                return;
+            }
+            else
+            {
+                manager.SwitchState(manager.States["Agro"]);
+                manager.BotNavigation.ResetStayInTarget();
+            }
         }
     }
+
 
     public class StandartDeployBomb : IState
     {
@@ -92,4 +125,19 @@ namespace Runtime.MonoBehaviours.Bot.StandartBotUtils
             }
         }
     }
+    public class TakePowerUp : IState 
+    {
+        public void Enter(BotLogicExecuter manager)
+        {
+        }
+
+        public void Exit(BotLogicExecuter manager)
+        {
+        }
+
+        public void Update(BotLogicExecuter manager)
+        {
+        }
+    }
+
 }

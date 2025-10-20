@@ -44,9 +44,7 @@ namespace Runtime.MonoBehaviours.Bot
         private static IEnumerator GeneratePositions(BombDto bombDto, float lifeTime)
         {
             float bombTimer = lifeTime;
-            Vector2Int bombPos = BaseShelterFinder.ConvertToVector2Int(bombDto.BombPosition);
-            
-
+            Vector2Int bombPos = bombDto.BombPosition.ConvertToVector2Int();        
 
             var onExplosionSections = new Dictionary<GroundSection, float>() { { SectionsPositions[bombPos.x, bombPos.y], bombTimer } };
             var bombs = new HashSet<Vector2Int>() { bombPos };

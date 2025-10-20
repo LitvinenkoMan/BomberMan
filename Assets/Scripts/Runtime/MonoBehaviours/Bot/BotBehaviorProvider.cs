@@ -32,7 +32,8 @@ namespace Runtime.MonoBehaviours.Bot
                     new Dictionary<string, IState>()
                     {
                         { "Agro", new StandartAgro() },
-                        { "Deploy Bomb", new StandartDeployBomb() }
+                        { "Deploy Bomb", new StandartDeployBomb() },
+                        { "Stay In Place", new StayInPlace() }
                     }
                 }
             };

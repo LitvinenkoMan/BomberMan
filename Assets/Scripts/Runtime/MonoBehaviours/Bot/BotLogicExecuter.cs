@@ -1,7 +1,9 @@
 ﻿using AbstractClasses;
 using Interfaces;
 using MonoBehaviours.GroundSectionSystem;
+using Runtime.MonoBehaviours.Bot.StandartBotUtils;
 using Runtime.MonoBehaviours.Player;
+using Runtime.NetworkBehaviours.PowerUps;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -29,7 +31,7 @@ namespace Runtime.MonoBehaviours.Bot
 
         /*------------Debugging--------------*/
         private HashSet<Vector2Int> blacklist;
-        private Queue<GroundSection> queue;
+        private Queue<GroundSection> path;
 
         private void OnDrawGizmos()
         {
@@ -43,12 +45,12 @@ namespace Runtime.MonoBehaviours.Bot
             //        Gizmos.DrawSphere(new Vector3(b.x, 0, b.y) + new Vector3(0, 1f, 0), 0.3f);
             //    }
             //}
-            //if (queue == null) return;
-            //foreach (var b in queue)
-            //{
-            //    Gizmos.color = Color.red;
-            //    Gizmos.DrawSphere(b.transform.position + new Vector3(0, 0.5f, 0), 0.3f);
-            //}
+            if (path == null) return;
+            foreach (var b in path)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawSphere(b.transform.position + new Vector3(0, 0.5f, 0), 0.3f);
+            }
         }
         public void UnsubscribeFromEvent()
         {
@@ -63,12 +65,12 @@ namespace Runtime.MonoBehaviours.Bot
             _characterData = _character.CharacterData;
 
             List<Canvas> canvas = new List<Canvas>();
-            for (int i = 0; i < 100; i++)
-            {
-                var newCanvas = Instantiate(canvasObj);
-                newCanvas.gameObject.SetActive(false);
-                canvas.Add(newCanvas);
-            }
+            //for (int i = 0; i < 100; i++)
+            //{
+            //    var newCanvas = Instantiate(canvasObj);
+            //    newCanvas.gameObject.SetActive(false);
+            //    canvas.Add(newCanvas);
+            //}
 
             BotBehaviorProvider botBehaviorProvider = new BotBehaviorProvider();
             botBehaviorProvider.InitializeBehaviors(GetComponent<NavMeshAgent>(), canvas);
@@ -96,8 +98,8 @@ namespace Runtime.MonoBehaviours.Bot
         }
         private void Update()
         {
-            queue = _botNavigation.GetPath();  
-            blacklist = BombPositions.GetAllBombPositions();
+            //path = _botNavigation.GetPath();  
+            //blacklist = BombPositions.GetAllBombPositions();
             _currentState.Update(this);
         }
     }
